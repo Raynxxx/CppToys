@@ -23,10 +23,8 @@ namespace rayn {
 		ptr->~T();
 	}
 
-	/*
-	** destroy() 第二个版本, 接受两个迭代器，此函数设法找出元素的数值类别
-	** 进而利用 _type_traits<T> 求取最适当措施
-	*/
+	//destroy() 第二个版本, 接受两个迭代器，此函数设法找出元素的数值类别
+	//进而利用 _type_traits<T> 求取最适当措施
 	template<class ForwardIterator>
 	inline void destroy(ForwardIterator first, ForwardIterator last) {
 		typedef typename _type_traits<T>::is_POD_type is_POD_type;
