@@ -12,14 +12,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Alloc.h" />
+    <ClInclude Include="Allocator.h" />
     <ClInclude Include="Construct.h" />
     <ClInclude Include="Iterator.h" />
+    <ClInclude Include="ReverseIterator.h" />
     <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="Uninitialized.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp" />
-    <ClCompile Include="AllocatorTest.cpp" />
+    <ClCompile Include="组件测试\AllocatorTest.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{68A28B10-9685-480F-B1F3-A527A7AD12DF}</ProjectGuid>

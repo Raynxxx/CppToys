@@ -11,7 +11,6 @@
 namespace rayn {
 	template<class InputIterator, class ForwardIterator>
 	ForwardIterator _uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result) {
-
 	}
 }
 

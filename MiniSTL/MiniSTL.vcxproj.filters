@@ -33,12 +33,21 @@
     <ClInclude Include="Uninitialized.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Allocator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ReverseIterator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="AllocatorTest.cpp">
+    <ClCompile Include="组件测试\AllocatorTest.cpp">
       <Filter>测试</Filter>
     </ClCompile>
   </ItemGroup>
