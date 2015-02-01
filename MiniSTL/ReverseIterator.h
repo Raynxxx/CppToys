@@ -4,9 +4,9 @@
 #include "Iterator.h"
 
 namespace rayn {
-	template<class Iterator>
-	class reverse_iterator {
+    template<class Iterator>
+    class reverse_iterator {
 
-	};
+    };
 }
 #endif
