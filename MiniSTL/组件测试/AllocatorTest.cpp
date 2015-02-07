@@ -11,6 +11,7 @@ using namespace std;
 int main() {
     vector<int, rayn::allocator<int>> vec;
     vector<int>::reverse_iterator it;
+    vec.data()
 	for (int i = 6; i < 10; ++i) {
 		vec.push_back(i);
 	}

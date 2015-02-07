@@ -41,6 +41,21 @@ namespace rayn {
             alloc::deallocate(static_cast<void *>(ptr), sizeof(T) * n);
         }
 
+        static void construct(T *ptr) {
+            new(ptr) T();
+        }
+
+        static void construct(T *ptr, const T& value) {
+            new(ptr)T(value);
+        }
+        static void destroy(T *ptr){
+            ptr->~T();
+        }
+        static void destroy(T *first, T *last) {
+            for (; first != last; ++first){
+                first->~T();
+            }
+        }
     };
 
 }
