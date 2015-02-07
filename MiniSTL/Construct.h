@@ -28,7 +28,7 @@ namespace rayn {
     template<class ForwardIterator>
     inline void destroy(ForwardIterator first, ForwardIterator last) {
         typedef typename _type_traits<T>::is_POD_type is_POD_type;
-        _destroy(first, last, is_POD_type);
+        _destroy(first, last, is_POD_type());
     }
 
     template<class ForwardIterator>

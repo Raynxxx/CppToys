@@ -9,8 +9,8 @@
 using namespace std;
 
 int main() {
-	vector<int, rayn::allocator<int>> vec{1, 2, 3, 4, 5};
-
+    vector<int, rayn::allocator<int>> vec;
+    vector<int>::reverse_iterator it;
 	for (int i = 6; i < 10; ++i) {
 		vec.push_back(i);
 	}

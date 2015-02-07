@@ -122,6 +122,33 @@ namespace rayn {
         return static_cast<typename iterator_traits<Iterator>::difference_type*>(0);
     }
     
+    
+    template <class InputIterator, class Distance>
+    inline void _advance(InputIterator& it, Distance n, input_iterator_tag) {
+        while (n--) ++it;
+    }
+    template <class BidirectionalIterator, class Distance>
+    inline void _advance(BidirectionalIterator& it, Distance n, bidirectional_iterator_tag) {
+        if (n >= 0) {
+            while (n--) ++it;
+        } else {
+            while (n++) --it;
+        }
+    }
+    template <class RandomAccessIterator, class Distance>
+    inline void _advance(RandomAccessIterator& it, Distance n, random_access_iterator_tag) {
+        it += n;
+    }
+    /*
+    ** @brief Increase n step at the iterator
+    ** @param it The increased iterator
+    ** @param n The distance that the iterator will be increased.
+    ** @return Nothing.
+    */
+    template <class InputIterator, class Distance>
+    inline void advance(InputIterator& it, Distance n) {
+        _advance(it, n, iterator_category(it));
+    }
 }
 
 #endif
