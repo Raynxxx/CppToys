@@ -9,7 +9,7 @@
 |组件|进度|
 |---|---|
 |空间配置器|100%|
-|uninitialized|10%|
+|uninitialized|100%|
 |type traits|100%|
 |iterator|100%|
 |reverse_iterator|100%|
@@ -17,11 +17,11 @@
 |pair|--|
 
 |顺序容器|进度|
-|---:|---|
+|---|---|
 |vector|20%|
 
 |关联容器|进度|
-|---:|---|
+|---|---|
 
 |STL Algorithms|进度|
-|---:|---|
+|---|---|
