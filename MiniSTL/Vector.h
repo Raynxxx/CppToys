@@ -13,19 +13,19 @@ namespace rayn {
     template <class T, class Alloc = allocator<T>>
     class vector {
     public:
-        typedef T                           value_type;
-        typedef T*                          iterator;
-        typedef const T*                    const_iterator;
-        typedef reverse_iterator<T*>        reverse_iterator;
-        typedef reverse_iterator<const T*>  const_reverse_iterator;
-        typedef T*                          pointer;
-        typedef const T*                    const_pointer;
-        typedef T&                          reference;
-        typedef const T&                    const_reference;
-        typedef size_t                      size_type;
-        typedef ptrdiff_t                   difference_type;
+        typedef T                               value_type;
+        typedef T*                              iterator;
+        typedef const T*                        const_iterator;
+        typedef reverse_iterator_t<T*>          reverse_iterator;
+        typedef reverse_iterator_t<const T*>    const_reverse_iterator;
+        typedef T*                              pointer;
+        typedef const T*                        const_pointer;
+        typedef T&                              reference;
+        typedef const T&                        const_reference;
+        typedef size_t                          size_type;
+        typedef ptrdiff_t                       difference_type;
 
-    protected:
+    private:
         typedef Alloc data_allocator;
 
         T *_start;
@@ -33,21 +33,72 @@ namespace rayn {
         T *_endOfStorage;
 
     public:
-        // The constructor
+        // The Default constructor
         vector() : _start(0), _finish(0), _endOfStorage(0) {}
-        explicit vector(const size_type n);
-        vector(const size_type n, const value_type& value);
+
+        //explicit construct a vector, size n.
+        explicit vector(const size_type n) {
+            allocateAndFillN(n, value_type());
+        }
+        vector(const size_type n, const value_type& value) {
+            allocateAndFillN(n, value);
+        }
+        //construct vector from [first, last)
         template <class InputIterator>
-        vector(InputIterator first, InputIterator last);
-        vector(const vector& v);
-        vector(vector&& v);
-        vector& operator = (const vector& v);
-        vector& operator = (vector&& v);
-        ~vector() { }
+        vector(InputIterator first, InputIterator last) {
+            //判断是迭代器还是数字, 重载vector_aux
+            vector_aux(first, last, typename std::is_integral<InputIterator>::type());
+        }
+        //The Copy Constructor
+        vector(const vector& v) {
+            allocateAndCopy(v.begin(), v.end());
+        }
+        //The Move Constructor
+        vector(vector&& v) {
+            _start = v._start;
+            _finish = v._finish;
+            _endOfStorage = v._endOfStorage;
+            v._start = v._finish = v._endOfStorage = 0;
+        }
+        //Vector Assignment operator
+        vector& operator = (const vector& v) {
+            if (this != &v) {
+                allocateAndCopy(v.begin(), v.end());
+            }
+            return *this;
+        }
+        //Vector Move Assignment operator
+        vector& operator = (vector&& v) {
+            if (this != &v) {
+                _start = v._start;
+                _finish = v._finish;
+                _endOfStorage = v._endOfStorage;
+                v._start = v._finish = v._endOfStorage = 0;
+            }
+            return *this;
+        }
+        ~vector() {
+            destoryAndDeallocateAll();
+        }
 
         //The compare function
-        bool operator == (const vector& v) const;
-        bool operator != (const vector& v) const;
+        bool operator == (const vector& v) const {
+            if (size() != v.size()) {
+                return false;
+            } else {
+                auto it1 = begin();
+                auto it2 = v.begin();
+                for (; it1 != end() && it2 != v.end(); ++it1, ++it2) {
+                    if (*it1 != *it2) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        bool operator != (const vector& v) const {
+            return !(*this == v);
+        }
 
         //The functions about iterator.
         iterator begin() { return _start; }
@@ -65,8 +116,27 @@ namespace rayn {
         difference_type size() const { return _finish - _start; }
         difference_type capacity() const { return _endOfStorage - _start; }
         bool empty() const { return _start == _finish; }
-        void resize(size_type n, value_type val = value_type());
-        void reserve(size_type n);
+        /*
+        ** @brief Resize the vector to the specified number of elements.
+        ** 调整容器大小，使其能够容纳 count 个元素。
+        ** 如果当前大小小于 count，则会追加额外的元素，并将它们初始化为 value。
+        ** 如果当前大小大于 count，则容器会缩小到仅包含前 count 个元素。
+        */
+        void resize(size_type n, value_type val = value_type()) {
+            if (n < size()) {
+                data_allocator::destory(_start + n, _finish);
+                _finish = _start + n;
+            } else if (size() < n && n <= capacity()) {
+                auto lengthOfAdd = n - size();
+                _finish = rayn::uninitialized_fill_n(_start, lengthOfAdd, val);
+            } else if (capacity() < n) {
+                auto lengthOfAdd = n - size();
+                T *newStart = data_allocator::allocate(getNewCapacity(lengthOfAdd));
+            }
+        }
+        void reserve(size_type n) {
+
+        }
         void shrink_to_fit() {
             data_allocator::deallocate(_finish, _endOfStorage - _finish);
             _endOfStorage = _finish;
@@ -91,7 +161,7 @@ namespace rayn {
             _finish = _start;
         }
         /*
-        ** @brief swap 2 vector.
+        ** @brief swap data with vector @c v.
         */
         void swap(vector& v) {
             //TODO after implementing the <Algorithm.h>
@@ -105,6 +175,52 @@ namespace rayn {
         iterator erase(iterator position);
         iterator erase(iterator first, iterator last);
 
+        Alloc get_allocator() {
+            return data_allocator;
+        }
+
+    private:
+        /*
+        ** @brief Destory exist object, deallocate all memory.
+        */
+        void destoryAndDeallocateAll() {
+            if (capacity() != 0) {
+                data_allocator::destory(_start, _finish);
+                data_allocator::deallocate(_start, capacity());
+            }
+        }
+        /*
+        ** @brief allocate memory that is fit for n object.
+        ** @param n The number of object.
+        ** @param value The value will be fill into vector.
+        */
+        void allocateAndFillN(const size_type n, const value_type& value) {
+            _start = data_allocator::allocate(n);
+            rayn::uninitialized_fill_n(_start, n, value);
+            _finish = _endOfStorage = _start + n;
+        }
+        /*
+        ** @brief Copy the Data in [first, last) into the allocated memory.
+        */
+        template <class InputIterator>
+        void allocateAndCopy(InputIterator first, InputIterator last) {
+            _start = data_allocator::allocate(last - first);
+            _finish = rayn::uninitialized_copy(first, last, _start);
+            _endOfStorage = _finish;
+        }
+
+        template <class InputIterator>
+        void vector_aux(InputIterator first, InputIterator last, std::false_type) {
+            allocateAndCopy(first, last);
+        }
+        template <class Integer>
+        void vector_aux(Integer n, const value_type& value, std::true_type) {
+            allocateAndFillN(n, value);
+        }
+        size_type getNewCapacity(size_type len) {
+            size_type oldCapacity = capacity();
+            //TODO after <Algorithm.h>
+        }
     };
 }
 

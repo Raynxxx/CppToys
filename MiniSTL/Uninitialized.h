@@ -40,7 +40,6 @@ namespace rayn {
     */
     template<class InputIterator, class ForwardIterator>
     ForwardIterator uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result) {
-        typedef typename _type_traits<iterator_traits<result>::value_type>::is_POD_type is_POD_type;
         return _uninitialized_copy(first, last, result, value_type(result));
     }
 
