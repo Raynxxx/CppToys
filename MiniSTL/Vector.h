@@ -70,6 +70,8 @@ namespace rayn {
         //Vector Move Assignment operator
         vector& operator = (vector&& v) {
             if (this != &v) {
+                //first to destory cur vector
+                destoryAndDeallocateAll();
                 _start = v._start;
                 _finish = v._finish;
                 _endOfStorage = v._endOfStorage;
@@ -116,6 +118,7 @@ namespace rayn {
         difference_type size() const { return _finish - _start; }
         difference_type capacity() const { return _endOfStorage - _start; }
         bool empty() const { return _start == _finish; }
+
         /*
         ** @brief Resize the vector to the specified number of elements.
         ** 调整容器大小，使其能够容纳 count 个元素。
@@ -132,18 +135,49 @@ namespace rayn {
             } else if (capacity() < n) {
                 auto lengthOfAdd = n - size();
                 T *newStart = data_allocator::allocate(getNewCapacity(lengthOfAdd));
+                T* newFinish = rayn::uninitialized_copy(begin(), end(), newStart);
+                newFinish = rayn::uninitialized_fill_n(newFinish, lengthOfAdd, val);
+                //first to destory cur vector
+                destoryAndDeallocateAll();
+                _start = newStart;
+                _finish = newFinish;
+                _endOfStorage = _start + n;
             }
         }
-        void reserve(size_type n) {
 
+        /*
+        ** @brief Attempt to preallocate enough memory for @c n elements.
+        ** @param n Number of elements required.
+        */
+        void reserve(size_type n) {
+            if (n <= capacity()) return;
+            T *newStart = data_allocator::allocate(n);
+            T *newFinish = rayn::uninitialized_copy(begin(), end(), newStart);
+            //first to destory cur vector
+            destoryAndDeallocateAll();
+            _start = newStart;
+            _finish = newFinish;
+            _endOfStorage = _start + n;
         }
         void shrink_to_fit() {
             data_allocator::deallocate(_finish, _endOfStorage - _finish);
             _endOfStorage = _finish;
         }
 
-        // Access function
-        value_type& operator[](const difference_type index) { return *(begin() + i); }
+        // Elements Access function
+        /*
+        ** @brief Access to the data contained in the %vector at the @c index
+        ** @param index The index of the element to access.
+        ** @return  A Read & Write(Non-const) reference to data.
+        ** This operator allows for easy, array-style, data access.
+        */
+        reference operator[](size_type index) {
+            return *(begin() + index);
+        }
+        const_reference operator[](size_type index) const {
+            return *(begin() + index);
+        }
+
         value_type& front() { return *(begin()); }
         value_type& back() { return *(end() - 1); }
 
