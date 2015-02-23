@@ -50,5 +50,8 @@
     <ClCompile Include="Alloc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="STLTest.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

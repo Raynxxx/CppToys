@@ -48,10 +48,10 @@ namespace rayn {
         static void construct(T *ptr, const T& value) {
             new(ptr)T(value);
         }
-        static void destory(T *ptr) {
+        static void destroy(T *ptr) {
             ptr->~T();
         }
-        static void destory(T *first, T *last) {
+        static void destroy(T *first, T *last) {
             for (; first != last; ++first) {
                 first->~T();
             }

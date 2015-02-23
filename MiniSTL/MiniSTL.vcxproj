@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp" />
+    <ClCompile Include="STLTest.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{68A28B10-9685-480F-B1F3-A527A7AD12DF}</ProjectGuid>

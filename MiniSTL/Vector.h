@@ -177,11 +177,16 @@ namespace rayn {
         const_reference operator[](size_type index) const {
             return *(begin() + index);
         }
+        /*
+        ** Returns a read/write reference to the data at the first element of vector
+        */
+        reference front() { return *(begin()); }
+        /*
+        ** Returns a read/write reference to the data at the last element of vector
+        */
+        reference back() { return *(end() - 1); }
 
-        value_type& front() { return *(begin()); }
-        value_type& back() { return *(end() - 1); }
-
-        // return address of first element
+        // return address of member
         pointer data() { return this->_start; }
         const_pointer data() const { return this->_start; }
 
@@ -198,21 +203,68 @@ namespace rayn {
         ** @brief swap data with vector @c v.
         */
         void swap(vector& v) {
+            if (this != &v)
             //TODO after implementing the <Algorithm.h>
         }
-        void push_back(const value_type& value);
-        void pop_back();
-        iterator insert(iterator position, const value_type& val);
-        void insert(iterator position, const size_type&n, const value_type& val);
-        template <class InputIterator>
-        void insert(iterator position, InputIterator first, InputIterator last);
-        iterator erase(iterator position);
-        iterator erase(iterator first, iterator last);
+        /*
+        ** @brief Add data to the end of vector.
+        */
+        void push_back(const value_type& value) {
+            insert(end(), value);
+        }
+        /*
+        ** @brief Erase the last data of vector
+        */
+        void pop_back() {
+            --_finish;
+            destroy(_finish);
+        }
 
+        /*
+        ** @brief Insert @c val at the @c position of vector.
+        ** @return The iterator of inserted element.
+        */
+        iterator insert(iterator position, const value_type& val) {
+            difference_type index = position - begin();
+            insert(position, 1, val);
+            return begin() + index;
+        }
+        void insert(iterator position, const size_type&n, const value_type& val) {
+            insert_aux(position, n, val, typename std::is_integral<size_type>::type());
+        }
+        template <class InputIterator>
+        void insert(iterator position, InputIterator first, InputIterator last) {
+            insert_aux(position, first, last, typename std::is_integral<InputIterator>::type());
+        }
+
+        /*
+        ** @brief Remove element at the given position.
+        ** @param position Iterator pointing to element to be erased.
+        ** @return An iterator pointing to the next element (or end()).
+        */
+        iterator erase(iterator position) {
+            return erase(position, position + 1);
+        }
+        /*
+        ** @brief Remove a range of elements [first, last).
+        ** @param first Iterator pointing to the first element to be erased.
+        ** @param last  Iterator pointing to one past the last element to be erased.
+        ** @return  An iterator pointing to the element pointed to by @a last prior to erasing (or end()).
+        */
+        iterator erase(iterator first, iterator last) {
+            difference_type lenthOfRemove = last - first;
+            _finish = _finish - lengthOfTail;
+            for (; last != end(); ++last) {
+                auto temp = last - lenthOfRemove;
+                *temp = *last;
+            }
+            return first;
+        }
+
+        //Allocator Function of Container
         Alloc get_allocator() {
             return data_allocator;
         }
-
     private:
         /*
         ** @brief Destory exist object, deallocate all memory.
@@ -251,9 +303,27 @@ namespace rayn {
         void vector_aux(Integer n, const value_type& value, std::true_type) {
             allocateAndFillN(n, value);
         }
+        template <class InputIterator>
+        void insert_aux(InputIterator first, InputIterator last, std::false_type);
+        template <class Integer>
+        void insert_aux(iterator position, Integer n, const value_type& value, std::true_type);
+
+        template <class InputIterator>
+        void reallocateAndCopy(iterator position, InputIterator first, InputIterator last);
+        void reallocateAndFillN(iterator position, const size_type& n, const value_type& val);
         size_type getNewCapacity(size_type len) {
             size_type oldCapacity = capacity();
             //TODO after <Algorithm.h>
+        }
+
+    public:
+        template <class T, class Alloc>
+        friend bool operator == (const vector<T, Alloc>& v1, const vector<T, Alloc>& v2) {
+            return v1.operator==(v2);
+        }
+        template <class T, class Alloc>
+        friend bool operator != (const vector<T, Alloc>& v1, const vector<T, Alloc>& v2) {
+            return !(v1 == v2);
         }
     };
 }

@@ -10,9 +10,13 @@
 
 namespace rayn {
 
+    template<class T>
+    inline void construct(T* ptr) {
+        new(ptr) T();  // 调用 T::T()
+    }
     template<class T1, class T2>
     inline void construct(T1* ptr, const T2& value) {
-        new(ptr)T1(value);  // 调用 T1::T1(value)
+        new(ptr) T1(value);  // 调用 T1::T1(value)
     }
 
     /*
