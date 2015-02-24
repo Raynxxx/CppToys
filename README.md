@@ -23,7 +23,7 @@
 |关联容器|进度|
 |---|---|
 
-|STL Algorithms|进度|
+|Algorithms|进度|
 |---|---|
 |fill|100%|
 |fill_n|100%|
