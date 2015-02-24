@@ -42,7 +42,13 @@
     <ClInclude Include="Vector.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="AlgoBase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="Algorithm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Algo.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

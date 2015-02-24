@@ -1,8 +1,7 @@
 #ifndef _ALGORITHM_H_
 #define _ALGORITHM_H_
 
-namespace rayn {
-
-}
+#include "AlgoBase.h"
+#include "Algo.h"
 
 #endif
