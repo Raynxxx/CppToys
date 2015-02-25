@@ -31,6 +31,10 @@ namespace rayn {
     //进而利用 _type_traits<T> 求取最适当措施
     template<class ForwardIterator>
     inline void destroy(ForwardIterator first, ForwardIterator last) {
+        destroy_aux(first, last, value_type(first));
+    }
+    template<class ForwardIterator, class T>
+    inline void destroy_aux(ForwardIterator first, ForwardIterator last, T*) {
         typedef typename _type_traits<T>::is_POD_type is_POD_type;
         _destroy(first, last, is_POD_type());
     }

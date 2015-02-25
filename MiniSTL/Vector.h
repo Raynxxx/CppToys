@@ -198,7 +198,7 @@ namespace rayn {
         ** Resize to 0, but not recycle the memory.
         */
         void clear() {
-            data_allocator::destory(_start, _finish);
+            destroy(_start, _finish);
             _finish = _start;
         }
         /*
@@ -287,7 +287,7 @@ namespace rayn {
         */
         void destoryAndDeallocateAll() {
             if (capacity() != 0) {
-                data_allocator::destroy(_start, _finish);
+                destroy(_start, _finish);
                 data_allocator::deallocate(_start, capacity());
             }
         }
