@@ -204,14 +204,22 @@ namespace rayn {
         ** @brief swap data with vector @c v.
         */
         void swap(vector& v) {
-            if (this != &v)
-            //TODO after <Algorithm.h>
+            if (this != &v) {
+                rayn::swap(_start, v._start);
+                rayn::swap(_finish, v._finish);
+                rayn::swap(_endOfStorage, v._endOfStorage);
+            }
         }
         /*
         ** @brief Add data to the end of vector.
         */
         void push_back(const value_type& value) {
-            insert(end(), value);
+            if (_finish != _endOfStorage) {
+                construct(_finish, value);
+                ++_finish;
+            } else {
+                insert(end(), value);
+            }
         }
         /*
         ** @brief Erase the last data of vector
@@ -230,6 +238,9 @@ namespace rayn {
             insert(position, 1, val);
             return begin() + index;
         }
+        /*
+        ** @brief Insert @c val at the range [position, position + n).
+        */
         void insert(iterator position, const size_type&n, const value_type& val) {
             insert_aux(position, n, val, typename std::is_integral<size_type>::type());
         }

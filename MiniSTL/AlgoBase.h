@@ -90,7 +90,50 @@ namespace rayn {
         return comp(a, b) ? b : a;
     }
 
-
+    /*
+    ** boolean equal(first1, last1, first2);
+    ** @brief       Judge seq1 and seq2 equal or not.
+    ** @complexity  O(N)
+    */
+    template <class InputIterator1, class InputIterator2>
+    inline bool equal(InputIterator1 first1, InputIterator1 last,
+        InputIterator2 first2) {
+        //遍历[first1, last1), 同时递增first2
+        //如果序列1的元素多于序列2, 会发生不可预料的错误.
+        for (; first1 != last1; ++first1, ++first2) {
+            if (*first1 != *first2) {
+                return false;
+            }
+        }
+        return true;
+    }
+    /*
+    ** boolean equal(first1, last1, first2, binary_pred);
+    ** @brief       Judge seq1 and seq2 equal or not with BinaryPredicate().
+    ** @complexity  O(N)
+    */
+    template <class InputIterator1, class InputIterator2, class BinaryPredicate>
+    inline bool equal(InputIterator1 first1, InputIterator1 last,
+        InputIterator2 first2, BinaryPredicate binary_pred) {
+        for (; first1 != last1; ++first1, ++first2) {
+            if (!binary_pred(*first1, *first2)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    /*
+    ** void swap(a, b);
+    ** @brief       Swap two object
+    ** @complexity  O(1)
+    */
+    template <class T>
+    inline void swap(T& a, T& b) {
+        T temp = a;
+        a = b;
+        b = a;
+    }
+    
 }
 
 #endif
