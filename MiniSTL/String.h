@@ -1,7 +1,7 @@
-/*
+ï»¿/*
 ** String.h
 ** Created by Rayn on 2015/02/25
-** basic_string ¶¨Òå
+** basic_string å®šä¹‰
 */
 #ifndef _STRING_H_
 #define _STRING_H_
