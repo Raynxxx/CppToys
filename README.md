@@ -10,7 +10,7 @@
 |---|---|
 |空间配置器|100%|
 |uninitialized|100%|
-|type traits|100%|
+|type_traits|100%|
 |iterator|100%|
 |reverse_iterator|100%|
 |string|--|
@@ -18,7 +18,7 @@
 
 |顺序容器|进度|
 |---|---|
-|vector|60%|
+|vector|95%|
 
 |关联容器|进度|
 |---|---|
@@ -29,4 +29,6 @@
 |fill_n|100%|
 |min|100%|
 |max|100%|
+|equal|100%|
+|swap|100%|
 |---|---|
