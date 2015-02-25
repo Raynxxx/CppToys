@@ -1,7 +1,7 @@
-/*
+ï»¿/*
 ** String.cpp
 ** Created by Rayn on 2015/02/25
-** basic_string ¾ßÌåÊµÏÖ
+** basic_string å…·ä½“å®ç°
 */
 #include "String.h"
 
