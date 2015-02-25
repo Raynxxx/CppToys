@@ -1,3 +1,8 @@
+/*
+** String.h
+** Created by Rayn on 2015/02/25
+** basic_string ∂®“Â
+*/
 #ifndef _STRING_H_
 #define _STRING_H_
 
@@ -78,20 +83,40 @@ namespace rayn {
 
         // Capacity
         /*
-        ** @brief   Returns the number of characters in the string
+        ** @return  Returns the number of characters in the string
         */
         size_type size() const { return _finish - _start; }
+        /*
+        ** @return  Returns the length of this string.
+        */
         size_type length() const { return _finish - _start; }
-
+        /*
+        ** @return  Returns the total number of characters that the cur string can hold
+        */
         size_type capacity() const { return _endOfStorage - _start; }
 
+        /*
+        ** @brief   Erases the string, Make this string empty.
+        */
         void clear() {
             destroy(_start, _finish);
             _start = _finish;
         }
+        /*
+        ** @return  Returns true if this string is empty.
+        */
         bool empty() const { return begin() == end(); }
+        /*
+        ** @brief   Resizes the string to the specified length.
+        */
         void resize(size_type n);
+        /*
+        ** @brief   Resizes the string to the specified length, fill with ch.
+        */
         void resize(size_type n, CharT ch);
+        /*
+        ** @brief   Attempt to preallocate enough memory for specified size.
+        */
         void reserve(size_type n = 0);
         void shrink_to_fit() {
             data_allocator::deallocate(_finish, _endOfStorage - _finish);

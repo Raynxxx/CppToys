@@ -1,3 +1,8 @@
+/*
+** Vector.h
+** Created by Rayn on 2015/02/07
+** vector ∂®“Â
+*/
 #ifndef _VECTOR_H_
 #define _VECTOR_H_
 

@@ -1,3 +1,7 @@
+/*
+** ReverseIterator.h
+** Created by Rayn on 2015/02/07
+*/
 #ifndef _REVERSE_ITERATOR_H_
 #define _REVERSE_ITERATOR_H_
 

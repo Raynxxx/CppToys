@@ -1,3 +1,7 @@
+/*
+** AlgoBase.h
+** Created by Rayn on 2015/02/25
+*/
 #ifndef _ALGO_BASE_H_
 #define _ALGO_BASE_H_
 
