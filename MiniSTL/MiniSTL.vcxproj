@@ -19,14 +19,15 @@
     <ClInclude Include="Construct.h" />
     <ClInclude Include="Iterator.h" />
     <ClInclude Include="ReverseIterator.h" />
+    <ClInclude Include="String.h" />
     <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="Uninitialized.h" />
     <ClInclude Include="Vector.h" />
-    <ClInclude Include="组件测试\TestHeader.h" />
     <ClInclude Include="组件测试\VectorTest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp" />
+    <ClCompile Include="String.cpp" />
     <ClCompile Include="组件测试\TestSTL.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

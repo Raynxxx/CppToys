@@ -34,17 +34,17 @@ namespace rayn {
         T *_endOfStorage;
 
     public:
-        // The Default constructor
+        // The Default Constructor
         vector() : _start(0), _finish(0), _endOfStorage(0) {}
-
-        //explicit construct a vector, size n.
+        // explicit Construct vector as Size n.
         explicit vector(const size_type n) {
             allocateAndFillN(n, value_type());
         }
+        // Construct vector as multiple elements.
         vector(const size_type n, const value_type& value) {
             allocateAndFillN(n, value);
         }
-        //construct vector from [first, last)
+        // Construct vector from range [first, last)
         template <class InputIterator>
         vector(InputIterator first, InputIterator last) {
             //判断是迭代器还是数字, 重载vector_aux
@@ -80,6 +80,7 @@ namespace rayn {
             }
             return *this;
         }
+        // Destroy the vector instance.
         ~vector() {
             destoryAndDeallocateAll();
         }
@@ -390,7 +391,7 @@ namespace rayn {
         }
 
         /*
-        ** @brief   如果原大小为0，则配置为len, 否则配置为原大小基础上加上 max(oldCapacity, len)
+        ** @brief   如果原大小为0，则配置为len, 否则配置为 旧大小 * 2 or 旧大小 + 增加长度
         ** @param   len (default = 1)  
         */
         size_type getNewCapacity(size_type len = 1) {

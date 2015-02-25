@@ -1,10 +1,10 @@
 #ifndef _VECTOR_TEST_H_
 #define _VECTOR_TEST_H_
 
-#include <string>
-#include <iostream>
-
 #include "../Vector.h"
+#include "../String.h"
+#include <iostream>
+#include <string>
 
 namespace rayn {
     namespace test {
@@ -14,8 +14,8 @@ namespace rayn {
                 std::cout << cur << std::endl;
             }
         }
-        void test_vector_2() {
-
+        void test_vector() {
+            test_vector_1();
         }
     }
 }

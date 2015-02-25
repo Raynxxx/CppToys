@@ -54,8 +54,8 @@
     <ClInclude Include="组件测试\VectorTest.h">
       <Filter>测试</Filter>
     </ClInclude>
-    <ClInclude Include="组件测试\TestHeader.h">
-      <Filter>测试</Filter>
+    <ClInclude Include="String.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +64,9 @@
     </ClCompile>
     <ClCompile Include="组件测试\TestSTL.cpp">
       <Filter>测试</Filter>
+    </ClCompile>
+    <ClCompile Include="String.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -21,10 +21,10 @@ namespace rayn {
         }
     }
     //C-style string 偏特化
-    void fill(char *first, char *last, const char& value) {
+    inline void fill(char *first, char *last, const char& value) {
         memset(first, static_cast<unsigned char>(value), (last - first) * sizeof(char));
     }
-    void fill(wchar_t *first, wchar_t *last, const wchar_t& value) {
+    inline void fill(wchar_t *first, wchar_t *last, const wchar_t& value) {
         memset(first, static_cast<unsigned char>(value), (last - first) * sizeof(wchar_t));
     }
 
@@ -43,12 +43,12 @@ namespace rayn {
     }
     //C-style string 偏特化
     template <class Size>
-    char *fill_n(char *first, Size n, const char& value) {
+    inline char *fill_n(char *first, Size n, const char& value) {
         memset(first, static_cast<unsigned char>(value), n * sizeof(char));
         return first + n;
     }
     template <class Size>
-    wchar_t *fill_n(wchar_t *first, Size n, const wchar_t& value) {
+    inline wchar_t *fill_n(wchar_t *first, Size n, const wchar_t& value) {
         memset(first, static_cast<unsigned char>(value), n * sizeof(wchar_t));
         return first + n;
     }
@@ -96,7 +96,7 @@ namespace rayn {
     ** @complexity  O(N)
     */
     template <class InputIterator1, class InputIterator2>
-    inline bool equal(InputIterator1 first1, InputIterator1 last,
+    inline bool equal(InputIterator1 first1, InputIterator1 last1,
         InputIterator2 first2) {
         //遍历[first1, last1), 同时递增first2
         //如果序列1的元素多于序列2, 会发生不可预料的错误.
@@ -113,7 +113,7 @@ namespace rayn {
     ** @complexity  O(N)
     */
     template <class InputIterator1, class InputIterator2, class BinaryPredicate>
-    inline bool equal(InputIterator1 first1, InputIterator1 last,
+    inline bool equal(InputIterator1 first1, InputIterator1 last1,
         InputIterator2 first2, BinaryPredicate binary_pred) {
         for (; first1 != last1; ++first1, ++first2) {
             if (!binary_pred(*first1, *first2)) {
@@ -131,7 +131,7 @@ namespace rayn {
     inline void swap(T& a, T& b) {
         T temp = a;
         a = b;
-        b = a;
+        b = temp;
     }
     
 }
