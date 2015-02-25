@@ -5,11 +5,10 @@
 #ifndef _UNINITIALIZED_H_
 #define _UNINITIALIZED_H_
 
-#include <cstring>
-
 #include "Construct.h"
 #include "Iterator.h"
 #include "TypeTraits.h"
+#include "Algorithm.h"
 
 namespace rayn {
     /********** uninitialized_copy **********/
@@ -76,7 +75,7 @@ namespace rayn {
     /********** uninitialized_fill_n **********/
     template<class ForwardIterator, class Size, class T>
     ForwardIterator _uninitialized_fill_n_aux(ForwardIterator first, Size n, const T& value, _true_type) {
-        //TODO
+        return rayn::fill_n(first, n, value);
     }
     template<class ForwardIterator, class Size, class T>
     ForwardIterator _uninitialized_fill_n_aux(ForwardIterator first, Size n, const T& value, _false_type) {
@@ -89,7 +88,7 @@ namespace rayn {
     template<class ForwardIterator, class Size, class T, class T1>
     ForwardIterator _uninitialized_fill_n(ForwardIterator first, Size n, const T& value, T1*) {
         typedef typename _type_traits<T1>::is_POD_type is_POD_type;
-        return _uninitialized_fill_aux(first, n, value, is_POD_type());
+        return _uninitialized_fill_n_aux(first, n, value, is_POD_type());
     }
     /*
     ** @brief Fill the value xxx into range [first, first + n).

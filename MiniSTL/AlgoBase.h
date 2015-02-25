@@ -1,5 +1,5 @@
-#ifndef _ALGOBASE_H_
-#define _ALGOBASE_H_
+#ifndef _ALGO_BASE_H_
+#define _ALGO_BASE_H_
 
 #include <cstring>
 

@@ -8,6 +8,7 @@
 #include "Iterator.h"
 #include "ReverseIterator.h"
 #include "Uninitialized.h"
+#include "Algorithm.h"
 
 namespace rayn {
     template <class T, class Alloc = allocator<T>>
@@ -204,7 +205,7 @@ namespace rayn {
         */
         void swap(vector& v) {
             if (this != &v)
-            //TODO after implementing the <Algorithm.h>
+            //TODO after <Algorithm.h>
         }
         /*
         ** @brief Add data to the end of vector.
@@ -252,11 +253,14 @@ namespace rayn {
         ** @return  An iterator pointing to the element pointed to by @a last prior to erasing (or end()).
         */
         iterator erase(iterator first, iterator last) {
+            // 尾部余留的元素
+            difference_type lengthOfTail = end() - last;
             difference_type lenthOfRemove = last - first;
             _finish = _finish - lengthOfTail;
-            for (; last != end(); ++last) {
-                auto temp = last - lenthOfRemove;
+            for (; lengthOfTail != 0; --lengthOfTail) {
+                iterator temp = last - lenthOfRemove;
                 *temp = *last;
+                ++last;
             }
             return first;
         }
@@ -271,7 +275,7 @@ namespace rayn {
         */
         void destoryAndDeallocateAll() {
             if (capacity() != 0) {
-                data_allocator::destory(_start, _finish);
+                data_allocator::destroy(_start, _finish);
                 data_allocator::deallocate(_start, capacity());
             }
         }
@@ -295,6 +299,41 @@ namespace rayn {
             _endOfStorage = _finish;
         }
 
+        /*
+        ** @brief Reallocate memory and Insert(Copy) [first, last) into [position, last - last).
+        */
+        template <class InputIterator>
+        void reallocateAndCopy(iterator position, InputIterator first, InputIterator last) {
+            difference_type newCapacity = getNewCapacity(last - first);
+            T* newStart = data_allocator::allocate(newCapacity);
+            T* newEndOfStorage = newStart + newCapacity;
+            T* newFinish = rayn::uninitialized_copy(begin(), position, newStart);
+            newFinish = rayn::uninitialized_copy(first, last, newFinish);
+            newFinish = rayn::uninitialized_copy(position, end(), newFinish);
+            // First to destroy cur Vector.
+            destoryAndDeallocateAll();
+            _start = newStart;
+            _finish = newFinish;
+            _endOfStorage = newEndOfStorage;
+        }
+        /*
+        ** @brief Reallocate memory and Insert(Copy) n val into [position, position + n).
+        */
+        void reallocateAndFillN(iterator position, const size_type& n, const value_type& value) {
+            difference_type newCapacity = getNewCapacity(n);
+            T* newStart = data_allocator::allocate(newCapacity);
+            T* newEndOfStorage = newStart + newCapacity;
+            T* newFinish = rayn::uninitialized_copy(begin(), position, newStart);
+            newFinish = rayn::uninitialized_fill_n(newFinish, n, value);
+            newFinish = rayn::uninitialized_copy(position, end(), newFinish);
+            // First to destroy cur Vector.
+            destoryAndDeallocateAll();
+            _start = newStart;
+            _finish = newFinish;
+            _endOfStorage = newEndOfStorage;
+        }
+
+        //Public Function的辅助函数
         template <class InputIterator>
         void vector_aux(InputIterator first, InputIterator last, std::false_type) {
             allocateAndCopy(first, last);
@@ -304,19 +343,53 @@ namespace rayn {
             allocateAndFillN(n, value);
         }
         template <class InputIterator>
-        void insert_aux(InputIterator first, InputIterator last, std::false_type);
+        void insert_aux(iterator position, InputIterator first, InputIterator last, std::false_type) {
+            // the size of left storage
+            difference_type storageLeft = _endOfStorage - _finish;
+            difference_type rangeNeed = last - first;
+            if (storageLeft >= rangeNeed) {
+                iterator lastPtr = end() - 1;
+                // Move the range [position, _finish) back
+                for (; lastPtr - position >= 0; --lastPtr) {
+                    *(lastPtr + rangeNeed) = *lastPtr;
+                }
+                rayn::uninitialized_copy(first, last, position);
+                _finish += rangeNeed;
+            } else {
+                reallocateAndCopy(position, first, last);
+            }
+        }
         template <class Integer>
-        void insert_aux(iterator position, Integer n, const value_type& value, std::true_type);
+        void insert_aux(iterator position, Integer n, const value_type& value, std::true_type) {
+            assert(n != 0);
+            // the size of left storage
+            difference_type storageLeft = _endOfStorage - _finish;
+            difference_type rangeNeed = n;
+            if (storageLeft >= rangeNeed) {
+                iterator lastPtr = end() - 1;
+                // Move the range [position, _finish) back
+                for (; lastPtr - position >= 0; --lastPtr) {
+                    *(lastPtr + rangeNeed) = *lastPtr;
+                }
+                rayn::uninitialized_fill_n(position, n, value);
+                _finish += rangeNeed;
+            } else {
+                reallocateAndFillN(position, n, value);
+            }
+        }
 
-        template <class InputIterator>
-        void reallocateAndCopy(iterator position, InputIterator first, InputIterator last);
-        void reallocateAndFillN(iterator position, const size_type& n, const value_type& val);
-        size_type getNewCapacity(size_type len) {
+        /*
+        ** @brief   如果原大小为0，则配置为len, 否则配置为原大小基础上加上 max(oldCapacity, len)
+        ** @param   len (default = 1)  
+        */
+        size_type getNewCapacity(size_type len = 1) {
             size_type oldCapacity = capacity();
-            //TODO after <Algorithm.h>
+            size_type newCapacity = (oldCapacity != 0 ? (oldCapacity + max(oldCapacity, len)) : len);
+            return newCapacity;
         }
 
     public:
+        // 全局重载运算符
         template <class T, class Alloc>
         friend bool operator == (const vector<T, Alloc>& v1, const vector<T, Alloc>& v2) {
             return v1.operator==(v2);

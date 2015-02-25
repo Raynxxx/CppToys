@@ -51,13 +51,19 @@
     <ClInclude Include="Algo.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="组件测试\VectorTest.h">
+      <Filter>测试</Filter>
+    </ClInclude>
+    <ClInclude Include="组件测试\TestHeader.h">
+      <Filter>测试</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="STLTest.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="组件测试\TestSTL.cpp">
+      <Filter>测试</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
