@@ -283,7 +283,7 @@ namespace rayn {
         }
 
         //Allocator Function of Container
-        Alloc get_allocator() {
+        Alloc get_allocator() const {
             return data_allocator;
         }
     private:

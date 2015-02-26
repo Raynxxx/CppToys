@@ -14,7 +14,7 @@
 #include "ReverseIterator.h"
 
 namespace rayn {
-    template <class CharT>
+    template <class CharT, class Alloc = allocator<CharT>>
     class basic_string {
     public:
         typedef CharT                               value_type;
@@ -34,7 +34,7 @@ namespace rayn {
         CharT *_finish;
         CharT *_endOfStorage;
 
-        typedef allocator<value_type> data_allocator;
+        typedef Alloc data_allocator;
 
     public:
         // The Default Constructor
@@ -409,6 +409,91 @@ namespace rayn {
         */
         template <class InputIterator>
         basic_string& replace(iterator i1, iterator i2, InputIterator first, InputIterator last);
+
+        /*
+        ** @brief   Copy substring into C-String.
+        ** @param   cstr    C-String to copy into.
+        ** @param   len     Number of characters to copy.
+        ** @param   pos     Index of first character to copy.
+        ** @return  Number of characters actually copied.
+        */
+        size_type copy(const CharT* cstr, size_type len, size_type pos = 0) const;
+        /*
+        ** @brief   Swap contents with another string.
+        */
+        void swap(basic_string& str);
+        /*
+        ** @brief   Return const pointer to null-terminated contents.
+        */
+        const CharT* c_str() const;
+        /*
+        ** @brief   Return const pointer to contents.
+        */
+        const CharT* data() const;
+        /*
+        ** @brief   Return allocator used to construct this string.
+        */
+        Alloc get_allocator() const;
+
+        /*
+        ** @brief   Find position of a C substring.
+        ** @param   cstr    C-String to locate.
+        ** @param   pos     Index of character to search from.
+        ** @param   n       Number of characters from cstr to search for.
+        ** @return  Index of start of first occurrence.
+        */
+        size_type find(const CharT* cstr, size_type pos, size_type n) const;
+        /*
+        ** @brief   Find position of a C-String.
+        ** @param   cstr    C-String to locate.
+        ** @param   pos     Index of character to search from. (Default = 0)
+        ** @return  Index of start of first occurrence.
+        */
+        size_type find(const CharT* cstr, size_type pos = 0) const;
+        /*
+        ** @brief   Find position of a String.
+        ** @param   cstr    String to locate.
+        ** @param   pos     Index of character to search from. (Default = 0)
+        ** @return  Index of start of first occurrence.
+        */
+        size_type find(const basic_string& str, size_type pos = 0) const;
+        /*
+        ** @brief   Find position of a Character.
+        ** @param   ch      Character to locate.
+        ** @param   pos     Index of character to search from. (Default = 0)
+        ** @return  Index of start of first occurrence.
+        */
+        size_type find(CharT ch, size_type pos = 0) const;
+
+        /*
+        ** @brief   Find last position of a String.
+        ** @param   cstr    String to locate.
+        ** @param   pos     Index of character to search back from. (Default = npos)
+        ** @return  Index of start of first occurrence.
+        */
+        size_type rfind(const basic_string& str, size_type pos = npos) const;
+        /*
+        ** @brief   Find last position of a C substring.
+        ** @param   cstr    C-String to locate.
+        ** @param   pos     Index of character to search back from.
+        ** @param   n       Number of characters from cstr to search for.
+        ** @return  Index of start of first occurrence.
+        */
+        size_type rfind(const CharT* cstr, size_type pos, size_type n) const;
+        /*
+        ** @brief   Find last position of a C-String.
+        ** @param   cstr    C-String to locate.
+        ** @param   pos     Index of character to search back from. (Default = npos)
+        ** @return  Index of start of first occurrence.
+        */
+        size_type rfind(const CharT* cstr, size_type pos = 0) const;   
+        /*
+        ** @brief   Find last position of a Character.
+        ** @param   ch      Character to locate.
+        ** @param   pos     Index of character to search back from. (Default = npos)
+        ** @return  Index of start of first occurrence.
+        */
+        size_type rfind(CharT ch, size_type pos = npos) const;
     };
 
     typedef basic_string<char>      string;
