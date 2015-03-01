@@ -14,7 +14,7 @@
 #include "ReverseIterator.h"
 
 namespace rayn {
-    template <class CharT, class Alloc = allocator<CharT>>
+    template <class CharT>
     class basic_string {
     public:
         typedef CharT                               value_type;
@@ -29,12 +29,13 @@ namespace rayn {
 
         // Value returned by various member functions when they Fail.
         static const size_type npos = static_cast<size_type>(-1);
+
     private:
         CharT *_start;
         CharT *_finish;
         CharT *_endOfStorage;
 
-        typedef Alloc data_allocator;
+        typedef allocator<CharT> data_allocator;
 
     public:
         // The Default Constructor
@@ -430,10 +431,6 @@ namespace rayn {
         ** @brief   Return const pointer to contents.
         */
         const CharT* data() const;
-        /*
-        ** @brief   Return allocator used to construct this string.
-        */
-        Alloc get_allocator() const;
 
         /*
         ** @brief   Find position of a C substring.
@@ -494,6 +491,214 @@ namespace rayn {
         ** @return  Index of start of first occurrence.
         */
         size_type rfind(CharT ch, size_type pos = npos) const;
+
+        /*
+        ** @brief   Find position of a char of string.
+        ** @param   str     The string containing characters to locate.
+        ** @param   pos     Index of character to search from.(Default = 0)
+        ** @return  Index of first occurrence.
+        ** 
+        ** Start from pos, searches forward for one of the characters of str
+        ** within this string. If not found, returns npos.
+        */
+        size_type find_first_of(const basic_string& str, size_type pos = 0) const;
+        /*
+        ** @brief   Find position of a char of C substring.
+        ** @param   str     The C-String containing characters to locate.
+        ** @param   pos     Index of character to search from
+        ** @param   n       Number of characters from cstr to search for.
+        ** @return  Index of first occurrence.
+        **
+        ** Start from pos, searches forward for one of the frist n 
+        ** characters of cstr within this string. If not found, returns npos.
+        */
+        size_type find_first_of(const CharT* cstr, size_type pos, size_type n) const;
+        /*
+        ** @brief   Find position of a char of C-String.
+        ** @param   str     The C-String containing characters to locate.
+        ** @param   pos     Index of character to search from.(Default = 0)
+        ** @return  Index of first occurrence.
+        **
+        ** Start from pos, searches forward for one of the characters
+        ** of cstr within this string. If not found, returns npos.
+        */
+        size_type find_first_of(const CharT* cstr, size_type pos = 0) const;
+        /*
+        ** @brief   Find position of a Char.
+        ** @param   ch      Character to locate.
+        ** @param   pos     Index of character to search from.(Default = 0)
+        ** @return  Index of first occurrence.
+        **
+        ** Start from pos, searches forward for the character ch within
+        ** this string. If not found, returns npos.
+        */
+        size_type find_first_of(CharT ch, size_type pos = 0) const;
+
+        /*
+        ** @brief   Find last position of a char of string.
+        ** @param   str     The string containing characters to locate.
+        ** @param   pos     Index of character to search back from.(Default = npos)
+        ** @return  Index of last occurrence.
+        **
+        ** Start from pos, searches backward for one of the characters of str
+        ** within this string. If not found, returns npos.
+        */
+        size_type find_last_of(const basic_string& str, size_type pos = npos) const;
+        /*
+        ** @brief   Find last position of a char of C substring.
+        ** @param   str     The C-String containing characters to locate.
+        ** @param   pos     Index of character to search back from.(Default = npos)
+        ** @return  Index of last occurrence.
+        **
+        ** Start from pos, searches backward for one of the first n characters
+        ** of cstr within this string. If not found, returns npos.
+        */
+        size_type find_last_of(const CharT* cstr, size_type pos, size_type n) const;
+        /*
+        ** @brief   Find last position of a char of C-String.
+        ** @param   str     The C-String containing characters to locate.
+        ** @param   pos     Index of character to search back from.(Default = npos)
+        ** @return  Index of last occurrence.
+        **
+        ** Start from pos, searches backward for one of the characters of cstr
+        ** within this string. If not found, returns npos.
+        */
+        size_type find_last_of(const CharT* cstr, size_type pos = npos) const;
+        /*
+        ** @brief   Find last position of a char.
+        ** @param   str     Character to locate.
+        ** @param   pos     Index of character to search back from.(Default = npos)
+        ** @return  Index of last occurrence.
+        **
+        ** Start from pos, searches backward for the character ch
+        ** within this string. If not found, returns npos.
+        */
+        size_type find_last_of(CharT ch, size_type pos = npos) const;
+
+        /*
+        ** @brief   Find position of a character not in string.
+        ** @param   str    String containing characters to avoid.
+        ** @param   pos    Index of character to search from (Default = 0).
+        ** @return  Index of first occurrence.
+        **
+        ** Starting from pos, searches forward for a character not contained
+        ** in str within this string.  If found, returns the index where it
+        ** was found.  If not found, returns npos.
+        */
+        size_type find_first_not_of(const basic_string& str, size_type pos = 0) const;
+        /*
+        ** @brief   Find position of a character not in C subtring.
+        ** @param   str     C-String containing characters to avoid.
+        ** @param   pos     Index of character to search from.
+        ** @param   n       Number of character to search from.
+        ** @return  Index of first occurrence.
+        **
+        ** Starting from pos, searches forward for a character not contained
+        ** in first n characters of cstr within this string.  If found, returns
+        ** the index where it was found.  If not found, returns npos.
+        */
+        size_type find_first_not_of(const CharT* cstr, size_type pos, size_type n) const;
+        /*
+        ** @brief   Find position of a character not in C-String.
+        ** @param   str    C-String containing characters to avoid.
+        ** @param   pos    Index of character to search from (Default = 0).
+        ** @return  Index of first occurrence.
+        **
+        ** Starting from pos, searches forward for a character not contained
+        ** in cstr within this string.  If found, returns the index where it
+        ** was found.  If not found, returns npos.
+        */
+        size_type find_first_not_of(const CharT* cstr, size_type pos = 0) const;
+        /*
+        ** @brief   Find position of a different character.
+        ** @param   str    Character to avoid.
+        ** @param   pos    Index of character to search from (Default = 0).
+        ** @return  Index of first occurrence.
+        **
+        ** Starting from pos, searches forward for a character different from
+        ** ch within this string.  If found, returns the index where it
+        ** was found.  If not found, returns npos.
+        */
+        size_type find_first_not_of(CharT ch, size_type pos = 0) const;
+
+        /*
+        ** @brief   Find last position of a character not in string.
+        ** @param   str    String containing characters to avoid.
+        ** @param   pos    Index of character to search back from (Default = npos).
+        ** @return  Index of last occurrence.
+        **
+        ** Starting from pos, searches backward for a character not contained
+        ** in str within this string.  If found, returns the index where it
+        ** was found.  If not found, returns npos.
+        */
+        size_type find_last_not_of(const basic_string& str, size_type pos = npos) const;
+        /*
+        ** @brief   Find last position of a character not in C subtring.
+        ** @param   str     C-String containing characters to avoid.
+        ** @param   pos     Index of character to search back from.
+        ** @param   n       Number of character to search back from.
+        ** @return  Index of last occurrence.
+        **
+        ** Starting from pos, searches backward for a character not contained
+        ** in first n characters of cstr within this string.  If found, returns
+        ** the index where it was found.  If not found, returns npos.
+        */
+        size_type find_last_not_of(const CharT* cstr, size_type pos, size_type n) const;
+        /*
+        ** @brief   Find last position of a character not in C-String.
+        ** @param   str    C-String containing characters to avoid.
+        ** @param   pos    Index of character to search back from (Default = npos).
+        ** @return  Index of last occurrence.
+        **
+        ** Starting from pos, searches backward for a character not contained
+        ** in cstr within this string.  If found, returns the index where it
+        ** was found.  If not found, returns npos.
+        */
+        size_type find_last_not_of(const CharT* cstr, size_type pos = npos) const;
+        /*
+        ** @brief   Find last position of a different character.
+        ** @param   str    Character to avoid.
+        ** @param   pos    Index of character to search back from (Default = npos).
+        ** @return  Index of last occurrence.
+        **
+        ** Starting from pos, searches backward for a character different from
+        ** ch within this string.  If found, returns the index where it
+        ** was found.  If not found, returns npos.
+        */
+        size_type find_last_not_of(CharT ch, size_type pos = npos) const;
+
+        /*
+        ** @brief   Get a substring.
+        ** @param   pos     Index of first character.(Default = 0)
+        ** @param   n       Number of character in substring.(Default = npos)
+        ** @return  The new string.
+        */
+        basic_string substr(size_type pos = 0, size_type len = npos) const;
+
+    private:
+        void moveData(basic_string&& str);
+        /*
+        ** @brief   如果原大小为0，则配置为len, 否则配置为 旧大小 * 2 or 旧大小 + 增加长度
+        ** @param   len (default = 1)
+        */
+        size_type getNewCapacity(size_type len = 1);
+        /*
+        ** @brief   Allocate memory for n elem and fill with same character.
+        */
+        void allocate_and_fill(size_type n, CharT ch);
+        /*
+        ** @brief   Allocate memory and copy data from range [first, last) into.
+        */
+        template <class InputIterator>
+        void allocate_and_copy(InputIterator first, InputIterator last);
+        /*
+        ** @brief   Destroy data and deallocate memory.
+        */
+        void destroy_and_deallocate();
+
+    public:
+        friend std::ostream& operator<< (std::ostream& os, const basic_string& str);
+        friend std::istream& operator>> (std::istream& is, basic_string& str);
     };
 
     typedef basic_string<char>      string;

@@ -6,4 +6,9 @@
 #include "String.h"
 
 namespace rayn {
+    template <class CharT>
+    basic_string<CharT>::
+        basic_string(const basic_string& str) {
+
+    }
 }

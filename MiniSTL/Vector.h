@@ -76,8 +76,8 @@ namespace rayn {
         //Vector Move Assignment operator
         vector& operator = (vector&& v) {
             if (this != &v) {
-                //first to destory cur vector
-                destoryAndDeallocateAll();
+                //first to destroy cur vector
+                destroyAndDeallocateAll();
                 _start = v._start;
                 _finish = v._finish;
                 _endOfStorage = v._endOfStorage;
@@ -87,11 +87,11 @@ namespace rayn {
         }
         // Destroy the vector instance.
         ~vector() {
-            destoryAndDeallocateAll();
+            destroyAndDeallocateAll();
         }
 
         //The compare function
-        bool operator == (const vector& v) const {
+        bool operator== (const vector& v) const {
             if (size() != v.size()) {
                 return false;
             } else {
@@ -105,7 +105,7 @@ namespace rayn {
                 return true;
             }
         }
-        bool operator != (const vector& v) const {
+        bool operator!= (const vector& v) const {
             return !(*this == v);
         }
 
@@ -134,7 +134,7 @@ namespace rayn {
         */
         void resize(size_type n, value_type val = value_type()) {
             if (n < size()) {
-                data_allocator::destory(_start + n, _finish);
+                data_allocator::destroy(_start + n, _finish);
                 _finish = _start + n;
             } else if (size() < n && n <= capacity()) {
                 auto lengthOfAdd = n - size();
@@ -144,8 +144,8 @@ namespace rayn {
                 T *newStart = data_allocator::allocate(getNewCapacity(lengthOfAdd));
                 T* newFinish = rayn::uninitialized_copy(begin(), end(), newStart);
                 newFinish = rayn::uninitialized_fill_n(newFinish, lengthOfAdd, val);
-                //first to destory cur vector
-                destoryAndDeallocateAll();
+                //first to destroy cur vector
+                destroyAndDeallocateAll();
                 _start = newStart;
                 _finish = newFinish;
                 _endOfStorage = _start + n;
@@ -160,8 +160,8 @@ namespace rayn {
             if (n <= capacity()) return;
             T *newStart = data_allocator::allocate(n);
             T *newFinish = rayn::uninitialized_copy(begin(), end(), newStart);
-            //first to destory cur vector
-            destoryAndDeallocateAll();
+            //first to destroy cur vector
+            destroyAndDeallocateAll();
             _start = newStart;
             _finish = newFinish;
             _endOfStorage = _start + n;
@@ -199,7 +199,7 @@ namespace rayn {
 
         /*
         ** @brief Clear the vector. 
-        ** destory all the object in the vector.
+        ** destroy all the object in the vector.
         ** Resize to 0, but not recycle the memory.
         */
         void clear() {
@@ -288,9 +288,9 @@ namespace rayn {
         }
     private:
         /*
-        ** @brief Destory exist object, deallocate all memory.
+        ** @brief destroy exist object, deallocate all memory.
         */
-        void destoryAndDeallocateAll() {
+        void destroyAndDeallocateAll() {
             if (capacity() != 0) {
                 destroy(_start, _finish);
                 data_allocator::deallocate(_start, capacity());
@@ -328,7 +328,7 @@ namespace rayn {
             newFinish = rayn::uninitialized_copy(first, last, newFinish);
             newFinish = rayn::uninitialized_copy(position, end(), newFinish);
             // First to destroy cur Vector.
-            destoryAndDeallocateAll();
+            destroyAndDeallocateAll();
             _start = newStart;
             _finish = newFinish;
             _endOfStorage = newEndOfStorage;
@@ -344,7 +344,7 @@ namespace rayn {
             newFinish = rayn::uninitialized_fill_n(newFinish, n, value);
             newFinish = rayn::uninitialized_copy(position, end(), newFinish);
             // First to destroy cur Vector.
-            destoryAndDeallocateAll();
+            destroyAndDeallocateAll();
             _start = newStart;
             _finish = newFinish;
             _endOfStorage = newEndOfStorage;
@@ -406,16 +406,24 @@ namespace rayn {
         }
 
     public:
-        // 全局重载运算符
-        template <class T, class Alloc>
-        friend bool operator == (const vector<T, Alloc>& v1, const vector<T, Alloc>& v2) {
-            return v1.operator==(v2);
-        }
-        template <class T, class Alloc>
-        friend bool operator != (const vector<T, Alloc>& v1, const vector<T, Alloc>& v2) {
-            return !(v1 == v2);
-        }
+        friend bool operator== (const vector& lhs, const vector& rhs);
+        friend bool operator!= (const vector& lhs, const vector& rhs);
+        friend void swap(vector& lhs, vector& rhs);
     };
+
+    // 全局重载运算符
+    template <class T, class Alloc>
+    inline bool operator== (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+        return lhs.operator==(rhs);
+    }
+    template <class T, class Alloc>
+    inline bool operator!= (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+        return !(lhs == rhs);
+    }
+    template <class T, class Alloc>
+    inline void swap(vector<T, Alloc>& lhs, vector<T, Alloc>& rhs) {
+        lhs.swap(rhs);
+    }
 }
 
 #endif
