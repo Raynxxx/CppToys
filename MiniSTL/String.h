@@ -7,6 +7,7 @@
 #define _STRING_H_
 
 #include <cstring>
+#include <iostream>
 #include <type_traits>
 
 #include "Allocator.h"
@@ -41,20 +42,40 @@ namespace rayn {
         // The Default Constructor
         basic_string() : _start(0), _finish(0), _endOfStorage(0) {}
         // The Copy Constructor
-        basic_string(const basic_string& str);
+        basic_string(const basic_string& str) {
+            allocate_and_copy(str._start, str._finish);
+        }
         // The Move Constructor
-        basic_string(basic_string&& str);
+        basic_string(basic_string&& str) {
+            moveData(str);
+        }
         // Construct string as copy of a substring.
-        basic_string(const basic_string& str, size_type pos, size_type len = npos);
+        basic_string(const basic_string& str, size_type pos, size_type len = npos) {
+            len = fix_npos(len, str.length(), pos);
+            allocate_and_copy(str._start + pos, str._start + pos + len);
+        }
         // Construct string as copy of a C-Style string.
-        basic_string(const CharT* cstr);
+        basic_string(const CharT* cstr) {
+            allocate_and_copy(cstr, cstr + strlen(cstr));
+        }
         // Construct string initialized by a Char Array.
-        basic_string(const CharT* cstr, size_type n);
+        basic_string(const CharT* cstr, size_type n) {
+            allocate_and_copy(cstr, cstr + n);
+        }
         // Construct string as multiple characters.
-        basic_string(size_type n, CharT ch);
+        basic_string(size_type n, CharT ch) {
+            allocate_and_fill(n, ch);
+        }
         // Construct string as copy of a range [first, last).
         template <class InputIterator>
-        basic_string(InputIterator first, InputIterator last);
+        basic_string(InputIterator first, InputIterator last) {
+            allocate_and_copy(first, last);
+        }
+
+        // Destroy the string instance.
+        ~basic_string() {
+            destroy_and_deallocate();
+        }
 
         // Copy Assign str to this string.
         basic_string& operator= (const basic_string& str);
@@ -64,9 +85,6 @@ namespace rayn {
         basic_string& operator= (const CharT* cstr);
         // Set value to string of length 1.
         basic_string& operator= (CharT ch);
-
-        // Destroy the string instance.
-        ~basic_string();
 
         // The Iterator Functions
         iterator begin() { return _start; }
@@ -114,7 +132,7 @@ namespace rayn {
         /*
         ** @brief   Resizes the string to the specified length, fill with ch.
         */
-        void resize(size_type n, CharT ch);
+        void resize(size_type n, value_type ch);
         /*
         ** @brief   Attempt to preallocate enough memory for specified size.
         */
@@ -675,30 +693,186 @@ namespace rayn {
         */
         basic_string substr(size_type pos = 0, size_type len = npos) const;
 
-    private:
-        void moveData(basic_string&& str);
         /*
-        ** @brief   如果原大小为0，则配置为len, 否则配置为 旧大小 * 2 or 旧大小 + 增加长度
-        ** @param   len (default = 1)
+        ** @brief   Compare to a string.
+        ** @param   str String to compare against.
+        ** @return  Integer < 0, 0, or > 0.
+        **
+        ** Returns an integer < 0 if this string is ordered before str,
+        ** 0 if their values are equivalent, or > 0 if this string is 
+        ** ordered after str.
         */
-        size_type getNewCapacity(size_type len = 1);
+        int compare(const basic_string& str) const;
+        /*
+        ** @brief   Compare substring to a string.
+        ** @param   pos     Index of first char of substring.
+        ** @param   n       Number of chars in substring.
+        ** @param   str     String to compare against.
+        ** @return  Integer < 0, 0, or > 0.
+        **
+        ** Form the substring of this string from the n chars starting at pos.
+        */
+        int compare(size_type pos, size_type n, const basic_string& str) const;
+        /*
+        ** @brief   Compare substring to a substring.
+        ** @param   pos1    Index of first char of substring.
+        ** @param   n1      Number of chars in substring.
+        ** @param   str     String to compare against.
+        ** @param   pos2    Index of first char of substring of str.
+        ** @param   n2      Number of chars in substring of str.
+        ** @return  Integer < 0, 0, or > 0.
+        **
+        ** Form the substring of this string from the n1 chars starting at pos1.
+        ** Form the substring of str from the n2 characters starting at pos2.
+        */
+        int compare(size_type pos1, size_type n1, const basic_string& str, size_type pos2, size_type n2) const;
+        /*
+        ** @brief   Compare to a C-String.
+        ** @param   cstr    C-String to compare against.
+        ** @return  Integer < 0, 0, or > 0.
+        **
+        ** Returns an integer < 0 if this string is ordered before cstr,
+        ** 0 if their values are equivalent, or > 0 if this string is
+        ** ordered after str.
+        */
+        int compare(const CharT* cstr);
+        /*
+        ** @brief   Compare substring to a C-String.
+        ** @param   pos     Index of first char of substring.
+        ** @param   n       Number of chars in substring.
+        ** @param   cstr    C-String to compare against.
+        ** @return  Integer < 0, 0, or > 0.
+        **
+        ** Form the substring of this string from the n chars starting at pos.
+        */
+        int compare(size_type pos, size_type n, const CharT* cstr) const;
+        /*
+        ** @brief   Compare substring to a C substring.
+        ** @param   pos1    Index of first char of substring.
+        ** @param   n1      Number of chars in substring.
+        ** @param   cstr    C-String to compare against.
+        ** @param   n2      Number of chars in substring of cstr.
+        ** @return  Integer < 0, 0, or > 0.
+        **
+        ** Form the substring of this string from the n1 chars starting at pos.
+        ** Form a string from the first n2 characters of cstr.
+        */
+        int compare(size_type pos, size_type n1, const CharT* cstr, size_type n2) const;
+
+    
+
+    public:
+        // operator+
+        /*
+        ** @brief   Concatenate two strings.
+        ** return   New string with value lhs + rhs.
+        */
+        friend basic_string operator+ (const basic_string& lhs, const basic_string& rhs);
+        /*
+        ** @brief   Concatenate a C-String and a string.
+        ** return   New string with value lhs + rhs.
+        */
+        friend basic_string operator+ (const CharT* lhs, const basic_string& rhs);
+        /*
+        ** @brief   Concatenate a string and a C-String.
+        ** return   New string with value lhs + rhs.
+        */
+        friend basic_string operator+ (const basic_string& lhs, const CharT* rhs);
+        /*
+        ** @brief   Concatenate a string and a character.
+        ** return   New string with value lhs + rhs.
+        */
+        friend basic_string operator+ (const basic_string& lhs, CharT rhs);
+        /*
+        ** @brief   Concatenate a character and a string.
+        ** return   New string with value lhs + rhs.
+        */
+        friend basic_string operator+ (CharT lhs, const basic_string& rhs);
+
+        // operator==
+        friend bool operator== (const basic_string& lhs, const basic_string& rhs);
+        friend bool operator== (const basic_string& lhs, const CharT* rhs);
+        friend bool operator== (const CharT* lhs, const basic_string& rhs);
+
+        // operator!=
+        friend bool operator!= (const basic_string& lhs, const basic_string& rhs);
+        friend bool operator!= (const basic_string& lhs, const CharT* rhs);
+        friend bool operator!= (const CharT* lhs, const basic_string& rhs);
+
+        // operator<
+        friend bool operator< (const basic_string& lhs, const basic_string& rhs);
+        friend bool operator< (const basic_string& lhs, const CharT* rhs);
+        friend bool operator< (const CharT* lhs, const basic_string& rhs);
+
+        // operator<=
+        friend bool operator<= (const basic_string& lhs, const basic_string& rhs);
+        friend bool operator<= (const basic_string& lhs, const CharT* rhs);
+        friend bool operator<= (const CharT* lhs, const basic_string& rhs);
+
+        // operator>
+        friend bool operator> (const basic_string& lhs, const basic_string& rhs);
+        friend bool operator> (const basic_string& lhs, const CharT* rhs);
+        friend bool operator> (const CharT* lhs, const basic_string& rhs);
+
+        // operator>=
+        friend bool operator>= (const basic_string& lhs, const basic_string& rhs);
+        friend bool operator>= (const basic_string& lhs, const CharT* rhs);
+        friend bool operator>= (const CharT* lhs, const basic_string& rhs);
+        
+        friend void swap(basic_string &lhs, basic_string& rhs);
+     
+        friend std::ostream& operator << (std::ostream& os, const basic_string& str);
+        friend std::istream& operator >> (std::istream& is, basic_string& str);
+
+    private:
+        /*
+        ** @brief   Move the data to this string.
+        */
+        void moveData(basic_string& str) {
+            _start = str._start;
+            _finish = str._finish;
+            _endOfStorage = str._endOfStorage;
+            str._start = str._finish = str._endOfStorage = 0;
+        }
         /*
         ** @brief   Allocate memory for n elem and fill with same character.
         */
-        void allocate_and_fill(size_type n, CharT ch);
+        void allocate_and_fill(size_type n, CharT ch) {
+            _start = data_allocator::allocate(n);
+            _finish = rayn::uninitialized_fill_n(_start, n, ch);
+            _endOfStorage = _finish;
+        }
         /*
         ** @brief   Allocate memory and copy data from range [first, last) into.
         */
         template <class InputIterator>
-        void allocate_and_copy(InputIterator first, InputIterator last);
+        void allocate_and_copy(InputIterator first, InputIterator last) {
+            _start = data_allocator::allocate(last - first);
+            _finish = rayn::uninitialized_copy(first, last, _start);
+            _endOfStorage = _finish;
+        }
         /*
         ** @brief   Destroy data and deallocate memory.
         */
-        void destroy_and_deallocate();
-
-    public:
-        friend std::ostream& operator<< (std::ostream& os, const basic_string& str);
-        friend std::istream& operator>> (std::istream& is, basic_string& str);
+        void destroy_and_deallocate() {
+            rayn::destroy(_start, _finish);
+            data_allocator::deallocate(_start, _endOfStorage - _start);
+        }
+        /*
+        ** @brief   如果原大小为0，则配置为len, 否则配置为 旧大小 * 2 or 旧大小 + 增加长度
+        ** @param   len
+        */
+        size_type getNewCapacity(size_type len) {
+            size_type oldCapacity = _endOfStorage - _start;
+            size_type newCapacity = oldCapacity + rayn::max(oldCapacity, len);
+            return newCapacity;
+        }
+        /*
+        ** @brief   Fix var when var equal to npos.
+        */
+        size_type fix_npos(size_type var, size_type length, size_type off) const {
+            return var == npos ? (length - off) : var;
+        }
     };
 
     typedef basic_string<char>      string;
