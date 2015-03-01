@@ -7,29 +7,22 @@
 
 ## 项目计划
 
-|组件|进度|
-|---|---|
-|空间配置器|100%|
-|uninitialized|100%|
-|type_traits|100%|
-|iterator|100%|
-|reverse_iterator|100%|
-|string|15%|
-|pair|--|
+|组件|进度|链接|
+|---|---|---|
+|空间配置器|100%|[Allocator.h](MiniSTL/Allocator.h), [Alloc.h](MiniSTL/Alloc.h), [Alloc.cpp](MiniSTL/Alloc.cpp), [Construct.h](MiniSTL/Construct.h)|
+|uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|
+|type_traits|100%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
+|iterator|100%|[Iterator.h](MiniSTL/Iterator.h)|
+|reverse_iterator|100%|[ReverseIterator.h](MiniSTL/ReverseIterator.h)|
+|Algorithm|15%|[Algo.h](MiniSTL/Algo.h), [AlgoBase.h](MiniSTL/AlgoBase.h), [Algorithm.h](MiniSTL/Algorithm.h)|
+|string|25%|[String.h](MiniSTL/String.h), [String.cpp](MiniSTL/String.cpp)|
+|pair|--|--|
 
-|顺序容器|进度|
-|---|---|
-|vector|95%|
+|顺序容器|进度|链接|
+|---|---|---|
+|vector|95%|[Vector.h](MiniSTL/Vector.h)|
+|list|---|---|
 
-|关联容器|进度|
-|---|---|
-
-|Algorithms|进度|
-|---|---|
-|fill|100%|
-|fill_n|100%|
-|min|100%|
-|max|100%|
-|equal|100%|
-|swap|100%|
-|---|---|
+|关联容器|进度|链接|
+|---|---|---|
+|---|---|---|
