@@ -759,8 +759,6 @@ namespace rayn {
         */
         int compare(size_type pos, size_type n1, const CharT* cstr, size_type n2) const;
 
-    
-
     public:
         // operator+
         /*
@@ -790,13 +788,37 @@ namespace rayn {
         friend basic_string operator+ (CharT lhs, const basic_string& rhs);
 
         // operator==
+        /*
+        ** @brief   Test equivalence of two strings.
+        ** return   True if lhs.compare(rhs) == 0.  False otherwise.
+        */
         friend bool operator== (const basic_string& lhs, const basic_string& rhs);
+        /*
+        ** @brief   Test equivalence of a string and a C-String.
+        ** return   True if lhs.compare(rhs) == 0.  False otherwise.
+        */
         friend bool operator== (const basic_string& lhs, const CharT* rhs);
+        /*
+        ** @brief   Test equivalence of a string and a C-String.
+        ** return   True if lhs.compare(rhs) == 0.  False otherwise.
+        */
         friend bool operator== (const CharT* lhs, const basic_string& rhs);
 
         // operator!=
+        /*
+        ** @brief   Test difference of two strings.
+        ** return   True if lhs.compare(rhs) != 0.  False otherwise.
+        */
         friend bool operator!= (const basic_string& lhs, const basic_string& rhs);
+        /*
+        ** @brief   Test difference of a string and a C-String.
+        ** return   True if lhs.compare(rhs) != 0.  False otherwise.
+        */
         friend bool operator!= (const basic_string& lhs, const CharT* rhs);
+        /*
+        ** @brief   Test difference of a string and a C-String.
+        ** return   True if lhs.compare(rhs) != 0.  False otherwise.
+        */
         friend bool operator!= (const CharT* lhs, const basic_string& rhs);
 
         // operator<
@@ -823,6 +845,8 @@ namespace rayn {
      
         friend std::ostream& operator << (std::ostream& os, const basic_string& str);
         friend std::istream& operator >> (std::istream& is, basic_string& str);
+        friend std::istream& getline(std::istream& is, basic_string& str, char delim);
+        friend std::istream& getline(std::istream& is, basic_string& str);
 
     private:
         /*

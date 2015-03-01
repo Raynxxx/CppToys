@@ -36,7 +36,7 @@ namespace rayn {
 
     template <class CharT>
     void basic_string<CharT>::resize(size_type n) {
-        resize(n, value_type());
+        resize(n, CharT());
     }
     template <class CharT>
     void basic_string<CharT>::resize(size_type n, value_type ch) {
@@ -58,4 +58,6 @@ namespace rayn {
             _endOfStorage = _start + n;
         }
     }
+
+
 }
