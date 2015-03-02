@@ -242,7 +242,7 @@ namespace rayn {
         /*
         ** @brief   Append a single character.
         */
-        void push_back(CharT ch);
+        void push_back(CharT ch) { insert(end(), ch); }
 
         /*
         ** @brief   Set (Copy) this string as another string.
@@ -326,9 +326,9 @@ namespace rayn {
         */
         basic_string& erase(size_type pos = 0, size_type n = npos);
         /*
-        ** @brief   Remove characters.
-        ** @param   pos Iterator refer to The start index to remove. 
-        ** @return  Return the iterator refer to the location of first char removal.
+        ** @brief   Remove one character.
+        ** @param   pos     Iterator refer to the character to remove. 
+        ** @return  Return the iterator refer to same location after removal.
         */
         iterator erase(iterator pos);
         /*
@@ -339,7 +339,7 @@ namespace rayn {
         /*
         ** @brief   Remove the last character.
         */
-        void pop_back();
+        void pop_back() { erase(end() - 1, end()); }
 
         /*
         ** @brief   Replace characters with value from another string.
@@ -378,14 +378,14 @@ namespace rayn {
         */
         basic_string& replace(size_type pos, size_type len, const CharT* cstr);
         /*
-        ** @brief   Replace characters from C-Style string.
+        ** @brief   Replace characters from multiple characters.
         ** @param   pos     Index of first char to replace.
         ** @param   len     Number of char to be replaced.
-        ** @param   len2    Number of char to insert.
+        ** @param   n       Number of char to insert.
         ** @param   ch      Characters to insert.
         ** @return  Reference to this string.
         */
-        basic_string& replace(size_type pos, size_type len, size_type len2, CharT ch);
+        basic_string& replace(size_type pos, size_type len, size_type n, CharT ch);
         /*
         ** @brief   Replace range of characters with string.
         ** @param   i1  Iterator refer to start of range to replace.
@@ -806,6 +806,7 @@ namespace rayn {
         friend std::istream& getline(std::istream& is, basic_string& str);
 
     private:
+        //Aux function
         /*
         ** @brief   Move the data to this string.
         */
@@ -855,10 +856,17 @@ namespace rayn {
             return var == npos ? (length - off) : var;
         }
 
-        //Aux function
-        iterator insert_and_fill(iterator p, size_type n, value_type ch);
+        iterator insert_and_fill(iterator p, size_type n, value_type ch) {
+            _start = data_allocator::allocate(n);
+            _finish = rayn::uninitialized_fill_n(_start, n, ch);
+            _endOfStorage = _finish;
+        }
         template <class InputIterator>
-        iterator insert_and_copy(iterator p, InputIterator first, InputIterator last);
+        iterator insert_and_copy(iterator p, InputIterator first, InputIterator last) {
+            _start = data_allocator::allocate(last - first);
+            _finish = rayn::uninitialized_copy(first, last, _start);
+            _endOfStorage = _finish;
+        }
 
     };
 
