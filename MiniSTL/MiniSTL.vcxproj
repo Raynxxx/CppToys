@@ -18,6 +18,7 @@
     <ClInclude Include="Allocator.h" />
     <ClInclude Include="Construct.h" />
     <ClInclude Include="Iterator.h" />
+    <ClInclude Include="List.h" />
     <ClInclude Include="ReverseIterator.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="TypeTraits.h" />

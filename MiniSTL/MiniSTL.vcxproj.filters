@@ -57,6 +57,9 @@
     <ClInclude Include="String.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="List.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp">

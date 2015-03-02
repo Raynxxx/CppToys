@@ -281,7 +281,7 @@ namespace rayn {
         iterator insert(iterator p, InputIterator first, InputIterator last);
         /*
         ** @brief   Insert value of string.
-        ** @param   pos The iterator refer to pos to insert.
+        ** @param   pos The Index refer to pos to insert.
         ** @return  Reference to this string.
         */
         basic_string& insert(size_type pos, const basic_string& str);
@@ -292,7 +292,8 @@ namespace rayn {
         ** @param   sublen  Length of characters to insert.
         ** @return  Reference to this string.
         */
-        basic_string& insert(size_type pos, const basic_string& str, size_type subpos, size_type sublen = npos);
+        basic_string& insert(size_type pos, const basic_string& str,
+            size_type subpos, size_type sublen = npos);
         /*
         ** @brief   Insert a C-Style string.
         ** @param   pos     Index in this string to insert.
@@ -761,64 +762,20 @@ namespace rayn {
 
     public:
         // operator+
-        /*
-        ** @brief   Concatenate two strings.
-        ** return   New string with value lhs + rhs.
-        */
         friend basic_string operator+ (const basic_string& lhs, const basic_string& rhs);
-        /*
-        ** @brief   Concatenate a C-String and a string.
-        ** return   New string with value lhs + rhs.
-        */
         friend basic_string operator+ (const CharT* lhs, const basic_string& rhs);
-        /*
-        ** @brief   Concatenate a string and a C-String.
-        ** return   New string with value lhs + rhs.
-        */
         friend basic_string operator+ (const basic_string& lhs, const CharT* rhs);
-        /*
-        ** @brief   Concatenate a string and a character.
-        ** return   New string with value lhs + rhs.
-        */
         friend basic_string operator+ (const basic_string& lhs, CharT rhs);
-        /*
-        ** @brief   Concatenate a character and a string.
-        ** return   New string with value lhs + rhs.
-        */
         friend basic_string operator+ (CharT lhs, const basic_string& rhs);
 
         // operator==
-        /*
-        ** @brief   Test equivalence of two strings.
-        ** return   True if lhs.compare(rhs) == 0.  False otherwise.
-        */
         friend bool operator== (const basic_string& lhs, const basic_string& rhs);
-        /*
-        ** @brief   Test equivalence of a string and a C-String.
-        ** return   True if lhs.compare(rhs) == 0.  False otherwise.
-        */
         friend bool operator== (const basic_string& lhs, const CharT* rhs);
-        /*
-        ** @brief   Test equivalence of a string and a C-String.
-        ** return   True if lhs.compare(rhs) == 0.  False otherwise.
-        */
         friend bool operator== (const CharT* lhs, const basic_string& rhs);
 
         // operator!=
-        /*
-        ** @brief   Test difference of two strings.
-        ** return   True if lhs.compare(rhs) != 0.  False otherwise.
-        */
         friend bool operator!= (const basic_string& lhs, const basic_string& rhs);
-        /*
-        ** @brief   Test difference of a string and a C-String.
-        ** return   True if lhs.compare(rhs) != 0.  False otherwise.
-        */
         friend bool operator!= (const basic_string& lhs, const CharT* rhs);
-        /*
-        ** @brief   Test difference of a string and a C-String.
-        ** return   True if lhs.compare(rhs) != 0.  False otherwise.
-        */
         friend bool operator!= (const CharT* lhs, const basic_string& rhs);
 
         // operator<
@@ -843,8 +800,8 @@ namespace rayn {
         
         friend void swap(basic_string &lhs, basic_string& rhs);
      
-        friend std::ostream& operator << (std::ostream& os, const basic_string& str);
-        friend std::istream& operator >> (std::istream& is, basic_string& str);
+        friend std::ostream& operator<< (std::ostream& os, const basic_string& str);
+        friend std::istream& operator>> (std::istream& is, basic_string& str);
         friend std::istream& getline(std::istream& is, basic_string& str, char delim);
         friend std::istream& getline(std::istream& is, basic_string& str);
 
@@ -897,6 +854,12 @@ namespace rayn {
         size_type fix_npos(size_type var, size_type length, size_type off) const {
             return var == npos ? (length - off) : var;
         }
+
+        //Aux function
+        iterator insert_and_fill(iterator p, size_type n, value_type ch);
+        template <class InputIterator>
+        iterator insert_and_copy(iterator p, InputIterator first, InputIterator last);
+
     };
 
     typedef basic_string<char>      string;

@@ -39,14 +39,14 @@ namespace rayn {
         resize(n, CharT());
     }
     template <class CharT>
-    void basic_string<CharT>::resize(size_type n, value_type ch) {
+    void basic_string<CharT>::resize(size_type n, CharT ch) {
         if (n < size()) {
             rayn::destroy(_start + n, _finish);
             _finish = _start + n;
         } else if (n > size() && n <= capacity()) {
             size_type lengthOfAdd = n - size();
             _finish = rayn::uninitialized_fill_n(_finish, lengthOfAdd, ch);
-        } else if (n >capacity()) {
+        } else if (n > capacity()) {
             size_type lengthOfAdd = n - size();
             iterator newStart = data_allocator::allocate(getNewCapacity(lengthOfAdd));
             iterator newFinish = rayn::uninitialized_copy(begin(), end(), newStart);
@@ -59,5 +59,122 @@ namespace rayn {
         }
     }
 
+    template <class CharT>
+    void basic_string<CharT>::reserve(size_type n = 0) {
+        if (n <= capacity()) return;
+        iterator newStart = data_allocator::allocate(n);
+        iterator newFinish = rayn::uninitialized_copy(begin(), end(), newStart);
+        destroy_and_deallocate();
+        _start = newStart;
+        _finish = newFinish;
+        _endOfStorage = _start + n;
+    }
 
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::operator+= (const basic_string& str) {
+        insert(size(), str);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::operator+= (const CharT* cstr) {
+        insert(size(), cstr);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::operator+= (CharT ch) {
+        insert(end(), ch);
+        return *this;
+    }
+
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::append(const basic_string& str) {
+        insert(size(), str);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::append(const basic_string& str, size_type subpos, size_type sublen = npos) {
+        sublen = fix_npos(sublen, str.length(), subpos);
+        insert(size(), str, subpos, sublen);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<charT>& basic_string<CharT>::append(const CharT* cstr) {
+        insert(size(), cstr);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<charT>& basic_string<CharT>::append(const CharT* cstr, size_type n) {
+        insert(size(), cstr, n);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<charT>& basic_string<CharT>::append(size_type n, CharT ch) {
+        insert(size(), n, ch);
+        return *this;
+    }
+
+    template <class CharT>
+    typename basic_string<CharT>::iterator
+        basic_string<CharT>::insert(iterator p, size_type n, CharT ch) {
+        size_type lengthOfLeft = capacity() - size();
+        if (n <= lengthOfLeft) {
+            for (iterator it = _finish - 1; it >= p; --it) {
+                *(it + n) = *it;
+            }
+            rayn::uninitialized_fill_n(p, n, ch);
+            _finish += n;
+            return p + n;
+        } else {
+            return insert_and_fill(p, n, ch);
+        }
+    }
+    template <class CharT>
+    typename basic_string<CharT>::iterator
+        basic_string<CharT>::insert(iterator p, CharT ch) {
+        return insert(p, 1, ch);
+    }
+    template <class CharT>
+    template <class InputIterator>
+    typename basic_string<CharT>::iterator
+        basic_string<CharT>::insert(iterator p, InputIterator first, InputIterator last) {
+        size_type lengthOfLeft = capacity() - size();
+        size_type range = last - first;
+        if (range <= lengthOfLeft) {
+            for (iterator it = _finish - 1; it >= p; --it) {
+                *(it + range) = *it;
+            }
+            rayn::uninitialized_copy(first, last, p);
+            _finish += range;
+            return p + range;
+        } else {
+            return insert_and_copy(p, first, last);
+        }
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::insert(size_type pos, const basic_string& str) {
+        insert(begin() + pos, str.begin(), str.end());
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::insert(size_type pos, const basic_string& str,
+        size_type subpos, size_type sublen = npos) {
+        sublen = fix_npos(sublen, str.length(), subpos);
+        insert(_start + pos, str.begin() + subpos, str.begin() + subpos + sublen);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::insert(size_type pos, const CharT* cstr) {
+        insert(begin() + pos, cstr, cstr + strlen(cstr));
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::insert(size_type pos, const CharT* cstr, size_type n) {
+        insert(begin() + pos, cstr, cstr + n);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::insert(size_type pos, size_type n, CharT ch) {
+        insert(begin() + pos, n, ch);
+        return *this;
+    }
 }
