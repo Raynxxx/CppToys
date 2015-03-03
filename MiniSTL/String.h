@@ -420,7 +420,7 @@ namespace rayn {
         */
         basic_string& replace(iterator i1, iterator i2, size_type n, CharT ch);
         /*
-        ** @brief   Replace range of characters with C-Style string.
+        ** @brief   Replace range of characters with range.
         ** @param   i1      Iterator refer to start of range to replace.
         ** @param   i2      Iterator refer to end of range to replace.
         ** @param   first   Iterator refer to start of range to insert.
@@ -445,11 +445,16 @@ namespace rayn {
         /*
         ** @brief   Return const pointer to null-terminated contents.
         */
-        const CharT* c_str() const;
+        const CharT* c_str() const { 
+            CharT* ret = new CharT[size() + 1];
+            rayn::uninitialized_copy(begin(), end(), ret);
+            ret[size()] = '\0';
+            return ret;
+        }
         /*
         ** @brief   Return const pointer to contents.
         */
-        const CharT* data() const;
+        const CharT* data() const { return _start; }
 
         /*
         ** @brief   Find position of a C substring.
@@ -857,15 +862,34 @@ namespace rayn {
         }
 
         iterator insert_and_fill(iterator p, size_type n, value_type ch) {
-            _start = data_allocator::allocate(n);
-            _finish = rayn::uninitialized_fill_n(_start, n, ch);
-            _endOfStorage = _finish;
+            size_type newCapacity = getNewCapacity(n);
+            iterator newStart = data_allocator::allocate(newCapacity);
+            iterator newFinish = rayn::uninitialized_copy(_start, p, newStart);
+            newFinish = rayn::uninitialized_fill_n(newFinish, n, ch);
+            iterator ret = newFinish;
+            newFinish = rayn::uninitialized_copy(p, _finish, newFinish);
+
+            destroy_and_deallocate();
+            _start = newStart;
+            _finish = newFinish;
+            _endOfStorage = _start + newCapacity;
+            return ret;
         }
         template <class InputIterator>
         iterator insert_and_copy(iterator p, InputIterator first, InputIterator last) {
-            _start = data_allocator::allocate(last - first);
-            _finish = rayn::uninitialized_copy(first, last, _start);
-            _endOfStorage = _finish;
+            size_type lengthOfAdd = last - first;
+            size_type newCapacity = getNewCapacity(lengthOfAdd);
+            iterator newStart = data_allocator::allocate(newCapacity);
+            iterator newFinish = rayn::uninitialized_copy(_start, p, newStart);
+            newFinish = rayn::uninitialized_copy(first, last, newFinish);
+            iterator ret = newFinish;
+            newFinish = rayn::uninitialized_copy(p, _finish, newFinish);
+
+            destroy_and_deallocate();
+            _start = newStart;
+            _finish = newFinish;
+            _endOfStorage = _start + newCapacity;
+            return ret;
         }
 
     };

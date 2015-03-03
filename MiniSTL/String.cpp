@@ -281,4 +281,29 @@ namespace rayn {
         insert(cur, first, last);
         return *this;
     }
+
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::copy(const CharT* cstr, size_type len, size_type pos = 0) const {
+        iterator tail = rayn::uninitialized_copy(begin() + pos, begin() + pos + len, cstr);
+        return static_cast<size_type>(tail - cstr);
+    }
+    template <class CharT>
+    void basic_string<CharT>::swap(basic_string& str) {
+        rayn::swap(_start, str._start);
+        rayn::swap(_finish, str._finish);
+        rayn::swap(_endOfStorage, str._endOfStorage);
+    }
+
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find(const CharT* cstr, size_type pos, size_type n) const {
+
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find(const CharT* cstr, size_type pos = 0) const {
+
+    }
+
 }

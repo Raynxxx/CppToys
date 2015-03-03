@@ -60,6 +60,9 @@
     <ClInclude Include="List.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="组件测试\StringTest.h">
+      <Filter>测试</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp">

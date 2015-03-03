@@ -6,7 +6,6 @@
 #define _VECTOR_TEST_H_
 
 #include "../Vector.h"
-#include "../String.h"
 #include <iostream>
 #include <string>
 

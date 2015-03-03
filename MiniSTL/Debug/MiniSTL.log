@@ -1,4 +1,4 @@
-﻿生成启动时间为 3/2 星期一 22:29:28。
+﻿生成启动时间为 3/3 星期二 20:05:23。
      1>项目“D:\Code\MiniSTL\MiniSTL\MiniSTL.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt String.cpp "组件测试\TestSTL.cpp"
@@ -16,4 +16,4 @@
 
 生成成功。
 
-已用时间 00:00:01.71
+已用时间 00:00:01.39
