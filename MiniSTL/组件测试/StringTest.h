@@ -13,7 +13,7 @@ namespace rayn {
     namespace test {
         void test_string_1() {
             rayn::string str("Hello World!");
-            printf("%s\n", str.c_str());
+            std::cout << str.rfind("ld") << std::endl;
         }
         void test_string() {
             test_string_1();

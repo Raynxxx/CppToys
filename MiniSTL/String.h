@@ -29,7 +29,7 @@ namespace rayn {
         typedef ptrdiff_t                           difference_type;
 
         // Value returned by various member functions when they Fail.
-        static const size_type npos = static_cast<size_type>(-1);
+        static const size_type npos = -1;
 
     private:
         CharT *_start;
@@ -457,6 +457,13 @@ namespace rayn {
         const CharT* data() const { return _start; }
 
         /*
+        ** @brief   Find position of a String.
+        ** @param   cstr    String to locate.
+        ** @param   pos     Index of character to search from. (Default = 0)
+        ** @return  Index of start of first occurrence.
+        */
+        size_type find(const basic_string& str, size_type pos = 0) const;
+        /*
         ** @brief   Find position of a C substring.
         ** @param   cstr    C-String to locate.
         ** @param   pos     Index of character to search from.
@@ -471,13 +478,6 @@ namespace rayn {
         ** @return  Index of start of first occurrence.
         */
         size_type find(const CharT* cstr, size_type pos = 0) const;
-        /*
-        ** @brief   Find position of a String.
-        ** @param   cstr    String to locate.
-        ** @param   pos     Index of character to search from. (Default = 0)
-        ** @return  Index of start of first occurrence.
-        */
-        size_type find(const basic_string& str, size_type pos = 0) const;
         /*
         ** @brief   Find position of a Character.
         ** @param   ch      Character to locate.
@@ -507,7 +507,7 @@ namespace rayn {
         ** @param   pos     Index of character to search back from. (Default = npos)
         ** @return  Index of start of first occurrence.
         */
-        size_type rfind(const CharT* cstr, size_type pos = 0) const;   
+        size_type rfind(const CharT* cstr, size_type pos = npos) const;   
         /*
         ** @brief   Find last position of a Character.
         ** @param   ch      Character to locate.
@@ -860,7 +860,9 @@ namespace rayn {
         size_type fix_npos(size_type var, size_type length, size_type off) const {
             return var == npos ? (length - off) : var;
         }
-
+        /*
+        ** @brief   Insert aux, allocate memory and fill with char.
+        */
         iterator insert_and_fill(iterator p, size_type n, value_type ch) {
             size_type newCapacity = getNewCapacity(n);
             iterator newStart = data_allocator::allocate(newCapacity);
@@ -875,6 +877,9 @@ namespace rayn {
             _endOfStorage = _start + newCapacity;
             return ret;
         }
+        /*
+        ** @brief   Insert aux, allocate memory and copy range into.
+        */
         template <class InputIterator>
         iterator insert_and_copy(iterator p, InputIterator first, InputIterator last) {
             size_type lengthOfAdd = last - first;
@@ -891,11 +896,427 @@ namespace rayn {
             _endOfStorage = _start + newCapacity;
             return ret;
         }
-
+        /*
+        ** @brief   Find aux, from range [st, ed) to find substring equal to [it, it + length).
+        */
+        size_type find_aux(size_type st, size_type ed, const_iterator it, size_type length) const {
+            size_type i, j;
+            for (i = st; i != ed; ++i) {
+                for (j = 0; j != length; ++j) {
+                    if (*(begin() + i + j) != *(it + j)) {
+                        break;
+                    }
+                }
+                if (j == length) return i;
+            }
+            return npos;
+        }
+        /*
+        ** @brief   rFind aux, from range [st, ed) to find substring equal to [it, it + length).
+        */
+        size_type rfind_aux(size_type st, size_type ed, const_iterator it, size_type length) const {
+            size_type i, j;
+            for (i = st; i >= ed; --i) {
+                for (j = 0; j != length; ++j) {
+                    if (*(begin() + i + j) != *(it + j)) {
+                        break;
+                    }
+                }
+                if (j == length) return i;
+            }
+            return npos;
+        }
+        /*
+        ** @brief Test whether the char is in range [first, last) or not.
+        */
+        bool isContained(CharT ch, const_iterator first, const_iterator last) const {
+            for (const_iterator it = first; it != last; ++it) {
+                if (*it == ch) {
+                    return true;
+                }
+            }
+            return false;
+        }
     };
 
     typedef basic_string<char>      string;
     typedef basic_string<wchar_t>   wstring;
+
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::operator= (const basic_string& str) {
+        if (this != &str) {
+            destroy_and_deallocate();
+            allocate_and_copy(str._start, str._finish);
+        }
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::operator= (basic_string&& str) {
+        if (this != &str) {
+            moveData(str);
+        }
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::operator= (const CharT* cstr) {
+        destroy_and_deallocate();
+        allocate_and_copy(cstr, cstr + strlen(cstr));
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::operator= (CharT ch) {
+        destroy_and_deallocate();
+        allocate_and_fill(1, ch);
+        return *this;
+    }
+
+    template <class CharT>
+    void basic_string<CharT>::resize(size_type n) {
+        resize(n, CharT());
+    }
+    template <class CharT>
+    void basic_string<CharT>::resize(size_type n, CharT ch) {
+        if (n < size()) {
+            rayn::destroy(_start + n, _finish);
+            _finish = _start + n;
+        } else if (n > size() && n <= capacity()) {
+            size_type lengthOfAdd = n - size();
+            _finish = rayn::uninitialized_fill_n(_finish, lengthOfAdd, ch);
+        } else if (n > capacity()) {
+            size_type lengthOfAdd = n - size();
+            iterator newStart = data_allocator::allocate(getNewCapacity(lengthOfAdd));
+            iterator newFinish = rayn::uninitialized_copy(begin(), end(), newStart);
+            newFinish = rayn::uninitialized_fill_n(newFinish, lengthOfAdd, ch);
+
+            destroy_and_deallocate();
+            _start = newStart;
+            _finish = newFinish;
+            _endOfStorage = _start + n;
+        }
+    }
+
+    template <class CharT>
+    void basic_string<CharT>::reserve(size_type n = 0) {
+        if (n <= capacity()) return;
+        iterator newStart = data_allocator::allocate(n);
+        iterator newFinish = rayn::uninitialized_copy(begin(), end(), newStart);
+        destroy_and_deallocate();
+        _start = newStart;
+        _finish = newFinish;
+        _endOfStorage = _start + n;
+    }
+
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::operator+= (const basic_string& str) {
+        insert(size(), str);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::operator+= (const CharT* cstr) {
+        insert(size(), cstr);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::operator+= (CharT ch) {
+        insert(end(), ch);
+        return *this;
+    }
+
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::append(const basic_string& str) {
+        insert(size(), str);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::append(const basic_string& str, size_type subpos,
+        size_type sublen = npos) {
+        sublen = fix_npos(sublen, str.length(), subpos);
+        insert(size(), str, subpos, sublen);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::append(const CharT* cstr) {
+        insert(size(), cstr);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::append(const CharT* cstr, size_type n) {
+        insert(size(), cstr, n);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::append(size_type n, CharT ch) {
+        insert(end(), n, ch);
+        return *this;
+    }
+    template <class CharT>
+    template <class InputIterator>
+    basic_string<CharT>& basic_string<CharT>::append(InputIterator first, InputIterator last) {
+        insert(end(), first, last);
+        return *this;
+    }
+
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::assign(const basic_string& str) {
+        if (this != &str) {
+            destroy_and_deallocate();
+            allocate_and_copy(str.begin(), str.end());
+        }
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::assign(basic_string&& str) {
+        if (this != &str) {
+            moveData(str);
+        }
+        return *this;
+    }
+
+    template <class CharT>
+    typename basic_string<CharT>::iterator
+        basic_string<CharT>::insert(iterator p, size_type n, CharT ch) {
+        size_type lengthOfLeft = capacity() - size();
+        if (n <= lengthOfLeft) {
+            for (iterator it = _finish - 1; it >= p; --it) {
+                *(it + n) = *it;
+            }
+            rayn::uninitialized_fill_n(p, n, ch);
+            _finish += n;
+            return p + n;
+        } else {
+            return insert_and_fill(p, n, ch);
+        }
+    }
+    template <class CharT>
+    typename basic_string<CharT>::iterator
+        basic_string<CharT>::insert(iterator p, CharT ch) {
+        return insert(p, 1, ch);
+    }
+    template <class CharT>
+    template <class InputIterator>
+    typename basic_string<CharT>::iterator
+        basic_string<CharT>::insert(iterator p, InputIterator first, InputIterator last) {
+        size_type lengthOfLeft = capacity() - size();
+        size_type range = last - first;
+        if (range <= lengthOfLeft) {
+            for (iterator it = _finish - 1; it >= p; --it) {
+                *(it + range) = *it;
+            }
+            rayn::uninitialized_copy(first, last, p);
+            _finish += range;
+            return p + range;
+        } else {
+            return insert_and_copy(p, first, last);
+        }
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::insert(size_type pos, const basic_string& str) {
+        insert(begin() + pos, str.begin(), str.end());
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::insert(size_type pos, const basic_string& str,
+        size_type subpos, size_type sublen = npos) {
+        sublen = fix_npos(sublen, str.length(), subpos);
+        insert(_start + pos, str.begin() + subpos, str.begin() + subpos + sublen);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::insert(size_type pos, const CharT* cstr) {
+        insert(begin() + pos, cstr, cstr + strlen(cstr));
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::insert(size_type pos, const CharT* cstr, size_type n) {
+        insert(begin() + pos, cstr, cstr + n);
+        return *this;
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::insert(size_type pos, size_type n, CharT ch) {
+        insert(begin() + pos, n, ch);
+        return *this;
+    }
+
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::erase(size_type pos = 0, size_type n = npos) {
+        n = fix_npos(n, size(), pos);
+        erase(begin() + pos, begin() + pos + n);
+        return *this;
+    }
+    template <class CharT>
+    typename basic_string<CharT>::iterator
+        basic_string<CharT>::erase(iterator pos) {
+        return erase(pos, pos + 1);
+    }
+    template <class CharT>
+    typename basic_string<CharT>::iterator
+        basic_string<CharT>::erase(iterator first, iterator last) {
+        size_type lengthOfTail = _finish - last;
+        for (size_type off = 0; off != lengthOfTail; ++off) {
+            *(first + off) = *(last + off);
+        }
+        rayn::destroy(first + lengthOfTail, _finish);
+        _finish = first + lengthOfTail;
+        return first;
+    }
+
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::replace(size_type pos, size_type len,
+        const basic_string& str) {
+        return replace(begin() + pos, begin() + pos + len, str.begin(), str.end());
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::replace(size_type pos, size_type len,
+        const basic_string& str, size_type subpos, size_type sublen = npos) {
+        sublen = fix_npos(sublen, str.length(), subpos);
+        return replace(begin() + pos, begin() + pos + len, str.begin() + subpos,
+            str.begin() + subpos + sublen);
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::replace(size_type pos, size_type len,
+        const CharT* cstr, size_type len2) {
+        return replace(begin() + pos, begin() + pos + len, cstr, cstr + len2);
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::replace(size_type pos, size_type len,
+        const CharT* cstr) {
+        return replace(begin() + pos, begin() + pos + len, cstr, cstr + strlen(cstr));
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::replace(size_type pos, size_type len,
+        size_type n, CharT ch) {
+        return replace(begin() + pos, begin() + pos + len, n, ch);
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::replace(iterator i1, iterator i2,
+        const basic_string& str) {
+        return replace(i1, i2, str.begin(), str.end());
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::replace(iterator i1, iterator i2,
+        const CharT* cstr, size_type n) {
+        return replace(i1, i2, cstr, cstr + n);
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::replace(iterator i1, iterator i2,
+        const CharT* cstr) {
+        return replace(i1, i2, cstr, cstr + strlen(cstr));
+    }
+    template <class CharT>
+    basic_string<CharT>& basic_string<CharT>::replace(iterator i1, iterator i2,
+        size_type n, CharT ch) {
+        iterator cur = erase(i1, i2);
+        insert(cur, n, c);
+        return *this;
+    }
+    template <class CharT>
+    template <class InputIterator>
+    basic_string<CharT>& basic_string<CharT>::replace(iterator i1, iterator i2,
+        InputIterator first, InputIterator last) {
+        iterator cur = erase(i1, i2);
+        insert(cur, first, last);
+        return *this;
+    }
+
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::copy(const CharT* cstr, size_type len, size_type pos = 0) const {
+        iterator tail = rayn::uninitialized_copy(begin() + pos, begin() + pos + len, cstr);
+        return static_cast<size_type>(tail - cstr);
+    }
+    template <class CharT>
+    void basic_string<CharT>::swap(basic_string& str) {
+        rayn::swap(_start, str._start);
+        rayn::swap(_finish, str._finish);
+        rayn::swap(_endOfStorage, str._endOfStorage);
+    }
+
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find(const basic_string& str, size_type pos = 0) const {
+        size_type length = str.length();
+        if (size() - pos < length) return npos;
+        return find_aux(pos, size(), str.cbegin(), length);
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find(const CharT* cstr, size_type pos, size_type n) const {
+        return find_aux(pos, size(), cstr, n);
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find(const CharT* cstr, size_type pos = 0) const {
+        return find(cstr, pos, strlen(cstr));
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find(CharT ch, size_type pos = 0) const {
+        for (const_iterator it = cbegin() + pos; it != cend(); ++it) {
+            if (*it == ch) {
+                return it - cbegin();
+            }
+        }
+        return npos;
+    }
+
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::rfind(const basic_string& str, size_type pos = npos) const {
+        pos = fix_npos(pos, size(), 1);
+        return rfind_aux(pos, 0, str.cbegin(), str.length());
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::rfind(const CharT* cstr, size_type pos, size_type n) const {
+        return rfind_aux(pos, 0, cstr, n);
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::rfind(const CharT* cstr, size_type pos = npos) const {
+        pos = fix_npos(pos, size(), 1);
+        return rfind(cstr, pos, strlen(cstr));
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::rfind(CharT ch, size_type pos = npos) const {
+        pos = fix(pos, size(), 1);
+        for (const_iterator it = cbegin() + pos; it >= cbegin(); --it) {
+            if (*it == ch) {
+                return it - cbegin();
+            }
+        }
+        return npos;
+    }
+
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_first_of(const basic_string& str, size_type pos = 0) const {
+        return find_first_of(str.begin(), pos, str.size());
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_first_of(const CharT* cstr, size_type pos, size_type n) const {
+        for (size_type i = pos; i != size(); ++i) {
+            if (isContained(*(begin() + i), cstr, cstr + n)) {
+                return i;
+            }
+        }
+        return npos;
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_first_of(const CharT* cstr, size_type pos = 0) const {
+        return find_first_of(cstr, pos, strlen(cstr));
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_first_of(CharT ch, size_type pos = 0) const {
+        return find(ch, pos);
+    }
+
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+
 }
 
 #endif
