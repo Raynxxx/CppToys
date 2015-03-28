@@ -711,14 +711,14 @@ namespace rayn {
         int compare(const basic_string& str) const;
         /*
         ** @brief   Compare substring to a string.
-        ** @param   pos     Index of first char of substring.
-        ** @param   n       Number of chars in substring.
+        ** @param   pos1    Index of first char of substring.
+        ** @param   n1      Number of chars in substring.
         ** @param   str     String to compare against.
         ** @return  Integer < 0, 0, or > 0.
         **
         ** Form the substring of this string from the n chars starting at pos.
         */
-        int compare(size_type pos, size_type n, const basic_string& str) const;
+        int compare(size_type pos1, size_type n1, const basic_string& str) const;
         /*
         ** @brief   Compare substring to a substring.
         ** @param   pos1    Index of first char of substring.
@@ -741,17 +741,17 @@ namespace rayn {
         ** 0 if their values are equivalent, or > 0 if this string is
         ** ordered after str.
         */
-        int compare(const CharT* cstr);
+        int compare(const CharT* cstr) const;
         /*
         ** @brief   Compare substring to a C-String.
-        ** @param   pos     Index of first char of substring.
-        ** @param   n       Number of chars in substring.
+        ** @param   pos1    Index of first char of substring.
+        ** @param   n1      Number of chars in substring.
         ** @param   cstr    C-String to compare against.
         ** @return  Integer < 0, 0, or > 0.
         **
         ** Form the substring of this string from the n chars starting at pos.
         */
-        int compare(size_type pos, size_type n, const CharT* cstr) const;
+        int compare(size_type pos1, size_type n1, const CharT* cstr) const;
         /*
         ** @brief   Compare substring to a C substring.
         ** @param   pos1    Index of first char of substring.
@@ -763,7 +763,7 @@ namespace rayn {
         ** Form the substring of this string from the n1 chars starting at pos.
         ** Form a string from the first n2 characters of cstr.
         */
-        int compare(size_type pos, size_type n1, const CharT* cstr, size_type n2) const;
+        int compare(size_type pos1, size_type n1, const CharT* cstr, size_type n2) const;
 
     public:
         // operator+
@@ -936,6 +936,27 @@ namespace rayn {
                 }
             }
             return false;
+        }
+
+        /*
+        ** @brief Compare aux.
+        */
+        int compare_aux(size_type pos1, size_type n1, const_iterator it, size_type pos2, size_type n2) const {
+            size_type i, j;
+            for (i = 0, j = 0; i != n1 && j != n2; ++i, ++j) {
+                if (*(begin() + pos1 + i) < *(it + pos2 + j)) {
+                    return -1;
+                } else if (*(begin() + pos1 + i) > *(it + pos2 + j)) {
+                    return 1;
+                }
+            }
+            if (i == n1 && j == n2) {
+                return 0;
+            } else if (i == n1) {
+                return -1;
+            } else {
+                return 1;
+            }
         }
     };
 
@@ -1279,7 +1300,7 @@ namespace rayn {
     template <class CharT>
     typename basic_string<CharT>::size_type
         basic_string<CharT>::rfind(CharT ch, size_type pos = npos) const {
-        pos = fix(pos, size(), 1);
+        pos = fix_npos(pos, size(), 1);
         for (const_iterator it = cbegin() + pos; it >= cbegin(); --it) {
             if (*it == ch) {
                 return it - cbegin();
@@ -1316,7 +1337,133 @@ namespace rayn {
 
     template <class CharT>
     typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_last_of(const basic_string& str, size_type pos = npos) const {
+        pos = fix_npos(pos, size(), 1);
+        return find_last_of(str.begin(), pos, str.size());
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_last_of(const CharT* cstr, size_type pos, size_type n) const {
+        pos = fix_npos(pos, size(), 1);
+        for (size_type i = pos; i >= 0; --i) {
+            if (isContained(*(begin() + i), cstr, cstr + n)) {
+                return i;
+            }
+        }
+        return npos;
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_last_of(const CharT* cstr, size_type pos = npos) const {
+        pos = fix_npos(pos, size(), 1);
+        return find_last_of(cstr, pos, strlen(cstr));
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_last_of(CharT ch, size_type pos = npos) const {
+        pos = fix_npos(pos, size(), 1);
+        return rfind(ch, pos);
+    }
 
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_first_not_of(const basic_string& str, size_type pos = 0) const {
+        return find_first_not_of(str.begin(), pos, str.size());
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_first_not_of(const CharT* cstr, size_type pos, size_type n) const {
+        for (size_type i = pos; i != size(); ++i) {
+            if (!isContained(*(begin() + i), cstr, cstr + n)) {
+                return i;
+            }
+        }
+        return npos;
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_first_not_of(const CharT* cstr, size_type pos = 0) const {
+        return find_last_not_of(cstr, pos, strlen(cstr));
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_first_not_of(CharT ch, size_type pos = 0) const {
+        for (size_type i = pos; i != size(); ++i) {
+            if (*(begin() + i) != ch) {
+                return i;
+            }
+        }
+        return npos;
+    }
+
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_last_not_of(const basic_string& str, size_type pos = npos) const {
+        pos = fix_npos(pos, size(), 1);
+        return find_last_not_of(str.begin(), pos, str.size());
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_last_not_of(const CharT* cstr, size_type pos, size_type n) const {
+        pos = fix_npos(pos, size(), 1);
+        for (size_type i = pos; i >= 0; --i) {
+            if (!isContained(*(begin() + i), cstr, cstr + n)) {
+                return i;
+            }
+        }
+        return npos;
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_last_not_of(const CharT* cstr, size_type pos = npos) const {
+        pos = fix_npos(pos, size(), 1);
+        return find_last_not_of(cstr, pos, strlen(cstr));
+    }
+    template <class CharT>
+    typename basic_string<CharT>::size_type
+        basic_string<CharT>::find_last_not_of(CharT ch, size_type pos = npos) const {
+        pos = fix_npos(pos, size(), 1);
+        for (size_type i = pos; i >= 0; --i) {
+            if (*(begin() + i) != ch) {
+                return i;
+            }
+        }
+        return npos;
+    }
+
+    template <class CharT>
+    basic_string<CharT>
+        basic_string<CharT>::substr(size_type pos = 0, size_type len = npos) const {
+        len = fix_npos(len, size(), pos);
+        return basic_string<CharT>(begin() + pos, begin() + pos + len);
+    }
+
+
+    template <class CharT>
+    int basic_string<CharT>::compare(const basic_string& str) const {
+        return compare(0, size(), str, 0, str.size());
+    }
+    template <class CharT>
+    int basic_string<CharT>::compare(size_type pos1, size_type n1, const basic_string& str) const {
+        return compare(pos1, n1, str, 0, str.size());
+    }
+    template <class CharT>
+    int basic_string<CharT>::compare(size_type pos1, size_type n1,
+        const basic_string& str, size_type pos2, size_type n2) const {
+        return compare_aux(pos1, n1, str.begin(), pos2, n2);
+    }
+    template <class CharT>
+    int basic_string<CharT>::compare(const CharT* cstr) const {
+        return compare(0, size(), cstr, strlen(cstr));
+    }
+    template <class CharT>
+    int basic_string<CharT>::compare(size_type pos1, size_type n1, const CharT* cstr) const {
+        return compare(pos1, n1, cstr, strlen(cstr));
+    }
+    template <class CharT>
+    int basic_string<CharT>::compare(size_type pos1, size_type n1, const CharT* cstr, size_type n2) const {
+        return compare_aux(pos1, n1, cstr, 0, n2);
+    }
 }
 
 #endif
