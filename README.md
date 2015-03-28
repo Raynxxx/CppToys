@@ -15,7 +15,7 @@
 |iterator|100%|[Iterator.h](MiniSTL/Iterator.h)|
 |reverse_iterator|100%|[ReverseIterator.h](MiniSTL/ReverseIterator.h)|
 |Algorithm|15%|[Algo.h](MiniSTL/Algo.h), [AlgoBase.h](MiniSTL/AlgoBase.h), [Algorithm.h](MiniSTL/Algorithm.h)|
-|string|50%|[String.h](MiniSTL/String.h), [String.cpp](MiniSTL/String.cpp)|
+|string|50%|[String.h](MiniSTL/String.h)|
 |pair|--|--|
 
 |顺序容器|进度|链接|
