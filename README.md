@@ -15,7 +15,7 @@
 |iterator|100%|[Iterator.h](MiniSTL/Iterator.h)|
 |reverse_iterator|100%|[ReverseIterator.h](MiniSTL/ReverseIterator.h)|
 |Algorithm|15%|[Algo.h](MiniSTL/Algo.h), [AlgoBase.h](MiniSTL/AlgoBase.h), [Algorithm.h](MiniSTL/Algorithm.h)|
-|string|50%|[String.h](MiniSTL/String.h)|
+|string|80%|[String.h](MiniSTL/String.h) 计划加入一些QT的string接口|
 |pair|--|--|
 
 |顺序容器|进度|链接|

@@ -8,6 +8,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <memory>
 #include <type_traits>
 
 #include "Allocator.h"
@@ -1463,6 +1464,160 @@ namespace rayn {
     template <class CharT>
     int basic_string<CharT>::compare(size_type pos1, size_type n1, const CharT* cstr, size_type n2) const {
         return compare_aux(pos1, n1, cstr, 0, n2);
+    }
+
+    // Friend Functions
+    // operator +
+    template <class CharT>
+    basic_string<CharT> operator+ (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs) {
+        basic_string<CharT> res(lhs);
+        return res += rhs;
+    }
+    template <class CharT>
+    basic_string<CharT> operator+ (const CharT* lhs, const basic_string<CharT>& rhs) {
+        basic_string<CharT> res(lhs);
+        return res += rhs;
+    }
+    template <class CharT>
+    basic_string<CharT> operator+ (const basic_string<CharT>& lhs, const CharT* rhs) {
+        basic_string<CharT> res(lhs);
+        return res += rhs;
+    }
+    template <class CharT>
+    basic_string<CharT> operator+ (const basic_string<CharT>& lhs, CharT rhs) {
+        basic_string<CharT> res(lhs);
+        return res += rhs;
+    }
+    template <class CharT>
+    basic_string<CharT> operator+ (CharT lhs, const basic_string<CharT>& rhs) {
+        basic_string<CharT> res(lhs);
+        return res += rhs;
+    }
+
+    //operator==
+    template <class CharT>
+    bool operator== (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs) {
+        if (lhs.size() == rhs.size()) {
+            for (auto cit1 = lhs.cbegin(), cit2 = rhs.cbegin();
+                cit1 != lhs.cend() && cit2 != rhs.cend();
+                ++cit1, ++cit2) {
+                if (*cit1 != *cit2) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    template <class CharT>
+    bool operator== (const basic_string<CharT>& lhs, const CharT* rhs) {
+        size_t len1 = lhs.size(), len2 = strlen(rhs);
+        if (len1 == len2) {
+            auto cit1 = lhs.cbegin();
+            auto cit2 = rhs;
+            for ( ; cit1 != lhs.cend() && cit2 != rhs + len2;
+                ++cit1, ++cit2) {
+                if (*cit1 != *cit2) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    template <class CharT>
+    bool operator== (const CharT* lhs, const basic_string<CharT>& rhs) {
+        return rhs == lhs;
+    }
+
+    //operator!=
+    template <class CharT>
+    bool operator!= (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs) {
+        return !(lhs == rhs);
+    }
+    template <class CharT>
+    bool operator!= (const basic_string<CharT>& lhs, const CharT* rhs) {
+        return !(lhs == rhs);
+    }
+    template <class CharT>
+    bool operator!= (const CharT* lhs, const basic_string<CharT>& rhs) {
+        return !(lhs == rhs);
+    }
+
+    //operator<
+    template <class CharT>
+    bool operator< (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs) {
+        return lhs.compare(rhs) < 0;
+    }
+    template <class CharT>
+    bool operator< (const basic_string<CharT>& lhs, const CharT* rhs) {
+        return lhs.compare(rhs) < 0;
+    }
+    template <class CharT>
+    bool operator< (const CharT* lhs, const basic_string<CharT>& rhs) {
+        return rhs.compare(lhs) > 0;
+    }
+
+    //operator<=
+    template <class CharT>
+    bool operator<= (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs) {
+        return lhs.compare(rhs) <= 0;
+    }
+    template <class CharT>
+    bool operator<= (const basic_string<CharT>& lhs, const CharT* rhs) {
+        return lhs.compare(rhs) <= 0;
+    }
+    template <class CharT>
+    bool operator<= (const CharT* lhs, const basic_string<CharT>& rhs) {
+        return rhs.compare(lhs) >= 0;
+    }
+
+    //operator>
+    template <class CharT>
+    bool operator> (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs) {
+        return lhs.compare(rhs) > 0;
+    }
+    template <class CharT>
+    bool operator> (const basic_string<CharT>& lhs, const CharT* rhs) {
+        return lhs.compare(rhs) > 0;
+    }
+    template <class CharT>
+    bool operator> (const CharT* lhs, const basic_string<CharT>& rhs) {
+        return rhs.compare(lhs) < 0;
+    }
+
+    //operator>=
+    template <class CharT>
+    bool operator>= (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs) {
+        return lhs.compare(rhs) >= 0;
+    }
+    template <class CharT>
+    bool operator>= (const basic_string<CharT>& lhs, const CharT* rhs) {
+        return lhs.compare(rhs) >= 0;
+    }
+    template <class CharT>
+    bool operator>= (const CharT* lhs, const basic_string<CharT>& rhs) {
+        return rhs.compare(lhs) <= 0;
+    }
+
+    template <class CharT>
+    void swap(const basic_string<CharT>& lhs, const basic_string<CharT>& rhs) {
+        lhs.swap(rhs);
+    }
+
+    template <class CharT>
+    std::ostream& operator<< (std::ostream& os, const basic_string<CharT>& str) {
+        for (auto it = str.begin(); it != str.end(); ++it) {
+            os << *it;
+        }
+        return os;
+    }
+    template <class CharT>
+    std::istream& operator<< (std::istream& is, const basic_string<CharT>& str) {
+        char ch;
+        while (is.get(ch)) {
+            // TODO
+        }
     }
 }
 
