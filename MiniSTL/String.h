@@ -1613,11 +1613,43 @@ namespace rayn {
         return os;
     }
     template <class CharT>
-    std::istream& operator<< (std::istream& is, const basic_string<CharT>& str) {
-        char ch;
+    std::istream& operator>> (std::istream& is, const basic_string<CharT>& str) {
+        CharT ch;
+        bool hasPrevBlank = false;
         while (is.get(ch)) {
-            // TODO
+            if (isblank(ch) || ch == '\n') {
+                hasPrevBlank = true;
+            } else {
+                break;
+            }
         }
+        is.putback(ch);
+        str.clear();
+        while (is.get(ch)) {
+            if (ch != EOF && !isblank(ch) && ch != '\n') {
+                str.push_back(ch);
+            } else {
+                break;
+            }
+        }
+        return is;
+    }
+    template <class CharT>
+    std::istream& getline(std::istream& is, basic_string<CharT>& str, CharT delim) {
+        CharT ch;
+        str.clear();
+        while (is.get(ch)) {
+            if (ch == delim) {
+                break;
+            } else {
+                str.push_back(ch);
+            }
+        }
+        return is;
+    }
+    template <class CharT>
+    std::istream& getline(std::istream& is, basic_string<CharT>& str) {
+        return getline(is, str, '\n');
     }
 }
 
