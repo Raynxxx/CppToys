@@ -24,12 +24,12 @@
     <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="Uninitialized.h" />
     <ClInclude Include="Vector.h" />
-    <ClInclude Include="组件测试\StringTest.h" />
-    <ClInclude Include="组件测试\VectorTest.h" />
+    <ClInclude Include="UnitTest\StringTest.h" />
+    <ClInclude Include="UnitTest\VectorTest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp" />
-    <ClCompile Include="组件测试\TestSTL.cpp" />
+    <ClCompile Include="UnitTest\TestSTL.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{68A28B10-9685-480F-B1F3-A527A7AD12DF}</ProjectGuid>
