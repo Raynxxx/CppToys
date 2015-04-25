@@ -24,13 +24,12 @@ namespace rayn {
         pointer prev;
         pointer next;
         T data;
-        list<T>* container;
-        __list_node(const T& d, pointer p, pointer n, list<T> *c):
-            data(d), prev(p), next(n), container(c) {}
+        __list_node(const T& d, pointer p, pointer n):
+            data(d), prev(p), next(n) {}
 
         bool operator== (const __list_node& other) {
             return data == other.data && prev == other.prev
-                && next == other.next && container == other.container;
+                && next == other.next;
         }
     };
 
@@ -129,10 +128,12 @@ namespace rayn {
                 this->push_back(*it);
             }
         }
+        // Move Contructor
         list(list&& other) {
             this->empty_initialize();
             this->swap(other);
         }
+        // Default Destroy Function
         ~list() {
             this->clear();
         }
@@ -560,6 +561,52 @@ namespace rayn {
             counter[i].merge(counter[i - 1]);
         }
         this->swap(counter[fill - 1]);
+    }
+
+    template <class T>
+    inline bool operator== (list<T>& lhs, list<T>& rhs) {
+        typedef typename list<T>::const_iterator const_iterator;
+        const_iterator first1 = lhs.begin(), end1 = lhs.end();
+        const_iterator first2 = rhs.begin(), end2 = rhs.end();
+        while (first1 != end1 && first2 != end2 && *first1 == *first2) {
+            ++first1, ++first2;
+        }
+        return first1 == end1 && first2 == end2;
+    }
+    template <class T>
+    inline bool operator!= (list<T>& lhs, list<T>& rhs) {
+        return !(lhs == rhs);
+    }
+    template <class T>
+    inline bool operator< (list<T>& lhs, list<T>& rhs) {
+        typedef typename list<T>::const_iterator const_iterator;
+        const_iterator first1 = lhs.begin(), end1 = lhs.end();
+        const_iterator first2 = rhs.begin(), end2 = rhs.end();
+        while (first1 != end1) {
+            if (first2 == end2 || *first2 < *first1) {
+                return false;
+            } else if (*first1 < *first2) {
+                return true;
+            }
+            ++first1, ++first2;
+        }
+        return first2 != end2;
+    }
+    template <class T>
+    inline bool operator<= (list<T>& lhs, list<T>& rhs) {
+        return !(rhs < lhs);
+    }
+    template <class T>
+    inline bool operator> (list<T>& lhs, list<T>& rhs) {
+        return rhs < lhs;
+    }
+    template <class T>
+    inline bool operator>= (list<T>& lhs, list<T>& rhs) {
+        return !(lhs < rhs);
+    }
+    template <class T>
+    inline void swap(list<T>& lhs, list<T>& rhs) {
+        lhs.swap(rhs);
     }
 }
 

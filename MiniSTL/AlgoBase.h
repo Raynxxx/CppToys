@@ -12,7 +12,6 @@
 #include "TypeTraits.h"
 
 namespace rayn {
-
     /*
     ** void fill(first, last, value);
     ** @brief       Fill the Range [first, last] with value.
