@@ -167,8 +167,8 @@ namespace rayn {
 
     protected:
         //Data member
-        iterator    _start;     
-        iterator    _finish;    //尾部迭代器
+        iterator    _start;     //头部迭代器
+        iterator    _finish;    //尾后迭代器
         map_pointer map;        //指向map, map是块连续空间,每个元素是一个指针,指向一块缓存区
         size_type   map_size;   //map内可以容纳多少指针
     
@@ -268,7 +268,6 @@ namespace rayn {
         void clear();
         // inserts value before pos
         iterator insert(const_iterator pos, const value_type& value);
-        iterator insert(const_iterator pos, value_type&& value);
         // inserts count copies of the value before pos
         iterator insert(const_iterator pos, size_type count, const value_type& value);
         // inserts elements from range [first, last) before pos.
@@ -281,12 +280,10 @@ namespace rayn {
 
         // Appends the given element value to the end of the container.
         void push_back(const value_type& value);
-        void push_back(value_type&& value);
         // Removes the last element of the container.
         void pop_back();
         // Prepends the given element value to the beginning of the container.
         void push_front(const value_type& value);
-        void push_front(value_type value);
         // Removes the first element of the container.
         void pop_front();
 
@@ -351,7 +348,65 @@ namespace rayn {
             _start.cur = _start.first;
             _finish.cur = _finish.first + num_elements % buffer_size();
         }
+        void reallocate_map(size_type nodes_to_add, bool add_at_front);
+        void push_back_aux(const value_type& value);
+        void push_front_aux(const value_type& value);
+        void reserve_map_at_back();
+        void reserve_map_at_front();
     };
+
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::push_back(const value_type& value) {
+        if (_finish.cur != _finish.last - 1) {
+            rayn::construct(_finish.cur, value);
+            ++_finish.cur;
+        } else {
+            push_back_aux(value);
+        }
+    }
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::push_front(const value_type& value) {
+        if (_start.cur != _start.first) {
+            rayn::construct(_start.cur - 1, value);
+            --_start.cur;
+        } else {
+            push_front_aux(value);
+        }
+    }
+
+    // Helper functions
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::push_back_aux(const value_type& value) {
+        value_type v_copy = value;
+        reserve_map_at_back();
+        *(_finish.node + 1) = data_allocator::allocate(buffer_size());
+        try {
+            rayn::construct(_finish.cur, v_copy);
+            _finish.set_node(_finish.node + 1);
+            _finish.cur = _finish.first;
+        } catch (...) {
+            _finish.set_node(_finish.node - 1);
+            _finish.cur = _finish.last - 1;
+            data_allocator::deallocate(*(_finish.node + 1), buffer_size);
+            throw;
+        }
+    }
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::push_front_aux(const value_type& value) {
+        value_type v_copy = value;
+        reserve_map_at_front();
+        *(_start.node - 1) = data_allocator::allocate(buffer_size());
+        try {
+            _start.set_node(_start.node - 1);
+            _start.cur = _start.last - 1;
+            rayn::construct(_start.cur, v_copy);
+        } catch (...) {
+            _start.set_node(_start.node + 1);
+            _start.cur = _start.first;
+            data_allocator::deallocate(*(_start.node - 1), buffer_size());
+            throw;
+        }
+    }
 
     template <class T>
     inline bool operator== (const deque<T>& lhs, const deque<T>& rhs);
