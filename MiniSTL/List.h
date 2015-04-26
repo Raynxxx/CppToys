@@ -241,15 +241,6 @@ namespace rayn {
         template <class Compare>
         void sort(Compare comp);
 
-    public:
-        friend bool operator== (list& lhs, list& rhs);
-        friend bool operator!= (list& lhs, list& rhs);
-        friend bool operator< (list& lhs, list& rhs);
-        friend bool operator<= (list& lhs, list& rhs);
-        friend bool operator> (list& lhs, list& rhs);
-        friend bool operator>= (list& lhs, list& rhs);
-        friend void swap(list& lhs, list& rhs);
-
     protected:
         link_type get_node() {
             return node_allocator::allocate();

@@ -6,6 +6,7 @@
 #define _DEQUE_H_
 
 #include "Allocator.h"
+#include "Uninitialized.h"
 #include "TypeTraits.h"
 #include "Iterator.h"
 #include "ReverseIterator.h"
@@ -159,27 +160,215 @@ namespace rayn {
 
     protected:
         // pointer of pointer of T
-        typedef pointer*    map_pointer;
+        typedef pointer*                map_pointer;
+        typedef allocator<value_type>   data_allocator;
+        typedef allocator<pointer>      map_allocator;
+        enum { __initial_map_size = 8 };
 
-    //Data member
     protected:
-        iterator    _start;
-        iterator    _finish;
-        map_pointer map;    //指向map, map是块连续空间,每个元素是一个指针,指向一块缓存区
+        //Data member
+        iterator    _start;     
+        iterator    _finish;    //尾部迭代器
+        map_pointer map;        //指向map, map是块连续空间,每个元素是一个指针,指向一块缓存区
         size_type   map_size;   //map内可以容纳多少指针
-
-    //Public member and method
+    
     public:
-        deque();
+        // Default Contructor
+        deque() : _start(), _finish(), map(0), map_size(0) {}
+        // Constructor with count copies of elements.
+        explicit deque(size_type count) {
+            this->fill_initialize(count, value_type());
+        }
+        // Constructor with count copies of elements with value value.
+        deque(size_type count, const value_type& value) {
+            this->fill_initialize(count, value);
+        }
+        // Constructor with the contents of the range [first, last).
+        template <class InputIterator>
+        deque(InputIterator first, InputIterator last);
+        // Copy Contructor
         deque(const deque& other);
+        // Move Contructor
+        deque(deque&& other);
+        // Destructor
+        ~deque();
 
-        iterator begin() { return _start; }
-        iterator end() { return _finish; }
+        // Copy Assignment operator
+        deque& operator= (const deque& other);
+        // Move Assignment operator
+        deque& operator= (deque&& other);
 
-    //Private member and method
+        // Replaces the contents with count copies of value.
+        void assign(size_type count, const value_type& value);
+        // Replaces the contents with copies of those in the range [first, last).
+        template <class InputIterator>
+        void assign(InputIterator first, InputIterator last);
+
+        // Element access
+        // Returns a reference to the element at specified location pos.
+        reference at(size_type pos);
+        const_reference at(size_type pos) const;
+
+        // Returns a reference to the element at specified location pos. 
+        reference operator[] (size_type n) {
+            return _start[difference_type(n)];
+        }
+        const_reference operator[] (size_type n) const {
+            return _start[difference_type(n)];
+        }
+
+        // Returns a reference to the first element in the container.
+        reference front() { return *begin(); }
+        const_reference front() const { return *begin(); }
+        // Returns reference to the last element in the container.
+        reference back() {
+            iterator tmp = end();
+            --tmp;
+            return *tmp;
+        }
+        const_reference back() const {
+            iterator tmp = end();
+            --tmp;
+            return *tmp;
+        }
+
+        // Iterators
+        // Returns an iterator to the first element of the container.
+        iterator begin() { return this->_start; }
+        const_iterator begin() const { return this->_start; }
+        const_iterator cbegin() const { return this->_start; }
+        // Returns an iterator to the element following the last element of the container.
+        iterator end() { return this->_finish; }
+        const_iterator end() const { return this->_finish; }
+        const_iterator cend() const { return this->_finish; }
+        // Returns a reverse iterator to the first element of the reversed container.
+        reverse_iterator rbegin() { return reverse_iterator(this->_finish); }
+        const_reverse_iterator rbegin() const { return const_reverse_iterator(this->_finish); }
+        const_reverse_iterator crbegin() const { return const_reverse_iterator(this->_finish); }
+        // Returns a reverse iterator to the element following the last element of the reversed container. 
+        reverse_iterator rend() { return reverse_iterator(this->_start); }
+        const_reverse_iterator rend() const { return const_reverse_iterator(this->_start); }
+        const_reverse_iterator crend() const { return const_reverse_iterator(this->_start); }
+
+        // Capacity
+        // Checks if the container has no elements
+        bool empty() { return _finish == _start; }
+        // Returns the number of elements in the container.
+        size_type size() const { return _finish - _start; }
+        // Returns the maximum number of elements the container is 
+        // able to hold due to system or library implementation limitations
+        size_type max_size() const {
+            return size_type(-1);
+        }
+        // Requests the removal of unused capacity.
+        void shrink_to_fit();
+
+        // Modifiers
+        // Removes all elements from the container.
+        void clear();
+        // inserts value before pos
+        iterator insert(const_iterator pos, const value_type& value);
+        iterator insert(const_iterator pos, value_type&& value);
+        // inserts count copies of the value before pos
+        iterator insert(const_iterator pos, size_type count, const value_type& value);
+        // inserts elements from range [first, last) before pos.
+        template <class InputIterator>
+        iterator insert(const_iterator pos, InputIterator first, InputIterator last);
+        // Removes the element at pos.
+        iterator erase(const_iterator pos);
+        // Removes the elements in the range [first, last).
+        iterator erase(const_iterator first, const_iterator last);
+
+        // Appends the given element value to the end of the container.
+        void push_back(const value_type& value);
+        void push_back(value_type&& value);
+        // Removes the last element of the container.
+        void pop_back();
+        // Prepends the given element value to the beginning of the container.
+        void push_front(const value_type& value);
+        void push_front(value_type value);
+        // Removes the first element of the container.
+        void pop_front();
+
+        // Resizes the container to contain count elements.
+        void resize(size_type count);
+        void resize(size_type count, const value_type& value);
+        // Exchanges the contents of the container with those of other. 
+        void swap(deque& other);
+    
     private:
+        //private member and method
+        static size_t buffer_size() {
+            return __deque_buf_size(BufSize, sizeof(T));
+        }
+        void create_nodes(map_pointer start, map_pointer finish) {
+            map_pointer cur = start;
+            try {
+                for (; cur != finish; ++cur) {
+                    *cur = data_allocator::allocate(buffer_size());
+                }
+            } catch (...) {
+                destroy_nodes(start, cur);
+            }
+        }
+        void destroy_nodes(map_pointer start, map_pointer finish) {
+            for (map_pointer cur = start; cur != finish; ++cur) {
+                data_allocator::deallocate(*cur, buffer_size());
+            }
+        }
+        void fill_initialize(size_type count, const value_type& value) {
+            initialize_map(count);
+            map_pointer cur = _start.node;
+            try {
+                for (_start.node; cur != _finish.node; ++cur) {
+                    rayn::uninitialized_fill(*cur, *cur + buffer_size(), value);
+                }
+                uninitialized_fill(_finish.first + _finish.cur, value);
+            } catch (...) {
+                for (map_pointer mp = _start.node; mp != cur; ++mp) {
+                    data_allocator::destroy(*mp, *mp + buffer_size());
+                }
+                //TODO 留待改善
+            }
+        }
+        void initialize_map(size_type num_elements) {
+            size_type num_nodes = num_elements / buffer_size() + 1;
+            // 最多是所需节点数 + 2， 前后各预留一个
+            this->map_size = max(size_type(__initial_map_size), num_nodes + 2);
+            this->map = map_allocator::allocate(map_size);
 
+            map_pointer nstart = map + (map_size - num_nodes) / 2;
+            map_pointer nfinish = nstart + num_nodes;
+            try {
+                create_nodes(nstart, nfinish);
+            } catch (...) {
+                map_allocator::deallocate(this->map, this->map_size);
+                this->map = 0;
+                this->map_size = 0;
+            }
+            _start.set_node(nstart);
+            _finish.set_node(nfinish - 1);
+            _start.cur = _start.first;
+            _finish.cur = _finish.first + num_elements % buffer_size();
+        }
     };
+
+    template <class T>
+    inline bool operator== (const deque<T>& lhs, const deque<T>& rhs);
+    template <class T>
+    inline bool operator!= (const deque<T>& lhs, const deque<T>& rhs);
+    template <class T>
+    inline bool operator< (const deque<T>& lhs, const deque<T>& rhs);
+    template <class T>
+    inline bool operator<= (const deque<T>& lhs, const deque<T>& rhs);
+    template <class T>
+    inline bool operator> (const deque<T>& lhs, const deque<T>& rhs);
+    template <class T>
+    inline bool operator>= (const deque<T>& lhs, const deque<T>& rhs);
+
+    template <class T>
+    inline void swap(const deque<T>& lhs, const deque<T>& rhs);
+
 }
 
 #endif
