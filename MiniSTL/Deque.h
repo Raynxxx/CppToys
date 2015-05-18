@@ -5,6 +5,8 @@
 #ifndef _DEQUE_H_
 #define _DEQUE_H_
 
+#include <stdexcept>
+
 #include "Allocator.h"
 #include "Uninitialized.h"
 #include "TypeTraits.h"
@@ -166,7 +168,7 @@ namespace rayn {
         enum { __initial_map_size = 8 };
 
     protected:
-        //Data member
+        // Data member
         iterator    _start;     //头部迭代器
         iterator    _finish;    //尾后迭代器
         map_pointer map;        //指向map, map是块连续空间,每个元素是一个指针,指向一块缓存区
@@ -198,18 +200,37 @@ namespace rayn {
         // Move Assignment operator
         deque& operator= (deque&& other);
 
-        // Replaces the contents with count copies of value.
+        /*
+        ** @brief   Replaces the contents with count copies of value.
+        */
         void assign(size_type count, const value_type& value);
-        // Replaces the contents with copies of those in the range [first, last).
+        /*
+        ** @brief   Replaces the contents with copies of those in the range [first, last).
+        */
         template <class InputIterator>
         void assign(InputIterator first, InputIterator last);
 
         // Element access
-        // Returns a reference to the element at specified location pos.
-        reference at(size_type pos);
-        const_reference at(size_type pos) const;
+        /*
+        ** @brief       Returns a reference to the element at specified location pos.
+        ** @exception   std::out_of_range()
+        */
+        reference at(size_type pos) {
+            if (pos >= this->size()) {
+                throw std::out_of_range("out of range.");
+            }
+            return _start[difference_type(n)];
+        }
+        const_reference at(size_type pos) const {
+            if (pos >= this->size()) {
+                throw std::out_of_range("out of range.");
+            }
+            return _start[difference_type(n)];
+        }
 
-        // Returns a reference to the element at specified location pos. 
+        /*
+        ** @brief   Returns a reference to the element at specified location pos.
+        */
         reference operator[] (size_type n) {
             return _start[difference_type(n)];
         }
@@ -217,10 +238,14 @@ namespace rayn {
             return _start[difference_type(n)];
         }
 
-        // Returns a reference to the first element in the container.
+        /*
+        ** @brief   Returns a reference to the first element in the container.
+        */
         reference front() { return *begin(); }
         const_reference front() const { return *begin(); }
-        // Returns reference to the last element in the container.
+        /*
+        ** @brief   Returns reference to the last element in the container.
+        */
         reference back() {
             iterator tmp = end();
             --tmp;
@@ -233,34 +258,51 @@ namespace rayn {
         }
 
         // Iterators
-        // Returns an iterator to the first element of the container.
+        /*
+        ** @brief   Returns an iterator to the first element of the container.
+        */
         iterator begin() { return this->_start; }
         const_iterator begin() const { return this->_start; }
         const_iterator cbegin() const { return this->_start; }
-        // Returns an iterator to the element following the last element of the container.
+        /*
+        ** @brief   Returns an iterator to the element following the last element of the container.
+        */
         iterator end() { return this->_finish; }
         const_iterator end() const { return this->_finish; }
         const_iterator cend() const { return this->_finish; }
-        // Returns a reverse iterator to the first element of the reversed container.
+        /*
+        ** @brief   Returns a reverse iterator to the first element of the reversed container.
+        */
         reverse_iterator rbegin() { return reverse_iterator(this->_finish); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(this->_finish); }
         const_reverse_iterator crbegin() const { return const_reverse_iterator(this->_finish); }
-        // Returns a reverse iterator to the element following the last element of the reversed container. 
+        /*
+        ** @brief   Returns a reverse iterator to the element following 
+        **          the last element of the reversed container. 
+        */
         reverse_iterator rend() { return reverse_iterator(this->_start); }
         const_reverse_iterator rend() const { return const_reverse_iterator(this->_start); }
         const_reverse_iterator crend() const { return const_reverse_iterator(this->_start); }
 
         // Capacity
-        // Checks if the container has no elements
+        /*
+        ** @brief   Checks if the container has no elements
+        */
         bool empty() { return _finish == _start; }
-        // Returns the number of elements in the container.
+        /*
+        ** @brief   Returns the number of elements in the container.
+        */
         size_type size() const { return _finish - _start; }
-        // Returns the maximum number of elements the container is 
-        // able to hold due to system or library implementation limitations
+        /*
+        ** @brief   Returns the maximum number of elements the container is
+        **          able to hold due to system or library implementation limitations
+        */
         size_type max_size() const {
             return size_type(-1);
         }
-        // Requests the removal of unused capacity.
+        /*
+        ** @brief   Requests the removal of unused capacity.
+        */
         void shrink_to_fit();
 
         // Modifiers
@@ -354,6 +396,19 @@ namespace rayn {
         void reserve_map_at_back();
         void reserve_map_at_front();
     };
+
+    template <class T, size_t BufSize>
+    deque<T, BufSize>& deque<T, BufSize>::operator=(const deque<T, BufSize>& other) {
+        const size_type len = size();
+        if (&other != this) {
+            if (len >= other.size()) {
+                erase(copy(other.begin(), other.end(), this->_start), this->_finish);
+            }
+        }
+        return *this;
+    }
+    template <class T, size_t BufSize>
+    deque<T, BufSize>& deque<T, BufSize>::operator=(deque<T, BufSize>&& other) {}
 
     template <class T, size_t BufSize>
     void deque<T, BufSize>::push_back(const value_type& value) {
