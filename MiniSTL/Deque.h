@@ -340,75 +340,38 @@ namespace rayn {
         static size_t buffer_size() {
             return __deque_buf_size(BufSize, sizeof(T));
         }
-        void create_nodes(map_pointer start, map_pointer finish) {
-            map_pointer cur = start;
-            try {
-                for (; cur != finish; ++cur) {
-                    *cur = data_allocator::allocate(buffer_size());
-                }
-            } catch (...) {
-                destroy_nodes(start, cur);
-            }
-        }
-        void destroy_nodes(map_pointer start, map_pointer finish) {
-            for (map_pointer cur = start; cur != finish; ++cur) {
-                data_allocator::deallocate(*cur, buffer_size());
-            }
-        }
-        void fill_initialize(size_type count, const value_type& value) {
-            initialize_map(count);
-            map_pointer cur = _start.node;
-            try {
-                for (_start.node; cur != _finish.node; ++cur) {
-                    rayn::uninitialized_fill(*cur, *cur + buffer_size(), value);
-                }
-                uninitialized_fill(_finish.first + _finish.cur, value);
-            } catch (...) {
-                for (map_pointer mp = _start.node; mp != cur; ++mp) {
-                    data_allocator::destroy(*mp, *mp + buffer_size());
-                }
-                //TODO 留待改善
-            }
-        }
-        void initialize_map(size_type num_elements) {
-            size_type num_nodes = num_elements / buffer_size() + 1;
-            // 最多是所需节点数 + 2， 前后各预留一个
-            this->map_size = max(size_type(__initial_map_size), num_nodes + 2);
-            this->map = map_allocator::allocate(map_size);
-
-            map_pointer nstart = map + (map_size - num_nodes) / 2;
-            map_pointer nfinish = nstart + num_nodes;
-            try {
-                create_nodes(nstart, nfinish);
-            } catch (...) {
-                map_allocator::deallocate(this->map, this->map_size);
-                this->map = 0;
-                this->map_size = 0;
-            }
-            _start.set_node(nstart);
-            _finish.set_node(nfinish - 1);
-            _start.cur = _start.first;
-            _finish.cur = _finish.first + num_elements % buffer_size();
-        }
+        void create_nodes(map_pointer start, map_pointer finish);
+        void destroy_nodes(map_pointer start, map_pointer finish);
+        void fill_initialize(size_type count, const value_type& value);
+        void initialize_map(size_type num_elements);
         void reallocate_map(size_type nodes_to_add, bool add_at_front);
         void push_back_aux(const value_type& value);
         void push_front_aux(const value_type& value);
-        void reserve_map_at_back();
-        void reserve_map_at_front();
+        void reserve_map_at_back(size_type nodes_to_add = 1);
+        void reserve_map_at_front(size_type nodes_to_add = 1);
     };
 
     template <class T, size_t BufSize>
-    deque<T, BufSize>& deque<T, BufSize>::operator=(const deque<T, BufSize>& other) {
+    deque<T, BufSize>& deque<T, BufSize>::operator= (const deque<T, BufSize>& other) {
         const size_type len = size();
         if (&other != this) {
             if (len >= other.size()) {
-                erase(copy(other.begin(), other.end(), this->_start), this->_finish);
+                erase(rayn::copy(other.begin(), other.end(), this->_start), this->_finish);
+            } else {
+                const_iterator mid = other.begin() + difference_type(len);
+                rayn::copy(other.begin(), mid, this->_start);
+                insert(this->_finish, mid, other.end());
             }
         }
         return *this;
     }
+
     template <class T, size_t BufSize>
-    deque<T, BufSize>& deque<T, BufSize>::operator=(deque<T, BufSize>&& other) {}
+    void deque<T, BufSize>::assign(size_type count, const value_type& value);
+
+    template <class T, size_t BufSize>
+    template <class InputIterator>
+    void deque<T, BufSize>::assign(InputIterator first, InputIterator last);
 
     template <class T, size_t BufSize>
     void deque<T, BufSize>::push_back(const value_type& value) {
@@ -430,6 +393,62 @@ namespace rayn {
     }
 
     // Helper functions
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::create_nodes(map_pointer start, map_pointer finish) {
+        map_pointer cur = start;
+        try {
+            for (; cur != finish; ++cur) {
+                *cur = data_allocator::allocate(buffer_size());
+            }
+        } catch (...) {
+            destroy_nodes(start, cur);
+        }
+    }
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::destroy_nodes(map_pointer start, map_pointer finish) {
+        for (map_pointer cur = start; cur != finish; ++cur) {
+            data_allocator::deallocate(*cur, buffer_size());
+        }
+    }
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::fill_initialize(size_type count, const value_type& value) {
+        initialize_map(count);
+        map_pointer cur = _start.node;
+        try {
+            for (_start.node; cur != _finish.node; ++cur) {
+                rayn::uninitialized_fill(*cur, *cur + buffer_size(), value);
+            }
+            uninitialized_fill(_finish.first + _finish.cur, value);
+        } catch (...) {
+            for (map_pointer mp = _start.node; mp != cur; ++mp) {
+                data_allocator::destroy(*mp, *mp + buffer_size());
+            }
+            //TODO 留待改善
+        }
+    }
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::initialize_map(size_type num_elements) {
+        size_type num_nodes = num_elements / buffer_size() + 1;
+        // 最多是所需节点数 + 2， 前后各预留一个
+        this->map_size = max(size_type(__initial_map_size), num_nodes + 2);
+        this->map = map_allocator::allocate(map_size);
+
+        map_pointer nstart = map + (map_size - num_nodes) / 2;
+        map_pointer nfinish = nstart + num_nodes;
+        try {
+            create_nodes(nstart, nfinish);
+        } catch (...) {
+            map_allocator::deallocate(this->map, this->map_size);
+            this->map = 0;
+            this->map_size = 0;
+        }
+        _start.set_node(nstart);
+        _finish.set_node(nfinish - 1);
+        _start.cur = _start.first;
+        _finish.cur = _finish.first + num_elements % buffer_size();
+    }
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::reallocate_map(size_type nodes_to_add, bool add_at_front);
     template <class T, size_t BufSize>
     void deque<T, BufSize>::push_back_aux(const value_type& value) {
         value_type v_copy = value;
@@ -462,7 +481,20 @@ namespace rayn {
             throw;
         }
     }
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::reserve_map_at_back(size_type nodes_to_add = 1) {
+        if (nodes_to_add + 1 > map_size - (_finish.node - map)) {
+            reallocate_map(nodes_to_add, false);
+        }
+    }
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::reserve_map_at_front(size_type nodes_to_add = 1) {
+        if (nodes_to_add > _start.node - map) {
+            reallocate_map(nodes_to_add, true);
+        }
+    }
 
+    // Global functions
     template <class T>
     inline bool operator== (const deque<T>& lhs, const deque<T>& rhs);
     template <class T>
@@ -478,7 +510,6 @@ namespace rayn {
 
     template <class T>
     inline void swap(const deque<T>& lhs, const deque<T>& rhs);
-
 }
 
 #endif
