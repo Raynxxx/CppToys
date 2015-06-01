@@ -448,7 +448,16 @@ namespace rayn {
         _finish.cur = _finish.first + num_elements % buffer_size();
     }
     template <class T, size_t BufSize>
-    void deque<T, BufSize>::reallocate_map(size_type nodes_to_add, bool add_at_front);
+    void deque<T, BufSize>::reallocate_map(size_type nodes_to_add, bool add_at_front) {
+        size_type old_nums_nodes = _finish.node - _start.node + 1;
+        size_type new_nums_nodes = old_nums_nodes + nodes_to_add;
+        map_pointer new_start;
+        if (map_size > 2 * new_nums_nodes) {
+            new_start = map + (map_size - new_nums_nodes) / 2 + (add_at_front ? nodes_to_add : 0);
+
+        }
+
+    }
     template <class T, size_t BufSize>
     void deque<T, BufSize>::push_back_aux(const value_type& value) {
         value_type v_copy = value;

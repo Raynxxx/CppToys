@@ -12,6 +12,8 @@
 #include "TypeTraits.h"
 
 namespace rayn {
+    //-----------------------------------------------------------------
+    // fill
     /*
     ** void fill(first, last, value);
     ** @brief       Fill the Range [first, last] with value.
@@ -31,6 +33,8 @@ namespace rayn {
         memset(first, static_cast<unsigned char>(value), (last - first) * sizeof(wchar_t));
     }
 
+    //-----------------------------------------------------------------
+    // fill_n
     /*
     ** iter fill_n(first, n, value);
     ** @brief       Fill the Range [first, first + n] with value.
@@ -56,6 +60,8 @@ namespace rayn {
         return first + n;
     }
 
+    //-----------------------------------------------------------------
+    // min
     /*
     ** T min(a, b);
     ** @brief       Get the minimum value.
@@ -74,6 +80,9 @@ namespace rayn {
     inline const T& min(const T& a, const T& b, Compare comp) {
         return comp(b, a) ? b : a;
     }
+
+    //-----------------------------------------------------------------
+    // max
     /*
     ** T max(a, b);
     ** @brief       Get the maximum value.
@@ -93,6 +102,8 @@ namespace rayn {
         return comp(a, b) ? b : a;
     }
 
+    //-----------------------------------------------------------------
+    // equal
     /*
     ** boolean equal(first1, last1, first2);
     ** @brief       Judge seq1 and seq2 equal or not.
@@ -125,6 +136,9 @@ namespace rayn {
         }
         return true;
     }
+
+    //-----------------------------------------------------------------
+    // swap
     /*
     ** void swap(a, b);
     ** @brief       Swap two object
@@ -137,7 +151,7 @@ namespace rayn {
         b = temp;
     }
     
-    //--------------------------------------------
+    //-----------------------------------------------------------------
     // copy
     template <class RandomAccessIterator, class OutputIterator, class Distance>
     inline OutputIterator __copy_d(RandomAccessIterator first, RandomAccessIterator last,
@@ -147,17 +161,15 @@ namespace rayn {
         }
         return result;
     }
-
     template <class T>
-    inline T* __copy_t(const T* first, const T* last, const T* result, _true_type) {
+    inline T* __copy_t(const T* first, const T* last, T* result, _true_type) {
         memmove(result, first, sizeof(T) * (last - first));
         return result + (last - first);
     }
     template <class T>
-    inline T* __copy_t(const T* first, const T* last, const T* result, _false_type) {
+    inline T* __copy_t(const T* first, const T* last, T* result, _false_type) {
         return __copy_d(first, last, result, (ptrdiff_t*) 0);
     }
-
     template <class InputIterator, class OutputIterator>
     inline OutputIterator __copy(InputIterator first, InputIterator last, 
         OutputIterator result, const input_iterator_tag&) {
@@ -166,7 +178,6 @@ namespace rayn {
         }
         return result;
     }
-
     template <class RandomAccessIterator, class OutputIterator, class Distance>
     inline OutputIterator __copy(RandomAccessIterator first, RandomAccessIterator last, 
         OutputIterator result, const random_access_iterator_tag&) {
@@ -179,17 +190,15 @@ namespace rayn {
             return __copy(first, last, result, iterator_category(first));
         }
     };
-
     template <class T>
-    struct __copy_dispatch<T*, T*> {
+    struct __copy_dispatch< T*, T* > {
         T* operator() (T* first, T* last, T* result) {
             typedef typename _type_traits<T>::has_trivial_assignment_operator type;
             return __copy_t(first, last, result, type());
         }
     };
-
     template <class T>
-    struct __copy_dispatch<const T*, T*> {
+    struct __copy_dispatch< const T*, T* > {
         T* operator() (T* first, T* last, T* result) {
             typedef typename _type_traits<T>::has_trivial_assignment_operator type;
             return __copy_t(first, last, result, type());
@@ -211,6 +220,82 @@ namespace rayn {
         return result + (last - first);
     }
 
+    //-----------------------------------------------------------------
+    // copy_backward
+    template <class RandomAccessIterator, class BidirectionalIterator, class Distance>
+    inline BidirectionalIterator __copy_backward_d(RandomAccessIterator first, RandomAccessIterator last,
+        BidirectionalIterator result, Distance*) {
+        for (Distance n = last - first; n > 0; --n) {
+            *--result = *--last;
+        }
+        return result;
+    }
+    template <class T>
+    inline T* __copy_backward_t(const T* first, const T* last, T* result, _true_type) {
+        const ptrdiff_t num = last - first;
+        memmove(result - num, first, num);
+        return result - num;
+    }
+    template <class T>
+    inline T* __copy_backward_t(const T* first, const T* last, T* result, _false_type) {
+        return __copy_backward_d(first, last, result, (ptrdiff_t*)0);
+    }
+    template <class BidirectionalIterator, class BidirectionalIterator>
+    inline BidirectionalIterator __copy_backward(BidirectionalIterator first, BidirectionalIterator last,
+        BidirectionalIterator result, const bidirectional_iterator_tag&) {
+        while (last != first) {
+            *--result = *--last;
+        }
+        return result;
+    }
+    template <class RandomAccessIterator, class BidirectionalIterator>
+    inline BidirectionalIterator __copy_backward(RandomAccessIterator first, RandomAccessIterator last,
+        BidirectionalIterator result, const random_access_iterator_tag&) {
+        return __copy_backward_d(first, last, result, difference_type(first));
+        for (Distance n = last - first; n > 0; --n) {
+            *--result = *--last;
+        }
+        return result;
+    }
+
+    template <class BidirectionalIterator, class BidirectionalIterator>
+    struct __copy_backward_dispatch {
+        OutputIterator operator() (BidirectionalIterator first, BidirectionalIterator last,
+            BidirectionalIterator result) {
+            return __copy_backward(first, last, result, iterator_category(first));
+        }
+    };
+    template <class T>
+    struct __copy_backward_dispatch < T*, T* > {
+        T* operator() (T* first, T* last, T* result) {
+            typedef typename _type_traits<T>::has_trivial_assignment_operator type;
+            return __copy_t(first, last, result, type());
+        }
+    };
+    template <class T>
+    struct __copy_backward_dispatch < const T*, T* > {
+        T* operator() (const T* first, const T* last, T* result) {
+            typedef typename _type_traits<T>::has_trivial_assignment_operator type;
+            return __copy_t(first, last, result, type());
+        }
+    };
+
+    template <class BidirectionalIterator, class BidirectionalIterator>
+    inline OutputIterator copy_backward(BidirectionalIterator first, BidirectionalIterator last, 
+        BidirectionalIterator result) {
+        return __copy_backward_dispatch<BidirectionalIterator, BidirectionalIterator>()(first, last, result);
+    }
+    // ÌØ»¯
+    inline char* copy_backward(const char* first, const char* last, char* result) {
+        const ptrdiff_t num = last - first;
+        memmove(result - num, first, num);
+        return result - num;
+    }
+    inline wchar_t* copy_backward(const wchar_t* first, const wchar_t* last, wchar_t* result) {
+        const ptrdiff_t num = last - first;
+        memmove(result - num, first, num);
+        return result - num;
+    }
 }
 
 #endif
