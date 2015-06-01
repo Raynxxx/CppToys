@@ -240,9 +240,9 @@ namespace rayn {
     inline T* __copy_backward_t(const T* first, const T* last, T* result, _false_type) {
         return __copy_backward_d(first, last, result, (ptrdiff_t*)0);
     }
-    template <class BidirectionalIterator, class BidirectionalIterator>
-    inline BidirectionalIterator __copy_backward(BidirectionalIterator first, BidirectionalIterator last,
-        BidirectionalIterator result, const bidirectional_iterator_tag&) {
+    template <class BidirectionalIterator1, class BidirectionalIterator2>
+    inline BidirectionalIterator2 __copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
+        BidirectionalIterator2 result, const bidirectional_iterator_tag&) {
         while (last != first) {
             *--result = *--last;
         }
@@ -258,10 +258,10 @@ namespace rayn {
         return result;
     }
 
-    template <class BidirectionalIterator, class BidirectionalIterator>
+    template <class BidirectionalIterator1, class BidirectionalIterator2>
     struct __copy_backward_dispatch {
-        OutputIterator operator() (BidirectionalIterator first, BidirectionalIterator last,
-            BidirectionalIterator result) {
+        BidirectionalIterator2 operator() (BidirectionalIterator1 first, BidirectionalIterator1 last,
+            BidirectionalIterator2 result) {
             return __copy_backward(first, last, result, iterator_category(first));
         }
     };
@@ -280,9 +280,9 @@ namespace rayn {
         }
     };
 
-    template <class BidirectionalIterator, class BidirectionalIterator>
-    inline OutputIterator copy_backward(BidirectionalIterator first, BidirectionalIterator last, 
-        BidirectionalIterator result) {
+    template <class BidirectionalIterator1, class BidirectionalIterator2>
+    inline BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
+        BidirectionalIterator2 result) {
         return __copy_backward_dispatch<BidirectionalIterator, BidirectionalIterator>()(first, last, result);
     }
     // ÌØ»¯

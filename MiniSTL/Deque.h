@@ -349,6 +349,10 @@ namespace rayn {
         void push_front_aux(const value_type& value);
         void reserve_map_at_back(size_type nodes_to_add = 1);
         void reserve_map_at_front(size_type nodes_to_add = 1);
+        template<class InputIterator>
+        void assign_aux(InputIterator first, InputIterator last, const input_iterator_tag&);
+        template<class ForwardIterator>
+        void assign_aux(ForwardIterator first, ForwardIterator last, const forward_iterator_tag&);
     };
 
     template <class T, size_t BufSize>
@@ -367,11 +371,21 @@ namespace rayn {
     }
 
     template <class T, size_t BufSize>
-    void deque<T, BufSize>::assign(size_type count, const value_type& value);
+    void deque<T, BufSize>::assign(size_type count, const value_type& value) {
+        if (count > size()) {
+            rayn::fill(begin(), end(), value);
+            insert(end(), count - size(), value);
+        } else {
+            erase(begin() + count, end());
+            rayn::fill(begin(), end(), value);
+        }
+    }
 
     template <class T, size_t BufSize>
     template <class InputIterator>
-    void deque<T, BufSize>::assign(InputIterator first, InputIterator last);
+    void deque<T, BufSize>::assign(InputIterator first, InputIterator last) {
+        assign_aux(first, last, iterator_category(first));
+    }
 
     template <class T, size_t BufSize>
     void deque<T, BufSize>::push_back(const value_type& value) {
@@ -430,8 +444,8 @@ namespace rayn {
     void deque<T, BufSize>::initialize_map(size_type num_elements) {
         size_type num_nodes = num_elements / buffer_size() + 1;
         // 最多是所需节点数 + 2， 前后各预留一个
-        this->map_size = max(size_type(__initial_map_size), num_nodes + 2);
-        this->map = map_allocator::allocate(map_size);
+        map_size = max(size_type(__initial_map_size), num_nodes + 2);
+        map = map_allocator::allocate(map_size);
 
         map_pointer nstart = map + (map_size - num_nodes) / 2;
         map_pointer nfinish = nstart + num_nodes;
@@ -454,9 +468,24 @@ namespace rayn {
         map_pointer new_start;
         if (map_size > 2 * new_nums_nodes) {
             new_start = map + (map_size - new_nums_nodes) / 2 + (add_at_front ? nodes_to_add : 0);
-
+            if (new_start < _start.node) {
+                // copy warning: if result in range [first, last) and they are in the 
+                // same one container, an error occurred.
+                copy(_start.node, _finish.node + 1, new_start);
+            } else {
+                copy_backward(_start.node, _finish.node + 1, new_start + old_nums_nodes);
+            }
+        } else {
+            size_type new_map_size = map_size + max(map_size, nodes_to_add) + 2;
+            map_pointer new_map = map_allocator::allocate(new_map_size);
+            new_start = new_map + (new_map_size - new_nums_nodes) / 2 + (add_at_front ? nodes_to_add : 0);
+            copy(_start.node, _finish.node + 1, new_start);
+            map_allocator::deallocate(map, map_size);
+            map = new_map;
+            map_size = new_map_size;
         }
-
+        _start.set_node(new_start);
+        _finish.set_node(new_start + old_nums_nodes - 1);
     }
     template <class T, size_t BufSize>
     void deque<T, BufSize>::push_back_aux(const value_type& value) {
@@ -500,6 +529,35 @@ namespace rayn {
     void deque<T, BufSize>::reserve_map_at_front(size_type nodes_to_add = 1) {
         if (nodes_to_add > _start.node - map) {
             reallocate_map(nodes_to_add, true);
+        }
+    }
+
+    template <class T, size_t BufSize>
+    template<class InputIterator>
+    void deque<T, BufSize>::assign_aux(InputIterator first, InputIterator last,
+        const input_iterator_tag&) {
+        iterator cur = begin();
+        for (; first != last && cur != end(); ++cur, ++first) {
+            *cur = *first;
+        }
+        if (first == last) {
+            erase(cur, end());
+        } else {
+            insert(end(), first, last);
+        }
+    }
+    template <class T, size_t BufSize>
+    template<class ForwardIterator>
+    void deque<T, BufSize>::assign_aux(ForwardIterator first, ForwardIterator last,
+        const forward_iterator_tag&) {
+        size_type len = rayn::distance(first, last);
+        if (len > size()) {
+            ForwardIterator mid = first;
+            rayn::advance(mid, size());
+            rayn::copy(first, mid, begin());
+            insert(end(), mid, last);
+        } else {
+            erase(rayn::copy(first, last, begin()), end());
         }
     }
 
