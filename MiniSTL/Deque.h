@@ -346,6 +346,8 @@ namespace rayn {
         void initialize_map(size_type num_elements);
         void reallocate_map(size_type nodes_to_add, bool add_at_front);
         void push_back_aux(const value_type& value);
+        void pop_back_aux();
+        void pop_front_aux();
         void push_front_aux(const value_type& value);
         void reserve_map_at_back(size_type nodes_to_add = 1);
         void reserve_map_at_front(size_type nodes_to_add = 1);
@@ -397,12 +399,30 @@ namespace rayn {
         }
     }
     template <class T, size_t BufSize>
+    void deque<T, BufSize>::pop_back() {
+        if (_finish.cur != _finish.first) {
+            --_finish.cur;
+            rayn::destroy(_finish.cur);
+        } else {
+            pop_back_aux();
+        }
+    }
+    template <class T, size_t BufSize>
     void deque<T, BufSize>::push_front(const value_type& value) {
         if (_start.cur != _start.first) {
             rayn::construct(_start.cur - 1, value);
             --_start.cur;
         } else {
             push_front_aux(value);
+        }
+    }
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::pop_front() {
+        if (_start.cur != _start.last - 1) {
+            rayn::destroy(_start.cur);
+            ++_finish.cur;
+        } else {
+            pop_front_aux();
         }
     }
 
@@ -518,6 +538,20 @@ namespace rayn {
             data_allocator::deallocate(*(_start.node - 1), buffer_size());
             throw;
         }
+    }
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::pop_back_aux() {
+        data_allocator::deallocate(_finish.first, buffer_size());
+        _finish.set_node(_finish.node - 1);
+        _finish.cur = _finish.last - 1;
+        rayn::destroy(_finish.cur);
+    }
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::pop_front_aux() {
+        destroy(_start.cur);
+        data_allocator(_start.first, buffer_size());
+        _start.set_node(_start.node + 1);
+        _start.cur = _start.first;
     }
     template <class T, size_t BufSize>
     void deque<T, BufSize>::reserve_map_at_back(size_type nodes_to_add = 1) {
