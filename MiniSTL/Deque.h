@@ -382,11 +382,30 @@ namespace rayn {
             rayn::fill(begin(), end(), value);
         }
     }
-
     template <class T, size_t BufSize>
     template <class InputIterator>
     void deque<T, BufSize>::assign(InputIterator first, InputIterator last) {
         assign_aux(first, last, iterator_category(first));
+    }
+
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::clear() {
+        // 除开头尾其它所有节点
+        for (map_pointer node = _start.node + 1; node < _finish.node; ++node) {
+            rayn::destroy(*node, *node + buffer_size());
+            data_allocator::deallocate(*node, buffer_size());
+        }
+        if (_start.node != _finish.node) {
+            //头尾两个节点
+            rayn::destroy(_start.cur, _start.last);
+            rayn::destroy(_finish.cur, _finish.last);
+            // 保留头结点
+            data_allocator::deallocate(_finish.first, buffer_size());
+        } else {
+            //头尾就一个节点
+            rayn::destroy(_start.cur, _start.last);
+        }
+        _finish = _start;
     }
 
     template <class T, size_t BufSize>
