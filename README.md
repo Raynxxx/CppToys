@@ -10,23 +10,31 @@
 |基本组件|进度|链接|
 |---|---|---|
 |空间配置器|100%|[Allocator.h](MiniSTL/Allocator.h), [Alloc.h](MiniSTL/Alloc.h), [Alloc.cpp](MiniSTL/Alloc.cpp), [Construct.h](MiniSTL/Construct.h)|
-|uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|
-|type_traits|100%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
 |iterator|100%|[Iterator.h](MiniSTL/Iterator.h)|
 |reverse_iterator|100%|[ReverseIterator.h](MiniSTL/ReverseIterator.h)|
 |Algorithm|15%|[Algo.h](MiniSTL/Algo.h), [AlgoBase.h](MiniSTL/AlgoBase.h), [Algorithm.h](MiniSTL/Algorithm.h)|
-|string|80%|[String.h](MiniSTL/String.h) 计划加入一些QT的string接口|
-|pair|--|--|
 
 |顺序容器|进度|链接|
 |---|---|---|
+|string|80%|[String.h](MiniSTL/String.h) 计划加入一些QT的string接口|
 |vector|95%|[Vector.h](MiniSTL/Vector.h)|
 |list|95%|[List.h](MiniSTL/List.h)|
 |deque|85%|[Deque.h](MiniSTL/Deque.h)|
 
+|配接器|进度|链接|
+|---|---|---|
+|---|---|---|
+
 |关联容器|进度|链接|
 |---|---|---|
 |---|---|---|
+
+|工具|进度|链接|
+|---|---|---|
+|uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|
+|type_traits|100%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
+|pair|--|--|
+|bitset|--|--|
 
 ## 单元测试
 
