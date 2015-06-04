@@ -187,13 +187,20 @@ namespace rayn {
         }
         // Constructor with the contents of the range [first, last).
         template <class InputIterator>
-        deque(InputIterator first, InputIterator last);
+        deque(InputIterator first, InputIterator last) {
+            this->range_initialize(first, last, iterator_category(first));
+        }
         // Copy Contructor
-        deque(const deque& other);
+        deque(const deque& other) {
+            this->initialize_map(other.size());
+            std::copy(other.begin(), other.end(), this->_start);
+        }
         // Move Contructor
         deque(deque&& other);
         // Destructor
-        ~deque();
+        ~deque() {
+            rayn::destroy(this->_start, this->_finish);
+        }
 
         // Copy Assignment operator
         deque& operator= (const deque& other);
@@ -343,6 +350,10 @@ namespace rayn {
         void create_nodes(map_pointer start, map_pointer finish);
         void destroy_nodes(map_pointer start, map_pointer finish);
         void fill_initialize(size_type count, const value_type& value);
+        template <class InputIterator>
+        void range_initialize(InputIterator first, InputIterator last, const input_iterator_tag&);
+        template <class ForwardIterator>
+        void range_initialize(ForwardIterator first, ForwardIterator last, const forward_iterator_tag&);
         void initialize_map(size_type num_elements);
         void reallocate_map(size_type nodes_to_add, bool add_at_front);
         void push_back_aux(const value_type& value);
@@ -386,6 +397,10 @@ namespace rayn {
     template <class InputIterator>
     void deque<T, BufSize>::assign(InputIterator first, InputIterator last) {
         assign_aux(first, last, iterator_category(first));
+    }
+
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::shrink_to_fit() {
     }
 
     template <class T, size_t BufSize>
@@ -445,6 +460,15 @@ namespace rayn {
         }
     }
 
+    template <class T, size_t BufSize>
+    void deque<T, BufSize>::swap(deque& other) {
+        rayn::swap(this->_start, other._start);
+        rayn::swap(this->_finish, other._finish);
+        rayn::swap(this->map_size, other.map_size);
+        rayn::swap(this->map, other.map);
+    }
+
+    // ********************************************************************************
     // Helper functions
     template <class T, size_t BufSize>
     void deque<T, BufSize>::create_nodes(map_pointer start, map_pointer finish) {
@@ -477,6 +501,38 @@ namespace rayn {
                 data_allocator::destroy(*mp, *mp + buffer_size());
             }
             //TODO Áô´ý¸ÄÉÆ
+        }
+    }
+    template <class T, size_t BufSize>
+    template <class InputIterator>
+    void deque<T, BufSize>::range_initialize(InputIterator first, InputIterator last,
+        const input_iterator_tag&) {
+        this->initialize_map(0);
+        try {
+            for (; first != last; ++first) {
+                push_back(*first);
+            }
+        } catch (...) {
+            this->clear();
+        }
+    }
+    template <class T, size_t BufSize>
+    template <class ForwardIterator>
+    void deque<T, BufSize>::range_initialize(ForwardIterator first, ForwardIterator last,
+        const forward_iterator_tag&) {
+        size_type n = distance(first, last);
+        this->initialize_map(n);
+        map_pointer cur_node = this->_start.node;
+        try {
+            for (cur_node < this->_finish.node; ++cur_node) {
+                ForwardIterator mid = first;
+                rayn::advance(mid, buffer_size());
+                rayn::uninitialized_copy(first, mid, *cur_node);
+                first = mid;
+            }
+            rayn::uninitialized_copy(first, last, this->_finish.first);
+        } catch (...) {
+            rayn::destroy(this->_start, iterator(*cur_node, cur_node));
         }
     }
     template <class T, size_t BufSize>
@@ -629,7 +685,9 @@ namespace rayn {
     inline bool operator>= (const deque<T>& lhs, const deque<T>& rhs);
 
     template <class T>
-    inline void swap(const deque<T>& lhs, const deque<T>& rhs);
+    inline void swap(const deque<T>& lhs, const deque<T>& rhs) {
+        lhs.swap(rhs);
+    }
 }
 
 #endif

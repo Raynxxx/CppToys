@@ -7,7 +7,7 @@
 
 ## 项目计划
 
-|组件|进度|链接|
+|基本组件|进度|链接|
 |---|---|---|
 |空间配置器|100%|[Allocator.h](MiniSTL/Allocator.h), [Alloc.h](MiniSTL/Alloc.h), [Alloc.cpp](MiniSTL/Alloc.cpp), [Construct.h](MiniSTL/Construct.h)|
 |uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|
@@ -22,7 +22,7 @@
 |---|---|---|
 |vector|95%|[Vector.h](MiniSTL/Vector.h)|
 |list|95%|[List.h](MiniSTL/List.h)|
-|deque|30%|[Deque.h](MiniSTL/Deque.h)|
+|deque|85%|[Deque.h](MiniSTL/Deque.h)|
 
 |关联容器|进度|链接|
 |---|---|---|
