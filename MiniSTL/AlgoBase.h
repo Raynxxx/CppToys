@@ -181,7 +181,7 @@ namespace rayn {
     template <class RandomAccessIterator, class OutputIterator, class Distance>
     inline OutputIterator __copy(RandomAccessIterator first, RandomAccessIterator last, 
         OutputIterator result, const random_access_iterator_tag&) {
-        return __copy_d(first, last, result, difference_type(first));
+        return __copy_d(first, last, result, distance_type(first));
     }
 
     template <class InputIterator, class OutputIterator>
@@ -251,7 +251,7 @@ namespace rayn {
     template <class RandomAccessIterator, class BidirectionalIterator>
     inline BidirectionalIterator __copy_backward(RandomAccessIterator first, RandomAccessIterator last,
         BidirectionalIterator result, const random_access_iterator_tag&) {
-        return __copy_backward_d(first, last, result, difference_type(first));
+        return __copy_backward_d(first, last, result, distance_type(first));
         for (Distance n = last - first; n > 0; --n) {
             *--result = *--last;
         }

@@ -3,7 +3,8 @@
 * 开发语言 :  C++11
 * 编译环境 :  Visual Studio Community 2013
 * 参考资料1:  STL源码剖析 侯捷著
-* 参考资料2:  gcc 4.9 源代码 [点我](https://github.com/gcc-mirror/gcc/tree/master/libstdc%2B%2B-v3/include)
+* 参考资料2:  gcc 4.9 源码 [点我](https://github.com/gcc-mirror/gcc/tree/master/libstdc%2B%2B-v3/include)
+* 参考资料3:  QTBase 源码 [点我](https://github.com/qtproject/qtbase)
 
 ## 项目计划
 
@@ -19,7 +20,7 @@
 |string|80%|[String.h](MiniSTL/String.h) 计划加入一些QT的string接口|
 |vector|95%|[Vector.h](MiniSTL/Vector.h)|
 |list|95%|[List.h](MiniSTL/List.h)|
-|deque|85%|[Deque.h](MiniSTL/Deque.h)|
+|deque|90%|[Deque.h](MiniSTL/Deque.h)|
 
 |配接器|进度|链接|
 |---|---|---|
@@ -32,7 +33,7 @@
 |工具|进度|链接|
 |---|---|---|
 |uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|
-|type_traits|100%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
+|type_traits|50%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
 |pair|--|--|
 |bitset|--|--|
 

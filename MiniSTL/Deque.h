@@ -152,6 +152,7 @@ namespace rayn {
         typedef T           value_type;
         typedef T*          pointer;
         typedef T&          reference;
+        typedef ptrdiff_t   difference_type;
         typedef const T*    const_pointer;
         typedef const T&    const_reference;
         typedef size_t      size_type;
@@ -356,6 +357,7 @@ namespace rayn {
         void range_initialize(ForwardIterator first, ForwardIterator last, const forward_iterator_tag&);
         void initialize_map(size_type num_elements);
         void reallocate_map(size_type nodes_to_add, bool add_at_front);
+        iterator insert_aux(iterator pos, const value_type& value);
         void push_back_aux(const value_type& value);
         void pop_back_aux();
         void pop_front_aux();
@@ -401,6 +403,7 @@ namespace rayn {
 
     template <class T, size_t BufSize>
     void deque<T, BufSize>::shrink_to_fit() {
+
     }
 
     template <class T, size_t BufSize>
@@ -421,6 +424,77 @@ namespace rayn {
             rayn::destroy(_start.cur, _start.last);
         }
         _finish = _start;
+    }
+
+    template <class T, size_t BufSize>
+    typename deque<T, BufSize>::iterator
+        deque<T, BufSize>::insert(const_iterator pos, const value_type& value) {
+        if (pos.cur == _start.cur) {
+            push_front(value);
+            return _start;
+        } else if (pos.cur == _finish.cur) {
+            push_back(value);
+            iterator tmp = _finish;
+            return --tmp;
+        } else {
+            return insert_aux(pos, value);
+        }
+    }
+    template <class T, size_t BufSize>
+    typename deque<T, BufSize>::iterator
+        deque<T, BufSize>::insert(const_iterator pos, size_type count, const value_type& value) {
+
+    }
+    template <class T, size_t BufSize>
+    template <class InputIterator>
+    typename deque<T, BufSize>::iterator
+        deque<T, BufSize>::insert(const_iterator pos, InputIterator first, InputIterator last) {
+
+    }
+
+    template <class T, size_t BufSize>
+    typename deque<T, BufSize>::iterator
+        deque<T, BufSize>::erase(const_iterator pos) {
+        iterator next = pos;
+        ++next;
+        difference_type index = pos - _start;
+        if (index < (size() >> 1)) {
+            copy_backward(_start, pos, next);
+            pop_front();
+        } else {
+            copy(next, _finish, pos);
+            pop_back();
+        }
+        return _start + index;
+    }
+    template <class T, size_t BufSize>
+    typename deque<T, BufSize>::iterator
+        deque<T, BufSize>::erase(const_iterator first, const_iterator last) {
+        if (first == _start && last == _finish) {
+            clear();
+            return _finish;
+        } else {
+            difference_type n = last - first;
+            difference_type elems_before = first - _start;
+            if (elems_before < ((size() - n) >> 1)) {
+                copy_backward(_start, first, last);
+                iterator new_start = _start + n;
+                rayn::destroy(_start, new_start);
+                for (map_pointer node = _start.node; node < new_start.node; ++node) {
+                    data_allocator::deallocate(*node, buffer_size());
+                }
+                _start = new_start;
+            } else {
+                copy(last, _finish, first);
+                iterator new_finish = _finish - n;
+                destroy(new_finish, _finish);
+                for (map_pointer node = new_finish.node + 1; node <= _finish.node; ++node) {
+                    data_allocator::deallocate(*node, buffer_size());
+                }
+                _finish = new_finish;
+            }
+            return _start + elems_before;
+        }
     }
 
     template <class T, size_t BufSize>
@@ -581,6 +655,33 @@ namespace rayn {
         }
         _start.set_node(new_start);
         _finish.set_node(new_start + old_nums_nodes - 1);
+    }
+    template <class T, size_t BufSize>
+    typename deque<T, BufSize>::iterator 
+        deque<T, BufSize>::insert_aux(iterator pos, const value_type& value) {
+        difference_type index = pos - _start;
+        value_type v_copy = value;
+        if (index < (size() >> 1)) {
+            push_front(front());
+            iterator front1 = _start;
+            ++front1;
+            iterator front2 = front1;
+            ++front2;
+            pos = _start + index;
+            iterator pos1 = pos;
+            ++pos1;
+            copy(front2, pos1, front1);
+        } else {
+            push_back(back());
+            iterator back1 = _finish;
+            --back1;
+            iterator back2 = back1;
+            --back2;
+            pos = _start + index;
+            copy_backward(pos, back2, back1);
+        }
+        *pos = v_copy;
+        return pos;
     }
     template <class T, size_t BufSize>
     void deque<T, BufSize>::push_back_aux(const value_type& value) {

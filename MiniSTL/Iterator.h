@@ -118,7 +118,7 @@ namespace rayn {
     //决定某个迭代器的类型 difference type
     template <class Iterator>
     inline typename iterator_traits<Iterator>::difference_type*
-        difference_type(const Iterator& iter) {
+        distance_type(const Iterator& iter) {
         return static_cast<typename iterator_traits<Iterator>::difference_type*>(0);
     }
     
