@@ -308,25 +308,21 @@ namespace rayn {
         size_type max_size() const {
             return size_type(-1);
         }
-        /*
-        ** @brief   Requests the removal of unused capacity.
-        */
-        void shrink_to_fit();
 
         // Modifiers
         // Removes all elements from the container.
         void clear();
         // inserts value before pos
-        iterator insert(const_iterator pos, const value_type& value);
+        iterator insert(iterator pos, const value_type& value);
         // inserts count copies of the value before pos
-        iterator insert(const_iterator pos, size_type count, const value_type& value);
+        iterator insert(iterator pos, size_type count, const value_type& value);
         // inserts elements from range [first, last) before pos.
         template <class InputIterator>
-        iterator insert(const_iterator pos, InputIterator first, InputIterator last);
+        iterator insert(iterator pos, InputIterator first, InputIterator last);
         // Removes the element at pos.
-        iterator erase(const_iterator pos);
+        iterator erase(iterator pos);
         // Removes the elements in the range [first, last).
-        iterator erase(const_iterator first, const_iterator last);
+        iterator erase(iterator first, iterator last);
 
         // Appends the given element value to the end of the container.
         void push_back(const value_type& value);
@@ -358,10 +354,15 @@ namespace rayn {
         void initialize_map(size_type num_elements);
         void reallocate_map(size_type nodes_to_add, bool add_at_front);
         iterator insert_aux(iterator pos, const value_type& value);
+        iterator fill_insert_aux(iterator pos, size_type count, const value_type& value);
+        template <class InputIterator>
+        iterator range_insert_aux(iterator pos, InputIterator first, InputIterator last);
         void push_back_aux(const value_type& value);
         void pop_back_aux();
         void pop_front_aux();
         void push_front_aux(const value_type& value);
+        iterator reserve_elements_at_back(size_type n);
+        iterator reserve_elements_at_front(size_type n);
         void reserve_map_at_back(size_type nodes_to_add = 1);
         void reserve_map_at_front(size_type nodes_to_add = 1);
         template<class InputIterator>
@@ -402,11 +403,6 @@ namespace rayn {
     }
 
     template <class T, size_t BufSize>
-    void deque<T, BufSize>::shrink_to_fit() {
-
-    }
-
-    template <class T, size_t BufSize>
     void deque<T, BufSize>::clear() {
         // 除开头尾其它所有节点
         for (map_pointer node = _start.node + 1; node < _finish.node; ++node) {
@@ -428,7 +424,7 @@ namespace rayn {
 
     template <class T, size_t BufSize>
     typename deque<T, BufSize>::iterator
-        deque<T, BufSize>::insert(const_iterator pos, const value_type& value) {
+        deque<T, BufSize>::insert(iterator pos, const value_type& value) {
         if (pos.cur == _start.cur) {
             push_front(value);
             return _start;
@@ -442,19 +438,40 @@ namespace rayn {
     }
     template <class T, size_t BufSize>
     typename deque<T, BufSize>::iterator
-        deque<T, BufSize>::insert(const_iterator pos, size_type count, const value_type& value) {
-
+        deque<T, BufSize>::insert(iterator pos, size_type count, const value_type& value) {
+        if (pos.cur == _start.cur) {
+            iterator new_start = reserve_elements_at_front(count);
+            try {
+                rayn::uninitialized_fill(new_start, _start, value);
+            } catch (...) {
+                destroy_nodes(new_start.node, _start.node);
+            }
+            _start = new_start;
+            return _start;
+        } else if (pos.cur = _finish.cur) {
+            iterator new_finish = reserve_elements_at_back(count);
+            try {
+                rayn::uninitialized_fill(_finish, new_finish, value);
+            } catch (...) {
+                destroy_nodes(_finish.node + 1, new_finish.node + 1);
+            }
+            iterator old_finish = _finish;
+            _finish = new_finish;
+            return old_finish;
+        } else {
+            return fill_insert_aux(pos, count, value);
+        }
     }
     template <class T, size_t BufSize>
     template <class InputIterator>
     typename deque<T, BufSize>::iterator
-        deque<T, BufSize>::insert(const_iterator pos, InputIterator first, InputIterator last) {
+        deque<T, BufSize>::insert(iterator pos, InputIterator first, InputIterator last) {
 
     }
 
     template <class T, size_t BufSize>
     typename deque<T, BufSize>::iterator
-        deque<T, BufSize>::erase(const_iterator pos) {
+        deque<T, BufSize>::erase(iterator pos) {
         iterator next = pos;
         ++next;
         difference_type index = pos - _start;
@@ -469,7 +486,7 @@ namespace rayn {
     }
     template <class T, size_t BufSize>
     typename deque<T, BufSize>::iterator
-        deque<T, BufSize>::erase(const_iterator first, const_iterator last) {
+        deque<T, BufSize>::erase(iterator first, iterator last) {
         if (first == _start && last == _finish) {
             clear();
             return _finish;
@@ -684,6 +701,41 @@ namespace rayn {
         return pos;
     }
     template <class T, size_t BufSize>
+    typename deque<T, BufSize>::iterator
+        deque<T, BufSize>::fill_insert_aux(iterator pos, size_type count, const value_type& value) {
+        const difference_type elems_before = pos - _start;
+        size_type length = this->size();
+        value_type v_copy = value;
+        if (elems_before <= difference_type(length >> 1)) {
+            iterator new_start = reserve_elements_at_front(count);
+            iterator old_start = _start;
+            try {
+                if (elems_before >= difference_type(count)) {
+                    iterator _start_n = _start + difference_type(count);
+                    rayn::copy(_start, _start_n, new_start);
+                    rayn::copy(_start_n, pos, old_start);
+                    rayn::fill(pos - difference_type(count), pos, v_copy);
+                    _start = new_start;
+                    pos -= difference_type(count);
+                } else {
+                    rayn::uninitialized_copy(_start, pos, new_start);
+                    rayn::fill(pos - difference_type(count), pos, v_copy);
+                    _start = new_start;
+                    pos -= difference_type(count);
+                }
+            } catch (...) {
+                destroy_nodes(new_start.node, _start.node);
+            }
+        }
+        return pos;
+    }
+    template <class T, size_t BufSize>
+    template <class InputIterator>
+    typename deque<T, BufSize>::iterator
+        deque<T, BufSize>::range_insert_aux(iterator pos, InputIterator first, InputIterator last) {
+
+    }
+    template <class T, size_t BufSize>
     void deque<T, BufSize>::push_back_aux(const value_type& value) {
         value_type v_copy = value;
         reserve_map_at_back();
@@ -728,6 +780,48 @@ namespace rayn {
         data_allocator(_start.first, buffer_size());
         _start.set_node(_start.node + 1);
         _start.cur = _start.first;
+    }
+    template <class T, size_t BufSize>
+    typename deque<T, BufSize>::iterator
+        deque<T, BufSize>::reserve_elements_at_front(size_type n) {
+        size_type left_count = _start.cur - _start.first;
+        if (n > left_count) {
+            int new_elems = n - left_count;
+            size_type new_nodes = (new_elems + buffer_size() - 1) / buffer_size();
+            reserve_map_at_front(new_nodes);
+            size_type i = 1;
+            try {
+                for (; i <= new_nodes; ++i) {
+                    *(_start.node - i) = data_allocator::allocate(buffer_size());
+                }
+            } catch (...) {
+                for (size_type j = 1; j < i; ++j) {
+                    data_allocator::deallocate(*(_start.node - j), buffer_size());
+                }
+            }
+        }
+        return _start - difference_type(n);
+    }
+    template <class T, size_t BufSize>
+    typename deque<T, BufSize>::iterator
+        deque<T, BufSize>::reserve_elements_at_back(size_type n) {
+        size_type left_count = _finish.last - _finish.cur - 1;
+        if (n > left_count) {
+            int new_elems = n - left_count;
+            size_type new_nodes = (new_elems + buffer_size() - 1) / buffer_size();
+            reserve_map_at_back(new_nodes);
+            size_type i = 1;
+            try {
+                for (; i <= new_nodes; ++i) {
+                    *(_finish.node + i) = data_allocator::allocate(buffer_size());
+                }
+            } catch (...) {
+                for (size_type j = 1; j < i; ++j) {
+                    data_allocator::deallocate(*(_finish + j), buffer_size());
+                }
+            }
+        }
+        return _finish + difference_type(n);
     }
     template <class T, size_t BufSize>
     void deque<T, BufSize>::reserve_map_at_back(size_type nodes_to_add = 1) {
