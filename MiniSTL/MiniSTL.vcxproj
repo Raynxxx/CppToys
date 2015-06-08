@@ -20,7 +20,9 @@
     <ClInclude Include="Deque.h" />
     <ClInclude Include="Iterator.h" />
     <ClInclude Include="List.h" />
+    <ClInclude Include="Queue.h" />
     <ClInclude Include="ReverseIterator.h" />
+    <ClInclude Include="Stack.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="Uninitialized.h" />
