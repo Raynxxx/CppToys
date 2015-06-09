@@ -18,8 +18,10 @@
     <ClInclude Include="Allocator.h" />
     <ClInclude Include="Construct.h" />
     <ClInclude Include="Deque.h" />
+    <ClInclude Include="Heap.h" />
     <ClInclude Include="Iterator.h" />
     <ClInclude Include="List.h" />
+    <ClInclude Include="Pair.h" />
     <ClInclude Include="Queue.h" />
     <ClInclude Include="ReverseIterator.h" />
     <ClInclude Include="Stack.h" />

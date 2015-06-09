@@ -15,6 +15,14 @@
 |reverse_iterator|100%|[ReverseIterator.h](MiniSTL/ReverseIterator.h)|
 |Algorithm|15%|[Algo.h](MiniSTL/Algo.h), [AlgoBase.h](MiniSTL/AlgoBase.h), [Algorithm.h](MiniSTL/Algorithm.h)|
 
+|工具|进度|链接|
+|---|---|---|
+|uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|
+|type_traits|50%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
+|pair|30%|[Pair.h](MiniSTL/Pair.h)|
+|heap|0%|[Heap.h](MiniSTL/Heap.h)|
+|bitset|--|--|
+
 |顺序容器|进度|链接|
 |---|---|---|
 |string|80%|[String.h](MiniSTL/String.h) 计划加入一些QT的string接口|
@@ -32,12 +40,7 @@
 |---|---|---|
 |---|---|---|
 
-|工具|进度|链接|
-|---|---|---|
-|uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|
-|type_traits|50%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
-|pair|--|--|
-|bitset|--|--|
+
 
 ## 单元测试
 

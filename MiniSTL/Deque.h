@@ -466,7 +466,9 @@ namespace rayn {
     template <class InputIterator>
     typename deque<T, BufSize>::iterator
         deque<T, BufSize>::insert(iterator pos, InputIterator first, InputIterator last) {
+        if (pos.cur == _start.cur) {
 
+        }
     }
 
     template <class T, size_t BufSize>
