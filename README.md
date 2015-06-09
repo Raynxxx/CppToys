@@ -1,5 +1,5 @@
 # MiniSTL
-  一个STL的子集，采用C++11实现STL的基本组件，各类容器和算法
+  造轮子计划1，一个STL的子集，后期会加入一些有趣的组件功能。
 * 开发语言 :  C++11
 * 编译环境 :  Visual Studio Community 2013
 * 参考资料1:  STL源码剖析 侯捷著
@@ -26,14 +26,14 @@
 |顺序容器|进度|链接|
 |---|---|---|
 |string|80%|[String.h](MiniSTL/String.h) 计划加入一些QT的string接口|
-|vector|95%|[Vector.h](MiniSTL/Vector.h)|
-|list|95%|[List.h](MiniSTL/List.h)|
+|vector|100%|[Vector.h](MiniSTL/Vector.h)|
+|list|100%|[List.h](MiniSTL/List.h)|
 |deque|90%|[Deque.h](MiniSTL/Deque.h)|
 
 |配接器|进度|链接|
 |---|---|---|
-|stack|90%|[Stack.h](MiniSTL/Stack.h)|
-|queue|90%|[Queue.h](MiniSTL/Queue.h)|
+|stack|80%|[Stack.h](MiniSTL/Stack.h)|
+|queue|80%|[Queue.h](MiniSTL/Queue.h)|
 |priority_queue|--|--|
 
 |关联容器|进度|链接|
