@@ -356,7 +356,7 @@ namespace rayn {
         iterator insert_aux(iterator pos, const value_type& value);
         iterator fill_insert_aux(iterator pos, size_type count, const value_type& value);
         template <class InputIterator>
-        iterator range_insert_aux(iterator pos, InputIterator first, InputIterator last);
+        iterator range_insert_aux(iterator pos, InputIterator first, InputIterator last, size_type n);
         void push_back_aux(const value_type& value);
         void pop_back_aux();
         void pop_front_aux();
@@ -443,20 +443,20 @@ namespace rayn {
             iterator new_start = reserve_elements_at_front(count);
             try {
                 rayn::uninitialized_fill(new_start, _start, value);
+                _start = new_start;
             } catch (...) {
                 destroy_nodes(new_start.node, _start.node);
             }
-            _start = new_start;
             return _start;
         } else if (pos.cur = _finish.cur) {
             iterator new_finish = reserve_elements_at_back(count);
+            iterator old_finish = _finish;
             try {
                 rayn::uninitialized_fill(_finish, new_finish, value);
+                _finish = new_finish;
             } catch (...) {
                 destroy_nodes(_finish.node + 1, new_finish.node + 1);
             }
-            iterator old_finish = _finish;
-            _finish = new_finish;
             return old_finish;
         } else {
             return fill_insert_aux(pos, count, value);
@@ -469,6 +469,25 @@ namespace rayn {
         size_type n = rayn::distance(first, last);
         if (pos.cur == _start.cur) {
             iterator new_start = reserve_elements_at_front(n);
+            try {
+                rayn::uninitialized_copy(first, last, new_start);
+                _start = new_start;
+            } catch (...) {
+                destroy_nodes(new_start.node, _start.node);
+            }
+            return _start;
+        } else if (pos.cur == _finish.cur) {
+            iterator new_finish = reserve_elements_at_back(n);
+            iterator old_finish = _finish;
+            try {
+                rayn::uninitialized_copy(first, last, _finish);
+                _finish = new_finish;
+            } catch (...) {
+                destroy_nodes(_finish.node + 1, new_finish.node + 1);
+            }
+            return old_finish;
+        } else {
+            return range_insert_aux(pos, first, last, n);
         }
     }
 
@@ -735,7 +754,7 @@ namespace rayn {
     template <class T, size_t BufSize>
     template <class InputIterator>
     typename deque<T, BufSize>::iterator
-        deque<T, BufSize>::range_insert_aux(iterator pos, InputIterator first, InputIterator last) {
+        deque<T, BufSize>::range_insert_aux(iterator pos, InputIterator first, InputIterator last, size_type n) {
 
     }
     template <class T, size_t BufSize>
