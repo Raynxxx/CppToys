@@ -19,16 +19,18 @@
 |---|---|---|
 |uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|
 |type_traits|50%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
-|pair|30%|[Pair.h](MiniSTL/Pair.h)|
+|pair|50%|[Pair.h](MiniSTL/Pair.h)|
 |heap|0%|[Heap.h](MiniSTL/Heap.h)|
 |bitset|--|--|
 
 |顺序容器|进度|链接|
 |---|---|---|
-|string|80%|[String.h](MiniSTL/String.h) 计划加入一些QT的string接口|
+|string|80%|[String.h](MiniSTL/String.h)|
 |vector|100%|[Vector.h](MiniSTL/Vector.h)|
 |list|100%|[List.h](MiniSTL/List.h)|
 |deque|90%|[Deque.h](MiniSTL/Deque.h)|
+
+> 计划加入一些QT的string接口
 
 |配接器|进度|链接|
 |---|---|---|
