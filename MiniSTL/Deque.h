@@ -466,8 +466,9 @@ namespace rayn {
     template <class InputIterator>
     typename deque<T, BufSize>::iterator
         deque<T, BufSize>::insert(iterator pos, InputIterator first, InputIterator last) {
+        size_type n = rayn::distance(first, last);
         if (pos.cur == _start.cur) {
-
+            iterator new_start = reserve_elements_at_front(n);
         }
     }
 
