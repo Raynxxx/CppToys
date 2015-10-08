@@ -25,7 +25,7 @@ namespace rayn {
             *first = value;
         }
     }
-    //C-style string 偏特化
+    //C-style string specialization
     inline void fill(char *first, char *last, const char& value) {
         memset(first, static_cast<unsigned char>(value), (last - first) * sizeof(char));
     }
@@ -48,7 +48,7 @@ namespace rayn {
         }
         return first;
     }
-    //C-style string 偏特化
+    //C-style string specialization
     template <class Size>
     inline char *fill_n(char *first, Size n, const char& value) {
         memset(first, static_cast<unsigned char>(value), n * sizeof(char));
@@ -60,6 +60,7 @@ namespace rayn {
         return first + n;
     }
 
+    
     //-----------------------------------------------------------------
     // min
     /*
@@ -101,6 +102,7 @@ namespace rayn {
     inline const T& max(const T& a, const T& b, Compare comp) {
         return comp(a, b) ? b : a;
     }
+
 
     //-----------------------------------------------------------------
     // equal
@@ -149,6 +151,38 @@ namespace rayn {
         T temp = a;
         a = b;
         b = temp;
+    }
+
+    //-----------------------------------------------------------------
+    // lexicographical_compare
+    template <class InputIterator1, class InputIterator2>
+    bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1,
+        InputIterator2 first2, InputIterator2 last2) {
+        for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
+            if (*first1 < *first2)  return true;
+            if (*first2 < *first1)  return false;
+        }
+        return first1 == last1 && first2 != last2;
+    }
+    template <class InputIterator1, class InputIterator2, class Compare>
+    bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1,
+        InputIterator2 first2, InputIterator2 last2,
+        Compare comp) {
+        for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
+            if (comp(*first1, *first2)) return true;
+            if (comp(*first2, *first1)) return false;
+        }
+        return first1 == last1 && first2 != last2;
+    }
+    // specialization
+    bool lexicographical_compare(const unsigned char *first1,
+        const unsigned char *last1,
+        const unsigned char *first2,
+        const unsigned char *last2) {
+        const size_t len1 = last1 - first1;
+        const size_t len2 = last2 - first2;
+        const int res = memcmp(first1, first2, min(len1, len2));
+        return res != 0 ? res < 0 : len1 < len2;
     }
     
     //-----------------------------------------------------------------
@@ -206,11 +240,10 @@ namespace rayn {
     };
 
     template <class InputIterator, class OutputIterator>
-    inline OutputIterator copy(InputIterator first, InputIterator last, 
-        OutputIterator result) {
+    inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result) {
         return __copy_dispatch<InputIterator, OutputIterator>()(first, last, result);
     }
-    // 特化
+    // specialization
     inline char* copy(const char* first, const char* last, char* result) {
         memmove(result, first, sizeof(char) * (last - first));
         return result + (last - first);
@@ -252,10 +285,6 @@ namespace rayn {
     inline BidirectionalIterator __copy_backward(RandomAccessIterator first, RandomAccessIterator last,
         BidirectionalIterator result, const random_access_iterator_tag&) {
         return __copy_backward_d(first, last, result, distance_type(first));
-        for (Distance n = last - first; n > 0; --n) {
-            *--result = *--last;
-        }
-        return result;
     }
 
     template <class BidirectionalIterator1, class BidirectionalIterator2>
@@ -281,11 +310,10 @@ namespace rayn {
     };
 
     template <class BidirectionalIterator1, class BidirectionalIterator2>
-    inline BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
-        BidirectionalIterator2 result) {
+    inline BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last, BidirectionalIterator2 result) {
         return __copy_backward_dispatch<BidirectionalIterator, BidirectionalIterator>()(first, last, result);
     }
-    // 特化
+    // specialization
     inline char* copy_backward(const char* first, const char* last, char* result) {
         const ptrdiff_t num = last - first;
         memmove(result - num, first, num);
@@ -296,6 +324,7 @@ namespace rayn {
         memmove(result - num, first, num);
         return result - num;
     }
+
 }
 
 #endif

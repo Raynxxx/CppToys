@@ -104,7 +104,7 @@ namespace rayn {
         self& operator+= (difference_type n) {
             difference_type offset = n + (cur - first);
             if (offset >= 0 && offset < difference_type(buffer_size())) {
-                //目标在同一缓冲区中
+                //target in the same buffer node
                 cur += n;
             } else {
                 difference_type node_offset = offset > 0 ?
@@ -359,8 +359,8 @@ namespace rayn {
         iterator range_insert_aux(iterator pos, InputIterator first, InputIterator last, size_type n);
         void push_back_aux(const value_type& value);
         void pop_back_aux();
-        void pop_front_aux();
         void push_front_aux(const value_type& value);
+        void pop_front_aux();
         iterator reserve_elements_at_back(size_type n);
         iterator reserve_elements_at_front(size_type n);
         void reserve_map_at_back(size_type nodes_to_add = 1);
@@ -613,7 +613,6 @@ namespace rayn {
             for (map_pointer mp = _start.node; mp != cur; ++mp) {
                 data_allocator::destroy(*mp, *mp + buffer_size());
             }
-            //TODO 留待改善
         }
     }
     template <class T, size_t BufSize>
@@ -700,7 +699,7 @@ namespace rayn {
         deque<T, BufSize>::insert_aux(iterator pos, const value_type& value) {
         difference_type index = pos - _start;
         value_type v_copy = value;
-        if (index < (size() >> 1)) {
+        if (index < (size() / 2)) {
             push_front(front());
             iterator front1 = _start;
             ++front1;
@@ -728,7 +727,7 @@ namespace rayn {
         const difference_type elems_before = pos - _start;
         size_type length = this->size();
         value_type v_copy = value;
-        if (elems_before <= difference_type(length >> 1)) {
+        if (elems_before <= difference_type(length / 2)) {
             iterator new_start = reserve_elements_at_front(count);
             iterator old_start = _start;
             try {
@@ -748,6 +747,26 @@ namespace rayn {
             } catch (...) {
                 destroy_nodes(new_start.node, _start.node);
             }
+        } else {
+            iterator new_finish = reserve_elements_at_back(count);
+            iterator old_finish = _finish;
+            const difference_type elems_after = 
+                difference_type(length) - elems_before;
+            try {
+                if (elems_after > difference_type(count)) {
+                    iterator finish_count = _finish - difference_type(count);
+                    rayn::copy(finish_count, _finish, _finish);
+                    _finish = new_finish;
+                    rayn::copy_backward(pos, finish_count, old_finish);
+                    rayn::fill(pos, pos + difference_type(count), v_copy);
+                } else {
+                    rayn::copy_backward(pos, _finish, new_finish);
+                    _finish = new_finish;
+                    rayn::fill(pos, pos + difference_type(count), v_copy);
+                }
+            } catch (...) {
+                destroy_nodes(_finish.node + 1, new_finish.node + 1);
+            }
         }
         return pos;
     }
@@ -755,7 +774,48 @@ namespace rayn {
     template <class InputIterator>
     typename deque<T, BufSize>::iterator
         deque<T, BufSize>::range_insert_aux(iterator pos, InputIterator first, InputIterator last, size_type n) {
-
+        const difference_type __elems_before = pos - this->_start;
+        size_type __length = this->size();
+        if (__elems_before <= difference_type(__length / 2)) {
+            iterator __new_start = reserve_elements_at_front(n);
+            iterator __old_start = this->_start;
+            try {
+                if (__elems_before >= difference_type(n)) {
+                    iterator __start_n = this->_start + difference_type(n);
+                    rayn::copy(this->_start, __start_n, __new_start);
+                    this->_start = __new_start;
+                    rayn::copy(__start_n, pos, __old_start);
+                    rayn::copy(first, last, pos - difference_type(n));
+                } else {
+                    rayn::copy(this->_start, pos, __new_start);
+                    rayn::copy(first, last, pos - difference_type(n));
+                    this->_start = __new_start;
+                }
+            } catch (...) {
+                destroy_nodes(__new_start, _start);
+            }
+        } else {
+            iterator __new_finish = reserve_elements_at_back(n);
+            iterator __old_finish = this->_finish;
+            const difference_type __elem_after = 
+                difference_type(__length) - __elems_before;
+            try {
+                if (__elem_after > difference_type(n)) {
+                    iterator __finish_n = _finish - difference_type(n);
+                    rayn::copy(__finish_n, _finish, _finish);
+                    _finish = __new_finish;
+                    rayn::copy_backward(pos, __finish_n, __old_finish);
+                    rayn::copy(first, last, pos);
+                } else {
+                    rayn::copy_backward(pos, _finish, __new_finish);
+                    _finish = __new_finish;
+                    rayn::copy(first, last, pos);
+                }
+            } catch (...) {
+                destroy_nodes(__old_finish + 1, __new_finish + 1);
+            }
+        }
+        return pos;
     }
     template <class T, size_t BufSize>
     void deque<T, BufSize>::push_back_aux(const value_type& value) {
@@ -889,17 +949,30 @@ namespace rayn {
 
     // Global functions
     template <class T>
-    inline bool operator== (const deque<T>& lhs, const deque<T>& rhs);
+    inline bool operator== (const deque<T>& lhs, const deque<T>& rhs) {
+        return lhs.size() == rhs.size()
+            && rayn::equal(lhs.begin(), lhs.end(), rhs.begin());
+    }
     template <class T>
-    inline bool operator!= (const deque<T>& lhs, const deque<T>& rhs);
+    inline bool operator!= (const deque<T>& lhs, const deque<T>& rhs) {
+        return !(lsh == rhs);
+    }
     template <class T>
-    inline bool operator< (const deque<T>& lhs, const deque<T>& rhs);
+    inline bool operator< (const deque<T>& lhs, const deque<T>& rhs) {
+        return rayn::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
     template <class T>
-    inline bool operator<= (const deque<T>& lhs, const deque<T>& rhs);
+    inline bool operator<= (const deque<T>& lhs, const deque<T>& rhs) {
+        return !(rhs < lhs);
+    }
     template <class T>
-    inline bool operator> (const deque<T>& lhs, const deque<T>& rhs);
+    inline bool operator> (const deque<T>& lhs, const deque<T>& rhs) {
+        return rhs < lhs;
+    }
     template <class T>
-    inline bool operator>= (const deque<T>& lhs, const deque<T>& rhs);
+    inline bool operator>= (const deque<T>& lhs, const deque<T>& rhs) {
+        return !(lhs < rhs);
+    }
 
     template <class T>
     inline void swap(const deque<T>& lhs, const deque<T>& rhs) {
