@@ -14,8 +14,7 @@
 #include "Uninitialized.h"
 
 namespace rayn {
-    template <class T>
-    class list;
+    template <class T> class list;
 
     // 列表节点
     template <class T>
@@ -24,6 +23,7 @@ namespace rayn {
         pointer prev;
         pointer next;
         T data;
+
         __list_node(const T& d, pointer p, pointer n):
             data(d), prev(p), next(n) {}
 
@@ -84,7 +84,7 @@ namespace rayn {
     protected:
         typedef __list_node<T>                      list_node;
         typedef allocator<list_node>                node_allocator;
-        typedef list_node*                           link_type;
+        typedef list_node*                          link_type;
     public:
         typedef T                                   value_type;
         typedef T&                                  reference;

@@ -13,13 +13,13 @@
 |空间配置器|100%|[Allocator.h](MiniSTL/Allocator.h), [Alloc.h](MiniSTL/Alloc.h), [Alloc.cpp](MiniSTL/Alloc.cpp), [Construct.h](MiniSTL/Construct.h)|
 |iterator|100%|[Iterator.h](MiniSTL/Iterator.h)|
 |reverse_iterator|100%|[ReverseIterator.h](MiniSTL/ReverseIterator.h)|
-|Algorithm|15%|[Algo.h](MiniSTL/Algo.h), [AlgoBase.h](MiniSTL/AlgoBase.h), [Algorithm.h](MiniSTL/Algorithm.h)|
+|Algorithm|20%|[Algo.h](MiniSTL/Algo.h), [AlgoBase.h](MiniSTL/AlgoBase.h), [Algorithm.h](MiniSTL/Algorithm.h)|
 
 |工具|进度|链接|
 |---|---|---|
 |uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|
 |type_traits|50%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
-|pair|50%|[Pair.h](MiniSTL/Pair.h)|
+|pair|100%|[Pair.h](MiniSTL/Pair.h)|
 |heap|0%|[Heap.h](MiniSTL/Heap.h)|
 |bitset|--|--|
 
@@ -28,14 +28,14 @@
 |string|80%|[String.h](MiniSTL/String.h)|
 |vector|100%|[Vector.h](MiniSTL/Vector.h)|
 |list|100%|[List.h](MiniSTL/List.h)|
-|deque|90%|[Deque.h](MiniSTL/Deque.h)|
+|deque|100%|[Deque.h](MiniSTL/Deque.h)|
 
 > 计划加入一些QT的string接口
 
 |配接器|进度|链接|
 |---|---|---|
-|stack|80%|[Stack.h](MiniSTL/Stack.h)|
-|queue|80%|[Queue.h](MiniSTL/Queue.h)|
+|stack|100%|[Stack.h](MiniSTL/Stack.h)|
+|queue|100%|[Queue.h](MiniSTL/Queue.h)|
 |priority_queue|--|--|
 
 |关联容器|进度|链接|

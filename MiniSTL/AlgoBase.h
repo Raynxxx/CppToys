@@ -25,7 +25,7 @@ namespace rayn {
             *first = value;
         }
     }
-    //C-style string specialization
+    // C-style string specialization
     inline void fill(char *first, char *last, const char& value) {
         memset(first, static_cast<unsigned char>(value), (last - first) * sizeof(char));
     }
@@ -112,10 +112,12 @@ namespace rayn {
     ** @complexity  O(N)
     */
     template <class InputIterator1, class InputIterator2>
-    inline bool equal(InputIterator1 first1, InputIterator1 last1,
-        InputIterator2 first2) {
-        //遍历[first1, last1), 同时递增first2
-        //如果序列1的元素多于序列2, 会发生不可预料的错误.
+    inline bool equal(InputIterator1 first1,
+                      InputIterator1 last1,
+                      InputIterator2 first2) 
+    {
+        // travel [first1, last1), ++ first2
+        // len1 > len2 will be error!
         for (; first1 != last1; ++first1, ++first2) {
             if (*first1 != *first2) {
                 return false;
@@ -129,8 +131,11 @@ namespace rayn {
     ** @complexity  O(N)
     */
     template <class InputIterator1, class InputIterator2, class BinaryPredicate>
-    inline bool equal(InputIterator1 first1, InputIterator1 last1,
-        InputIterator2 first2, BinaryPredicate binary_pred) {
+    inline bool equal(InputIterator1 first1,
+                      InputIterator1 last1,
+                      InputIterator2 first2,
+                      BinaryPredicate binary_pred) 
+    {
         for (; first1 != last1; ++first1, ++first2) {
             if (!binary_pred(*first1, *first2)) {
                 return false;
@@ -155,30 +160,48 @@ namespace rayn {
 
     //-----------------------------------------------------------------
     // lexicographical_compare
+    /*
+    ** @brief   Performs @b dictionary comparison on ranges.
+    ** @return  A boolean true or false.
+    */
     template <class InputIterator1, class InputIterator2>
-    bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1,
-        InputIterator2 first2, InputIterator2 last2) {
+    bool lexicographical_compare(InputIterator1 first1,
+                                 InputIterator1 last1,
+                                 InputIterator2 first2,
+                                 InputIterator2 last2)
+    {
         for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
             if (*first1 < *first2)  return true;
             if (*first2 < *first1)  return false;
         }
         return first1 == last1 && first2 != last2;
     }
+
+    /*
+    ** @brief   Performs @b dictionary comparison on ranges.
+    ** @param   comp    A comparison_functors comparison functor.
+    ** @return  A boolean true or false.
+    */
     template <class InputIterator1, class InputIterator2, class Compare>
-    bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1,
-        InputIterator2 first2, InputIterator2 last2,
-        Compare comp) {
+    bool lexicographical_compare(InputIterator1 first1,
+                                 InputIterator1 last1,
+                                 InputIterator2 first2,
+                                 InputIterator2 last2,
+                                 Compare comp)
+    {
         for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
             if (comp(*first1, *first2)) return true;
             if (comp(*first2, *first1)) return false;
         }
         return first1 == last1 && first2 != last2;
     }
-    // specialization
+
+    // specialization for lexicographical_compare
     bool lexicographical_compare(const unsigned char *first1,
-        const unsigned char *last1,
-        const unsigned char *first2,
-        const unsigned char *last2) {
+                                 const unsigned char *last1,
+                                 const unsigned char *first2,
+                                 const unsigned char *last2)
+    {
         const size_t len1 = last1 - first1;
         const size_t len2 = last2 - first2;
         const int res = memcmp(first1, first2, min(len1, len2));
@@ -188,39 +211,59 @@ namespace rayn {
     //-----------------------------------------------------------------
     // copy
     template <class RandomAccessIterator, class OutputIterator, class Distance>
-    inline OutputIterator __copy_d(RandomAccessIterator first, RandomAccessIterator last,
-        OutputIterator result, Distance*) {
+    inline OutputIterator
+    __copy_d(RandomAccessIterator first,
+             RandomAccessIterator last,
+             OutputIterator result,
+             Distance*)
+    {
         for (Distance n = last - first; n > 0; --n, ++first, ++result) {
             *result = *first;
         }
         return result;
     }
+
     template <class T>
     inline T* __copy_t(const T* first, const T* last, T* result, _true_type) {
         memmove(result, first, sizeof(T) * (last - first));
         return result + (last - first);
     }
+
     template <class T>
     inline T* __copy_t(const T* first, const T* last, T* result, _false_type) {
         return __copy_d(first, last, result, (ptrdiff_t*) 0);
     }
+
     template <class InputIterator, class OutputIterator>
-    inline OutputIterator __copy(InputIterator first, InputIterator last, 
-        OutputIterator result, const input_iterator_tag&) {
+    inline OutputIterator
+    __copy(InputIterator first,
+           InputIterator last,
+           OutputIterator result,
+           const input_iterator_tag&)
+    {
         for (; first != last; ++first, ++result) {
             *result = *first;
         }
         return result;
     }
+
     template <class RandomAccessIterator, class OutputIterator, class Distance>
-    inline OutputIterator __copy(RandomAccessIterator first, RandomAccessIterator last, 
-        OutputIterator result, const random_access_iterator_tag&) {
+    inline OutputIterator
+    __copy(RandomAccessIterator first,
+           RandomAccessIterator last,
+           OutputIterator result,
+           const random_access_iterator_tag&)
+    {
         return __copy_d(first, last, result, distance_type(first));
     }
 
     template <class InputIterator, class OutputIterator>
     struct __copy_dispatch {
-        OutputIterator operator() (InputIterator first, InputIterator last, OutputIterator result) {
+        OutputIterator
+        operator() (InputIterator first,
+                    InputIterator last,
+                    OutputIterator result)
+        {
             return __copy(first, last, result, iterator_category(first));
         }
     };
@@ -231,6 +274,7 @@ namespace rayn {
             return __copy_t(first, last, result, type());
         }
     };
+
     template <class T>
     struct __copy_dispatch< const T*, T* > {
         T* operator() (T* first, T* last, T* result) {
@@ -240,9 +284,13 @@ namespace rayn {
     };
 
     template <class InputIterator, class OutputIterator>
-    inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result) {
+    inline OutputIterator copy(InputIterator first,
+                               InputIterator last,
+                               OutputIterator result)
+    {
         return __copy_dispatch<InputIterator, OutputIterator>()(first, last, result);
     }
+
     // specialization
     inline char* copy(const char* first, const char* last, char* result) {
         memmove(result, first, sizeof(char) * (last - first));
@@ -256,44 +304,64 @@ namespace rayn {
     //-----------------------------------------------------------------
     // copy_backward
     template <class RandomAccessIterator, class BidirectionalIterator, class Distance>
-    inline BidirectionalIterator __copy_backward_d(RandomAccessIterator first, RandomAccessIterator last,
-        BidirectionalIterator result, Distance*) {
+    inline BidirectionalIterator 
+    __copy_backward_d(RandomAccessIterator first,
+                      RandomAccessIterator last,
+                      BidirectionalIterator result,
+                      Distance*)
+    {
         for (Distance n = last - first; n > 0; --n) {
             *--result = *--last;
         }
         return result;
     }
+
     template <class T>
     inline T* __copy_backward_t(const T* first, const T* last, T* result, _true_type) {
         const ptrdiff_t num = last - first;
         memmove(result - num, first, num);
         return result - num;
     }
+
     template <class T>
     inline T* __copy_backward_t(const T* first, const T* last, T* result, _false_type) {
         return __copy_backward_d(first, last, result, (ptrdiff_t*)0);
     }
+
     template <class BidirectionalIterator1, class BidirectionalIterator2>
-    inline BidirectionalIterator2 __copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last,
-        BidirectionalIterator2 result, const bidirectional_iterator_tag&) {
+    inline BidirectionalIterator2 
+    __copy_backward(BidirectionalIterator1 first,
+                    BidirectionalIterator1 last,
+                    BidirectionalIterator2 result,
+                    const bidirectional_iterator_tag&)
+    {
         while (last != first) {
             *--result = *--last;
         }
         return result;
     }
+
     template <class RandomAccessIterator, class BidirectionalIterator>
-    inline BidirectionalIterator __copy_backward(RandomAccessIterator first, RandomAccessIterator last,
-        BidirectionalIterator result, const random_access_iterator_tag&) {
+    inline BidirectionalIterator 
+    __copy_backward(RandomAccessIterator first,
+                    RandomAccessIterator last,
+                    BidirectionalIterator result,
+                    const random_access_iterator_tag&)
+    {
         return __copy_backward_d(first, last, result, distance_type(first));
     }
 
     template <class BidirectionalIterator1, class BidirectionalIterator2>
     struct __copy_backward_dispatch {
-        BidirectionalIterator2 operator() (BidirectionalIterator1 first, BidirectionalIterator1 last,
-            BidirectionalIterator2 result) {
+        BidirectionalIterator2 
+        operator() (BidirectionalIterator1 first,
+                    BidirectionalIterator1 last,
+                    BidirectionalIterator2 result)
+        {
             return __copy_backward(first, last, result, iterator_category(first));
         }
     };
+
     template <class T>
     struct __copy_backward_dispatch < T*, T* > {
         T* operator() (T* first, T* last, T* result) {
@@ -301,6 +369,7 @@ namespace rayn {
             return __copy_t(first, last, result, type());
         }
     };
+
     template <class T>
     struct __copy_backward_dispatch < const T*, T* > {
         T* operator() (const T* first, const T* last, T* result) {
@@ -310,9 +379,14 @@ namespace rayn {
     };
 
     template <class BidirectionalIterator1, class BidirectionalIterator2>
-    inline BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last, BidirectionalIterator2 result) {
+    inline BidirectionalIterator2 
+    copy_backward(BidirectionalIterator1 first,
+                  BidirectionalIterator1 last,
+                  BidirectionalIterator2 result)
+    {
         return __copy_backward_dispatch<BidirectionalIterator, BidirectionalIterator>()(first, last, result);
     }
+
     // specialization
     inline char* copy_backward(const char* first, const char* last, char* result) {
         const ptrdiff_t num = last - first;

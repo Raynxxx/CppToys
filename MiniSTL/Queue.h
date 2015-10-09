@@ -19,18 +19,20 @@ namespace rayn {
         typedef typename    Sequence::const_reference   const_reference;
 
     protected:
+        // the underlying container.
         Sequence c;
 
     public:
         // Default Contructor
-        queue() : c() {}
+        queue()                             : c() {}
         // Contructor with a Sequence
-        explicit queue(const Sequence& s) : c(s) {}
+        explicit queue(const Sequence& s)   : c(s) {}
         // Copy Contructor
-        queue(const queue& other) : c(other.c) {}
+        queue(const queue& other)           : c(other.c) {}
         // Move Contructor
-        queue(queue&& other) : c(other.c) {}
+        queue(queue&& other)                : c(other.c) {}
         // Destructor, none
+        ~queue() {}
 
         // Copy Assignment operator
         queue& operator= (const queue& other);
@@ -38,36 +40,55 @@ namespace rayn {
         queue& operator= (queue&& other);
 
         // Element access
-        reference front() { return c.front(); }
-        const_reference front() const { return c.front(); }
-        reference back() { return c.back(); }
-        const_reference back() const { return c.back(); }
+        reference       front()         { return c.front(); }
+        const_reference front() const   { return c.front(); }
+        reference       back()          { return c.back(); }
+        const_reference back() const    { return c.back(); }
 
         // Capacity
-        bool empty() const { return c.empty(); }
-        size_type size() const { return c.size(); }
+        bool            empty() const   { return c.empty(); }
+        size_type       size() const    { return c.size(); }
 
         // Modifiers
-        void push(const T& value) { c.push_back(value); }
-        void pop() { c.pop_front(); }
-        void swap(queue& other) {
-            rayn::swap(this->c, other.c);
-        }
+        void            push(const T& value)    { c.push_back(value); }
+        void            pop()                   { c.pop_front(); }
+        void            swap(queue& other)      { rayn::swap(this->c, other.c); }
+
+    protected:
+        template <class T, class Sequence>
+        friend bool operator== (queue<T, Sequence>&, queue<T, Sequence>&);
+
+        template <class T, class Sequence>
+        friend bool operator< (queue<T, Sequence>&, queue<T, Sequence>&);
     };
 
     template <class T, class Sequence>
-    bool operator== (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs);
+    bool operator== (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs) {
+        return lhs.c == rhs.c;
+    }
     template <class T, class Sequence>
-    bool operator!= (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs);
+    bool operator!= (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs) {
+        return !(lhs == rhs);
+    }
     template <class T, class Sequence>
-    bool operator<= (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs);
+    bool operator<= (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs) {
+        return !(rhs < lhs);
+    }
     template <class T, class Sequence>
-    bool operator< (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs);
+    bool operator< (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs) {
+        return lhs.c < rhs.c;
+    }
     template <class T, class Sequence>
-    bool operator>= (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs);
+    bool operator>= (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs) {
+        return !(lhs < rhs);
+    }
     template <class T, class Sequence>
-    bool operator> (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs);
+    bool operator> (queue<T, Sequence>& lhs, queue<T, Sequence>& rhs) {
+        return rhs < lhs;
+    }
     template <class T, class Sequence>
-    void swap(queue<T, Sequence>& lhs, queue<T, Sequence>& rhs);
+    void swap(queue<T, Sequence>& lhs, queue<T, Sequence>& rhs) {
+        lhs.swap(rhs);
+    }
 }
 #endif
