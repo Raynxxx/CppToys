@@ -18,7 +18,9 @@
     <ClInclude Include="Allocator.h" />
     <ClInclude Include="Construct.h" />
     <ClInclude Include="Deque.h" />
+    <ClInclude Include="Functional.h" />
     <ClInclude Include="Heap.h" />
+    <ClInclude Include="UnitTest\HeapTest.h" />
     <ClInclude Include="Iterator.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="Pair.h" />

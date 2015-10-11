@@ -17,7 +17,10 @@ namespace rayn {
     ** Random Access Iterator: 支持原生指针的全部能力
     */
 
-    //标记迭代器类型，STL规定，对于算法，使用所能接受之最低阶迭代器类型
+    /*
+    ** iterator type tag
+    ** These are empty types, used to distinguish different iterators.
+    */
     struct input_iterator_tag {};
     struct output_iterator_tag {};
     struct forward_iterator_tag : public input_iterator_tag {};
@@ -102,57 +105,79 @@ namespace rayn {
         typedef const T*					pointer;
         typedef const T&					reference;
     };
+
     //决定某个迭代器的类型 category
     template <class Iterator>
     inline typename iterator_traits<Iterator>::iterator_category
-        iterator_category(const Iterator& iter) {
+    iterator_category(const Iterator& iter)
+    {
         typedef typename iterator_traits<Iterator>::iterator_category category;
         return category();
     }
     //决定某个迭代器的类型 value type
     template <class Iterator>
     inline typename iterator_traits<Iterator>::value_type*
-        value_type(const Iterator& iter) {
+    value_type(const Iterator& iter)
+    {
         return static_cast<typename iterator_traits<Iterator>::value_type*>(0);
     }
     //决定某个迭代器的类型 difference type
     template <class Iterator>
     inline typename iterator_traits<Iterator>::difference_type*
-        distance_type(const Iterator& iter) {
+    distance_type(const Iterator& iter)
+    {
         return static_cast<typename iterator_traits<Iterator>::difference_type*>(0);
     }
     
-    
+    /**********************************************************/
+    // advance
     template <class InputIterator, class Distance>
-    inline void _advance(InputIterator& it, Distance n, input_iterator_tag) {
+    inline void _advance(InputIterator& it,
+                         Distance n,
+                         input_iterator_tag)
+    {
         while (n--) ++it;
     }
+
     template <class BidirectionalIterator, class Distance>
-    inline void _advance(BidirectionalIterator& it, Distance n, bidirectional_iterator_tag) {
+    inline void _advance(BidirectionalIterator& it,
+                         Distance n,
+                         bidirectional_iterator_tag)
+    {
         if (n >= 0) {
             while (n--) ++it;
         } else {
             while (n++) --it;
         }
     }
+
     template <class RandomAccessIterator, class Distance>
-    inline void _advance(RandomAccessIterator& it, Distance n, random_access_iterator_tag) {
+    inline void _advance(RandomAccessIterator& it,
+                         Distance n,
+                         random_access_iterator_tag)
+    {
         it += n;
     }
+
     /*
-    ** @brief Increase n step at the iterator
-    ** @param it The increased iterator
-    ** @param n The distance that the iterator will be increased.
-    ** @return Nothing.
+    ** @brief   Increase n step at the iterator
+    ** @param   it  The increased iterator
+    ** @param   n   The distance that the iterator will be increased.
+    ** @return  Nothing.
     */
     template <class InputIterator, class Distance>
     inline void advance(InputIterator& it, Distance n) {
         _advance(it, n, iterator_category(it));
     }
 
+    /**********************************************************/
+    // distance
     template <class InputIterator>
     inline typename iterator_traits<InputIterator>::difference_type
-        _distance(InputIterator first, InputIterator last, input_iterator_tag) {
+    _distance(InputIterator first,
+              InputIterator last,
+              input_iterator_tag)
+    {
         typename iterator_traits<InputIterator>::difference_type n = 0;
         while (first != last) {
             ++first;
@@ -162,13 +187,20 @@ namespace rayn {
     }
     template <class RandomAccessIterator>
     inline typename iterator_traits<RandomAccessIterator>::difference_type
-        _distance(RandomAccessIterator first, RandomAccessIterator last, random_access_iterator_tag) {
+    _distance(RandomAccessIterator first,
+              RandomAccessIterator last,
+              random_access_iterator_tag)
+    {
         return last - first;
     }
 
+    /*
+    ** @brief   A generalization of pointer arithmetic.
+    ** @return  The distance between them.
+    */
     template <class InputIterator>
     inline typename iterator_traits<InputIterator>::difference_type
-        distance(InputIterator first, InputIterator last) {
+    distance(InputIterator first, InputIterator last) {
         typedef typename iterator_traits<InputIterator>::iterator_category category;
         _distance(first, last, category());
     }

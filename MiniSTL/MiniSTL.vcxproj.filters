@@ -78,6 +78,12 @@
     <ClInclude Include="Pair.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Functional.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTest\HeapTest.h">
+      <Filter>测试</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp">
