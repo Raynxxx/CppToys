@@ -150,7 +150,7 @@ namespace rayn {
                           RandomAccessIterator last)
     {
         while (last - first > 1)
-            pop_heap(first, last--);
+            rayn::pop_heap(first, last--);
     }
 
     /*
@@ -165,7 +165,7 @@ namespace rayn {
                           Compare comp)
     {
         while (last - first > 1)
-           pop_heap(first, last--, comp);
+           rayn::pop_heap(first, last--, comp);
     }
 
 

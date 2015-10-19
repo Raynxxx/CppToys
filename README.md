@@ -20,7 +20,7 @@
 |uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|
 |type_traits|50%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
 |pair|100%|[Pair.h](MiniSTL/Pair.h)|
-|heap|0%|[Heap.h](MiniSTL/Heap.h)|
+|heap|100%|[Heap.h](MiniSTL/Heap.h)|
 |bitset|--|--|
 
 |顺序容器|进度|链接|
@@ -36,7 +36,7 @@
 |---|---|---|
 |stack|100%|[Stack.h](MiniSTL/Stack.h)|
 |queue|100%|[Queue.h](MiniSTL/Queue.h)|
-|priority_queue|--|--|
+|priority_queue|100%|[Queue.h](MiniSTL/Queue.h)|
 
 |关联容器|进度|链接|
 |---|---|---|

@@ -112,15 +112,55 @@ namespace rayn {
 
     public:
         priority_queue()                                            : c() {}
-        explicit priority_queue(const Compare& __comp)              : c(), comp(__comp) {}
-        priority_queue(const Compare& __comp, const Sequence& __c)  : c(__c), comp(__comp) 
-        {
-            make_heap(__c.begin(), __c.end(), comp);
+        explicit priority_queue(const Compare& __c)                 : c(), comp(__c) {}
+        priority_queue(const Compare& __c, const Sequence& __s)     : c(__s), comp(__c) {
+            rayn::make_heap(__c.begin(), __c.end(), comp);
         }
 
+        template <class InputIterator>
+        priority_queue(InputIterator first, InputIterator last)     : c(first, last), comp()
+        {
+            rayn::make_heap(c.begin(), c.end(), comp);
+        }
+
+        template <class InputIterator>
+        priority_queue(InputIterator first, InputIterator last,
+                       const Compare& __c)
+            : c(first, last), comp(__c)
+        {
+            rayn::make_heap(c.begin(), c.end(), comp);
+        }
+
+        template <class InputIterator>
+        priority_queue(InputIterator first, InputIterator last,
+                       const Compare& __c, const Sequence& __s)
+            : c(__s), comp(__c)
+        {
+            c.insert(c.end(), first, last);
+            rayn::make_heap(c.begin(), c.end(), comp);
+        }
+
+        ~priority_queue() {}
+
+        priority_queue& operator= (const priority_queue& other) {
+            c = other.c;
+        }
+
+        const_reference     top() const     { return c.front(); }
+        bool                empty() const   { return c.empty(); }
+        size_type           size() const    { return c.size(); }
+
+        void push(const value_type& value) {
+            c.push_back(value);
+            rayn::push_heap(c.begin(), c.end(), comp);
+        }
         void pop() {
-            pop_heap(c.begin(), c.end(), comp);
+            rayn::pop_heap(c.begin(), c.end(), comp);
             c.pop_back();
+        }
+        void swap(priority_queue& other) {
+            swap(c, other.c);
+            swap(comp, other.comp);
         }
     };
 }
