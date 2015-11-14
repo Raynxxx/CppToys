@@ -14,6 +14,12 @@ namespace rayn {
         void test_string_1() {
             rayn::string str("Hello World!");
             std::cout << str.rfind("ld") << std::endl;
+            auto beg = str.begin();
+            auto end = beg;
+            end++;
+            end++;
+            str.erase(beg, end);
+            std::cout << str << std::endl;
         }
         void test_string() {
             test_string_1();

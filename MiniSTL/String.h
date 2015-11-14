@@ -6,14 +6,14 @@
 #ifndef _STRING_H_
 #define _STRING_H_
 
+#include "Allocator.h"
+#include "Uninitialized.h"
+#include "ReverseIterator.h"
+
 #include <cstring>
 #include <iostream>
 #include <memory>
 #include <type_traits>
-
-#include "Allocator.h"
-#include "Uninitialized.h"
-#include "ReverseIterator.h"
 
 namespace rayn {
     template <class CharT>
@@ -340,7 +340,7 @@ namespace rayn {
         /*
         ** @brief   Remove the last character.
         */
-        void pop_back() { erase(end() - 1, end()); }
+        void pop_back() { this->erase(end() - 1, end()); }
 
         /*
         ** @brief   Replace characters with value from another string.
@@ -806,10 +806,14 @@ namespace rayn {
         
         friend void swap(basic_string &lhs, basic_string& rhs);
      
-        friend std::ostream& operator<< (std::ostream& os, const basic_string& str);
-        friend std::istream& operator>> (std::istream& is, basic_string& str);
-        friend std::istream& getline(std::istream& is, basic_string& str, char delim);
-        friend std::istream& getline(std::istream& is, basic_string& str);
+        template <CharT>
+        friend std::ostream& operator<< (std::ostream& os, const basic_string<CharT>& str);
+        template <CharT>
+        friend std::istream& operator>> (std::istream& is, basic_string<CharT>& str);
+        template <CharT>
+        friend std::istream& getline(std::istream& is, basic_string<CharT>& str, char delim);
+        template <CharT>
+        friend std::istream& getline(std::istream& is, basic_string<CharT>& str);
 
     private:
         //Aux function
@@ -1439,7 +1443,6 @@ namespace rayn {
         return basic_string<CharT>(begin() + pos, begin() + pos + len);
     }
 
-
     template <class CharT>
     int basic_string<CharT>::compare(const basic_string& str) const {
         return compare(0, size(), str, 0, str.size());
@@ -1651,6 +1654,8 @@ namespace rayn {
     std::istream& getline(std::istream& is, basic_string<CharT>& str) {
         return getline(is, str, '\n');
     }
+
+    // Numeric Conversions [string.conversions].
 }
 
 #endif

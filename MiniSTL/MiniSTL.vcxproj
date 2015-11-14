@@ -20,6 +20,7 @@
     <ClInclude Include="Deque.h" />
     <ClInclude Include="Functional.h" />
     <ClInclude Include="Heap.h" />
+    <ClInclude Include="Tree.h" />
     <ClInclude Include="UnitTest\HeapTest.h" />
     <ClInclude Include="Iterator.h" />
     <ClInclude Include="List.h" />
