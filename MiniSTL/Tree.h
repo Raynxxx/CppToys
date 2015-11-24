@@ -8,6 +8,7 @@
 
 #include "Iterator.h"
 #include "Allocator.h"
+#include "Pair.h"
 
 namespace rayn {
 
@@ -188,14 +189,167 @@ namespace rayn {
         link_type   header;
         Compare     key_compare;
 
-        link_type& root() const         { return (link_type&) header->parent; }
-        link_type& leftmost() const     { return (link_type&) header->left; }
-        link_type& rightmost() const    { return (link_type&) header->right; }
+        link_type& root() const         { return (link_type&)header->parent; }
+        link_type& leftmost() const     { return (link_type&)header->left; }
+        link_type& rightmost() const    { return (link_type&)header->right; }
 
-        static link_type& left(link_type x);
-        static link_type& right(link_type x);
-        static link_type& parent(link_type x);
+        static link_type&   left(link_type x)   { return (link_type&)(x->left); }
+        static link_type&   right(link_type x)  { return (link_type&)(x->right); }
+        static link_type&   parent(link_type x) { return (link_type&)(x->parent); }
+        static reference    value(link_type x)  { return x->value_field; }
+        static const Key&   key(link_type x)    { return KeyOfValue()(value(x)); }
+        static color_type&  color(link_type x)  { return (color_type&)(x->color); }
+
+        static link_type&   left(base_ptr x)   { return (link_type&)(x->left); }
+        static link_type&   right(base_ptr x)  { return (link_type&)(x->right); }
+        static link_type&   parent(base_ptr x) { return (link_type&)(x->parent); }
+        static reference    value(base_ptr x)  { return ((link_type)x)->value_field; }
+        static const Key&   key(base_ptr x)    { return KeyOfValue()(value(link_type(x))); }
+        static color_type&  color(base_ptr x)  { return (color_type&)(link_type(x)->color); }
+
+        static link_type minimum(link_type x) {
+            return (link_type)__rb_tree_node_base::minimum(x);
+        }
+        static link_type maximum(link_type x) {
+            return (link_type)__rb_tree_node_base::maximum(x);
+        }
+
+    public:
+        typedef __rb_tree_iterator<value_type, reference, pointer>  iterator;
+
+    private:
+        iterator    __insert(base_ptr _pos, base_ptr _pa, const value_type& v);
+        link_type   __copy(link_type pos, link_type pa);
+        void        __erase(link_type x);
+
+        void init() {
+            header = get_node();
+            color(header) = _s_red;
+
+            root() = 0;
+            leftmost() = header;
+            rightmost() = header;
+        }
+
+    public:
+        rb_tree(const Compare& comp = Compare()) : 
+            node_count(0), key_compare(comp) { init(); }
+
+        ~rb_tree() {
+            put_node(header);
+        }
+
+        rb_tree<Key, Value, KeyOfValue, Compare>&
+            operator= (const rb_tree<Key, Value, KeyOfValue, Compare>& other);
+
+        Compare     key_comp() const    { return key_compare; }
+        iterator    begin()             { return leftmost(); }
+        iterator    end()               { return header; }
+        bool        empty()             { return node_count == 0; }
+        size_type   size() const        { return node_count; }
+        size_type   max_size() const    { return size_type(-1); }
+
+        pair<iterator, bool> insert_unique(const value_type& v);
+        iterator insert_equal(const value_type& v);
     };
+
+    inline void
+    __rb_tree_rebalance(__rb_tree_node_base* x, __rb_tree_node_base*& root)
+    {
+
+    }
+
+    inline void
+    __rb_tree_rotate_left(__rb_tree_node_base* x, __rb_tree_node_base*& root)
+    {
+
+    }
+    
+    inline void
+    __rb_tree_rotate_right(__rb_tree_node_base* x, __rb_tree_node_base*& root)
+    {
+
+    }
+
+
+    template <class Key, class Value, class KeyOfValue, class Compare>
+    typename rb_tree<Key, Value, KeyOfValue, Compare>::iterator
+    rb_tree<Key, Value, KeyOfValue, Compare>::
+    __insert(base_ptr _pos, base_ptr _pa, const value_type& v)
+    {
+        link_type pos = (link_type) _pos;
+        link_type pa = (link_type) _pa;
+        link_type tmp;
+
+        if (pa == header || pos != 0 || key_compare(KeyOfValue()(v), key(pa))) {
+            tmp = create_node(v);
+            left(pa) = tmp;
+            if (pa == header) {
+                root() = tmp;
+                rightmost() = tmp;
+            } else if (pa == leftmost()) {
+                leftmost() = tmp;
+            }
+        } else {
+            tmp = create_node(v);
+            right(pa) = tmp;
+            if (pa == rightmost()) {
+                rightmost() = tmp;
+            }
+        }
+        parent(tmp) = pa;
+        left(tmp) = 0;
+        right(tmp) = 0;
+
+        __rb_tree_rebalance(tmp, header->parent);
+        ++node_count;
+        return iterator(tmp);
+    }
+
+
+    template <class Key, class Value, class KeyOfValue, class Compare>
+    typename rb_tree<Key, Value, KeyOfValue, Compare>::iterator
+    rb_tree<Key, Value, KeyOfValue, Compare>::
+    insert_equal(const value_type& v)
+    {
+        link_type pa = header;
+        link_type cur = root();
+        while (cur != 0) {
+            pa = cur;
+            cur = key_compare(KeyOfValue()(v), key(cur)) ? left(cur) : right(cur);
+        }
+        return __insert(cur, pa, v);
+    }
+
+    template <class Key, class Value, class KeyOfValue, class Compare>
+    pair<typename rb_tree<Key, Value, KeyOfValue, Compare>::iterator, bool>
+    rb_tree<Key, Value, KeyOfValue, Compare>::
+    insert_unique(const value_type& v)
+    {
+        link_type pa = header;
+        link_type cur = root();
+        bool comp = true;
+        while (cur != 0) {
+            pa = cur;
+            comp = key_compare(KeyOfValue()(v), key(cur));
+            cur = comp ? left(cur) : right(cur);
+        }
+        iterator iter = iterator(pa);
+        if (comp) {
+            if (iter == begin()) {
+                return pair<iterator, bool>(__insert(cur, pa, v), true);
+            } else {
+                --iter;
+                // InsertPoint's parent not min key, InsertValue need to
+                // compare with prev key of InsertPoint's parent
+            }
+        }
+        if (key_compare(key(iter.node), KeyOfValue()(v))) {
+            return pair<iterator, bool>(__insert(cur, pa, v), true);
+        }
+        return pair<iterator, bool>(iter, false);
+    }
+
 
 }
 
