@@ -25,6 +25,7 @@ namespace rayn {
             *first = value;
         }
     }
+
     // C-style string specialization
     inline void fill(char *first, char *last, const char& value) {
         memset(first, static_cast<unsigned char>(value), (last - first) * sizeof(char));
@@ -48,6 +49,7 @@ namespace rayn {
         }
         return first;
     }
+
     //C-style string specialization
     template <class Size>
     inline char *fill_n(char *first, Size n, const char& value) {
@@ -197,10 +199,10 @@ namespace rayn {
     }
 
     // specialization for lexicographical_compare
-    bool lexicographical_compare(const unsigned char *first1,
-                                 const unsigned char *last1,
-                                 const unsigned char *first2,
-                                 const unsigned char *last2)
+    inline bool lexicographical_compare(const unsigned char *first1,
+                                        const unsigned char *last1,
+                                        const unsigned char *first2,
+                                        const unsigned char *last2)
     {
         const size_t len1 = last1 - first1;
         const size_t len2 = last2 - first2;
@@ -277,7 +279,7 @@ namespace rayn {
 
     template <class T>
     struct __copy_dispatch< const T*, T* > {
-        T* operator() (T* first, T* last, T* result) {
+        T* operator() (const T* first, const T* last, T* result) {
             typedef typename _type_traits<T>::has_trivial_assignment_operator type;
             return __copy_t(first, last, result, type());
         }

@@ -6,7 +6,6 @@
 #ifndef _VECTOR_H_
 #define _VECTOR_H_
 
-#include <algorithm>
 #include <type_traits>
 
 #include "Allocator.h"
@@ -110,21 +109,22 @@ namespace rayn {
         }
 
         //The functions about iterator.
-        iterator begin() { return _start; }
-        const_iterator begin() const { return _start; }
-        const_iterator cbegin() const { return _start; }
-        iterator end() { return _finish; }
-        const_iterator end() const { return _finish; }
-        const_iterator cend() const { return _finish; }
-        reverse_iterator rbegin() { return reverse_iterator(_finish); }
-        const_reverse_iterator crbegin() const { return const_reverse_iterator(_finish); }
-        reverse_iterator rend() { return reverse_iterator(_start); }
-        const_reverse_iterator crend() const { return const_reverse_iterator(_start); }
+        iterator                begin()         { return _start; }
+        const_iterator          begin() const   { return _start; }
+        const_iterator          cbegin() const  { return _start; }
+        iterator                end()           { return _finish; }
+        const_iterator          end() const     { return _finish; }
+        const_iterator          cend() const    { return _finish; }
+
+        reverse_iterator        rbegin()        { return reverse_iterator(_finish); }
+        const_reverse_iterator  crbegin() const { return const_reverse_iterator(_finish); }
+        reverse_iterator        rend()          { return reverse_iterator(_start); }
+        const_reverse_iterator  crend() const   { return const_reverse_iterator(_start); }
 
         //Size function
-        difference_type size() const { return _finish - _start; }
-        difference_type capacity() const { return _endOfStorage - _start; }
-        bool empty() const { return _start == _finish; }
+        size_type   size() const        { return _finish - _start; }
+        size_type   capacity() const    { return _endOfStorage - _start; }
+        bool        empty() const       { return _start == _finish; }
 
         /*
         ** @brief Resize the vector to the specified number of elements.
@@ -178,24 +178,20 @@ namespace rayn {
         ** @return  A Read & Write(Non-const) reference to data.
         ** This operator allows for easy, array-style, data access.
         */
-        reference operator[](size_type index) {
-            return *(begin() + index);
-        }
-        const_reference operator[](size_type index) const {
-            return *(begin() + index);
-        }
+        reference       operator[](size_type index)         { return *(begin() + index); }
+        const_reference operator[](size_type index) const   { return *(begin() + index); }
         /*
         ** Returns a read/write reference to the data at the first element of vector
         */
-        reference front() { return *(begin()); }
+        reference       front()   { return *(begin()); }
         /*
         ** Returns a read/write reference to the data at the last element of vector
         */
-        reference back() { return *(end() - 1); }
+        reference       back()    { return *(end() - 1); }
 
         // return address of member
-        pointer data() { return this->_start; }
-        const_pointer data() const { return this->_start; }
+        pointer         data()          { return this->_start; }
+        const_pointer   data() const    { return this->_start; }
 
         /*
         ** @brief Clear the vector. 
@@ -273,7 +269,7 @@ namespace rayn {
             // 尾部余留的元素
             difference_type lengthOfTail = end() - last;
             difference_type lenthOfRemove = last - first;
-            _finish = _finish - lengthOfTail;
+            _finish = _finish - lenthOfRemove;
             for (; lengthOfTail != 0; --lengthOfTail) {
                 iterator temp = last - lenthOfRemove;
                 *temp = *last;
@@ -406,9 +402,12 @@ namespace rayn {
         }
 
     public:
-        friend bool operator== (const vector& lhs, const vector& rhs);
-        friend bool operator!= (const vector& lhs, const vector& rhs);
-        friend void swap(vector& lhs, vector& rhs);
+        template <class T, class Alloc>
+        friend bool operator== (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
+        template <class T, class Alloc>
+        friend bool operator!= (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
+        template <class T, class Alloc>
+        friend void swap(vector<T, Alloc>& lhs, vector<T, Alloc>& rhs);
     };
 
     // 全局重载运算符

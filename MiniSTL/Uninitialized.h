@@ -13,12 +13,13 @@
 namespace rayn {
     /********** uninitialized_copy **********/
     template<class InputIterator, class ForwardIterator>
-    ForwardIterator _uninitialized_copy_aux(InputIterator first, InputIterator last, ForwardIterator result, _true_type) {
-        memcpy(result, first, (last - first) * sizeof(*first));
-        return result + (last - first);
+    ForwardIterator _uninitialized_copy_aux(InputIterator first, InputIterator last,
+                                            ForwardIterator result, _true_type) {
+        return copy(first, last, result);
     }
     template<class InputIterator, class ForwardIterator>
-    ForwardIterator _uninitialized_copy_aux(InputIterator first, InputIterator last, ForwardIterator result, _false_type) {
+    ForwardIterator _uninitialized_copy_aux(InputIterator first, InputIterator last,
+                                            ForwardIterator result, _false_type) {
         ForwardIterator cur = result;
         for (; first != last; ++first, ++cur) {
             construct(&*cur, *first);
@@ -26,9 +27,10 @@ namespace rayn {
         return cur;
     }
     template<class InputIterator, class ForwardIterator, class T>
-    ForwardIterator _uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result, T*) {
-        typedef typename _type_traits<T>::is_POD_type is_POD_type;
-        return _uninitialized_copy_aux(first, last, result, is_POD_type());
+    ForwardIterator _uninitialized_copy(InputIterator first, InputIterator last,
+                                        ForwardIterator result, T*) {
+        typedef typename _type_traits<T>::is_POD_type is_POD;
+        return _uninitialized_copy_aux(first, last, result, is_POD());
     }
     /*
     ** @brief Copy the range [first, last) into result.

@@ -768,43 +768,66 @@ namespace rayn {
 
     public:
         // operator+
-        friend basic_string operator+ (const basic_string& lhs, const basic_string& rhs);
-        friend basic_string operator+ (const CharT* lhs, const basic_string& rhs);
-        friend basic_string operator+ (const basic_string& lhs, const CharT* rhs);
-        friend basic_string operator+ (const basic_string& lhs, CharT rhs);
-        friend basic_string operator+ (CharT lhs, const basic_string& rhs);
+        template <class CharT>
+        friend basic_string operator+ (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs);
+        template <class CharT>
+        friend basic_string operator+ (const CharT* lhs, const basic_string<CharT>& rhs);
+        template <class CharT>
+        friend basic_string operator+ (const basic_string<CharT>& lhs, const CharT* rhs);
+        template <class CharT>
+        friend basic_string operator+ (const basic_string<CharT>& lhs, CharT rhs);
+        template <class CharT>
+        friend basic_string operator+ (CharT lhs, const basic_string<CharT>& rhs);
 
         // operator==
-        friend bool operator== (const basic_string& lhs, const basic_string& rhs);
-        friend bool operator== (const basic_string& lhs, const CharT* rhs);
-        friend bool operator== (const CharT* lhs, const basic_string& rhs);
+        template <class CharT>
+        friend bool operator== (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs);
+        template <class CharT>
+        friend bool operator== (const basic_string<CharT>& lhs, const CharT* rhs);
+        template <class CharT>
+        friend bool operator== (const CharT* lhs, const basic_string<CharT>& rhs);
 
         // operator!=
-        friend bool operator!= (const basic_string& lhs, const basic_string& rhs);
-        friend bool operator!= (const basic_string& lhs, const CharT* rhs);
-        friend bool operator!= (const CharT* lhs, const basic_string& rhs);
+        template <class CharT>
+        friend bool operator!= (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs);
+        template <class CharT>
+        friend bool operator!= (const basic_string<CharT>& lhs, const CharT* rhs);
+        template <class CharT>
+        friend bool operator!= (const CharT* lhs, const basic_string<CharT>& rhs);
 
         // operator<
-        friend bool operator< (const basic_string& lhs, const basic_string& rhs);
-        friend bool operator< (const basic_string& lhs, const CharT* rhs);
-        friend bool operator< (const CharT* lhs, const basic_string& rhs);
+        template <CharT>
+        friend bool operator< (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs);
+        template <CharT>
+        friend bool operator< (const basic_string<CharT>& lhs, const CharT* rhs);
+        template <CharT>
+        friend bool operator< (const CharT* lhs, const basic_string<CharT>& rhs);
 
         // operator<=
-        friend bool operator<= (const basic_string& lhs, const basic_string& rhs);
-        friend bool operator<= (const basic_string& lhs, const CharT* rhs);
-        friend bool operator<= (const CharT* lhs, const basic_string& rhs);
+        template <CharT>
+        friend bool operator<= (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs);
+        template <CharT>
+        friend bool operator<= (const basic_string<CharT>& lhs, const CharT* rhs);
+        template <CharT>
+        friend bool operator<= (const CharT* lhs, const basic_string<CharT>& rhs);
 
         // operator>
-        friend bool operator> (const basic_string& lhs, const basic_string& rhs);
-        friend bool operator> (const basic_string& lhs, const CharT* rhs);
-        friend bool operator> (const CharT* lhs, const basic_string& rhs);
+        template <CharT>
+        friend bool operator> (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs);
+        template <CharT>
+        friend bool operator> (const basic_string<CharT>& lhs, const CharT* rhs);
+        template <CharT>
+        friend bool operator> (const CharT* lhs, const basic_string<CharT>& rhs);
 
         // operator>=
-        friend bool operator>= (const basic_string& lhs, const basic_string& rhs);
-        friend bool operator>= (const basic_string& lhs, const CharT* rhs);
-        friend bool operator>= (const CharT* lhs, const basic_string& rhs);
+        template <CharT>
+        friend bool operator>= (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs);
+        template <CharT>
+        friend bool operator>= (const basic_string<CharT>& lhs, const CharT* rhs);
+        template <CharT>
+        friend bool operator>= (const CharT* lhs, const basic_string<CharT>& rhs);
         
-        friend void swap(basic_string &lhs, basic_string& rhs);
+        friend void swap(basic_string<CharT>& lhs, basic_string<CharT>& rhs);
      
         template <CharT>
         friend std::ostream& operator<< (std::ostream& os, const basic_string<CharT>& str);

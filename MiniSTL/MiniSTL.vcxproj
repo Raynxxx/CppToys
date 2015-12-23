@@ -21,7 +21,7 @@
     <ClInclude Include="Functional.h" />
     <ClInclude Include="Heap.h" />
     <ClInclude Include="Tree.h" />
-    <ClInclude Include="UnitTest\HeapTest.h" />
+    <ClInclude Include="UnitTest\catch.hpp" />
     <ClInclude Include="Iterator.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="Pair.h" />
@@ -32,12 +32,12 @@
     <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="Uninitialized.h" />
     <ClInclude Include="Vector.h" />
-    <ClInclude Include="UnitTest\StringTest.h" />
-    <ClInclude Include="UnitTest\VectorTest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp" />
     <ClCompile Include="UnitTest\TestSTL.cpp" />
+    <ClCompile Include="UnitTest\TestString.cpp" />
+    <ClCompile Include="UnitTest\TestVector.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{68A28B10-9685-480F-B1F3-A527A7AD12DF}</ProjectGuid>

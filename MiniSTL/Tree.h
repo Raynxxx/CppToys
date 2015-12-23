@@ -306,7 +306,6 @@ namespace rayn {
         return iterator(tmp);
     }
 
-
     template <class Key, class Value, class KeyOfValue, class Compare>
     typename rb_tree<Key, Value, KeyOfValue, Compare>::iterator
     rb_tree<Key, Value, KeyOfValue, Compare>::
@@ -350,7 +349,7 @@ namespace rayn {
         return pair<iterator, bool>(iter, false);
     }
 
-
 }
 
 #endif
+

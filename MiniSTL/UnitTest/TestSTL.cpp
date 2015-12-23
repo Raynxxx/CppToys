@@ -1,14 +1,14 @@
 /*
 ** TestSTL.cpp
-** Created by Rayn on 2015/02/25
+** Created by Rayn on 2015/12/22
 */
-#include "VectorTest.h"
-#include "StringTest.h"
-#include "HeapTest.h"
+#define CATCH_CONFIG_RUNNER
+#include "catch.hpp"
 
-int main() {
-    rayn::test::test_vector();
-    rayn::test::test_string();
-    rayn::test::test_heap();
-    return 0;
+int main( int argc, char* argv[]) {
+    Catch::Session session;
+    int returnCode = session.applyCommandLine(argc, argv);
+    if (returnCode != 0)
+        return returnCode;
+    return session.run();
 }
