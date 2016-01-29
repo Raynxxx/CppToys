@@ -18,7 +18,7 @@
 |工具|进度|链接|
 |---|---|---|
 |uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|
-|type_traits|50%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
+|type_traits|20%|[TypeTraits.h](MiniSTL/TypeTraits.h)|
 |pair|100%|[Pair.h](MiniSTL/Pair.h)|
 |heap|100%|[Heap.h](MiniSTL/Heap.h)|
 |rb_tree|20%|[Tree.h](MiniSTL/Tree.h)|
@@ -47,4 +47,22 @@
 
 ## 单元测试
 
-先开好坑，有空补
+最近get了一个超轻量级的单元测试框架 `Catch`， [链接点击这里](https://github.com/philsquared/Catch)。整个依赖就一个单独的头文件 `Catch.hpp`。
+
+看一下作者的 Tutorial，是不是超简洁！
+
+```
+#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+#include "catch.hpp"
+
+unsigned int Factorial( unsigned int number ) {
+    return number <= 1 ? number : Factorial(number-1)*number;
+}
+
+TEST_CASE( "Factorials are computed", "[factorial]" ) {
+    REQUIRE( Factorial(1) == 1 );
+    REQUIRE( Factorial(2) == 2 );
+    REQUIRE( Factorial(3) == 6 );
+    REQUIRE( Factorial(10) == 3628800 );
+}
+```

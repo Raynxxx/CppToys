@@ -37,6 +37,7 @@
     <ClCompile Include="Alloc.cpp" />
     <ClCompile Include="UnitTest\TestSTL.cpp" />
     <ClCompile Include="UnitTest\TestString.cpp" />
+    <ClCompile Include="UnitTest\TestTypeTraits.cpp" />
     <ClCompile Include="UnitTest\TestVector.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -48,7 +49,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>CTP_Nov2013</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

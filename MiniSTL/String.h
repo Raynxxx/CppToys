@@ -769,15 +769,15 @@ namespace rayn {
     public:
         // operator+
         template <class CharT>
-        friend basic_string operator+ (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs);
+        friend basic_string<CharT> operator+ (const basic_string<CharT>& lhs, const basic_string<CharT>& rhs);
         template <class CharT>
-        friend basic_string operator+ (const CharT* lhs, const basic_string<CharT>& rhs);
+        friend basic_string<CharT> operator+ (const CharT* lhs, const basic_string<CharT>& rhs);
         template <class CharT>
-        friend basic_string operator+ (const basic_string<CharT>& lhs, const CharT* rhs);
+        friend basic_string<CharT> operator+ (const basic_string<CharT>& lhs, const CharT* rhs);
         template <class CharT>
-        friend basic_string operator+ (const basic_string<CharT>& lhs, CharT rhs);
+        friend basic_string<CharT> operator+ (const basic_string<CharT>& lhs, CharT rhs);
         template <class CharT>
-        friend basic_string operator+ (CharT lhs, const basic_string<CharT>& rhs);
+        friend basic_string<CharT> operator+ (CharT lhs, const basic_string<CharT>& rhs);
 
         // operator==
         template <class CharT>

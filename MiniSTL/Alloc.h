@@ -29,18 +29,18 @@ namespace rayn {
         static size_t heap_size;
 
     private:
-        //将bytes上调至8的倍数
+        // 将bytes上调至8的倍数
         static size_t ROUND_UP(size_t bytes) {
             return ((bytes + EAlign::ALIGN - 1) & ~(EAlign::ALIGN - 1));
         }
-        //根据区块大小，决定使用第n号free-list，n从0开始计算
+        // 根据区块大小，决定使用第n号free-list，n从0开始计算
         static size_t FREELIST_INDEX(size_t bytes) {
             return ((bytes + EAlign::ALIGN - 1) / EAlign::ALIGN - 1);
         }
-        //返回一个大小为size的对象，并可能加入大小为size的其他区块到free-list
+        // 返回一个大小为size的对象，并可能加入大小为size的其他区块到free-list
         static void *refill(size_t size);
-        //配置一大块空间，可容纳nobjs个大小为size的区块
-        //如果配置nobjs个区块有所不便，nobjs可能会降低
+        // 配置一大块空间，可容纳nobjs个大小为size的区块
+        // 如果配置nobjs个区块有所不便，nobjs可能会降低
         static char *chunk_alloc(size_t size, size_t& nobjs);
 
     public:

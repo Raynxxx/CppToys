@@ -6,10 +6,92 @@
 #ifndef _TYPE_TRAITS_H_
 #define _TYPE_TRAITS_H_
 
+#include <type_traits>
+
 namespace rayn {
+    /// Helper classes
+
+    // integral_constant
+    template <typename T, T val>
+    struct integral_constant {
+        static const T                      value = val;
+        typedef T                           value_type;
+        typedef integral_constant<T, val>   type;
+
+        operator T() { return value; }
+    };
+
+    // true type
+    typedef integral_constant<bool, true>   true_type;
+
+    // false type
+    typedef integral_constant<bool, false>  false_type;
+
+
+    /// Primary type categories
+
+    template <typename>
+    struct remove_cv;
+
+
+    template <typename>
+    struct __is_void_helper : public false_type {};
+
+    template <>
+    struct __is_void_helper<void> : public true_type {};
+
+    // is_void
+    template <typename T>
+    struct __is_void
+        : public __is_void_helper<typename remove_cv<T>::type>::type {};
+
+    // is_array
+    template <typename T>
+    struct is_array : public false_type {};
+
+    template <typename T, size_t Size>
+    struct is_array<T[Size]> : public true_type {};
+
+    template <typename T>
+    struct is_array<T[]> : public true_type {};
+
+    // is_class, depend on compiler
+    template <typename T>
+    struct is_class : public integral_constant <bool, __is_class(T)> {};
+
+    // is_enum, depend on compiler
+    template <typename T>
+    struct is_enum : public integral_constant <bool, __is_enum(T)> {};
+
+    // is_union, depend on compiler
+    template <typename T>
+    struct is_union : public integral_constant <bool, __is_union(T)> {};
+
+    // is_floating_point
+    template <typename T>
+    struct __is_floating_point_helper
+        : public false_type {};
+
+    template <>
+    struct __is_floating_point_helper<float>
+        : public true_type {};
+
+    template <>
+    struct __is_floating_point_helper<double>
+        : public true_type {};
+
+    template <>
+    struct __is_floating_point_helper<long double>
+        : public true_type {};
+
+    template <typename T>
+    struct is_floating_point
+        : public false_type {};
+
     /*
     ** primary template
     */
+
     struct _true_type {};
     struct _false_type {};
 

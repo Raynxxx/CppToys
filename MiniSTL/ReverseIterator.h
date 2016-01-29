@@ -119,7 +119,7 @@ namespace rayn {
         ** The underlying iterator must be a Random Access Iterator.
         */
         reverse_iterator_t operator-(difference_type n) const {
-            return reverse_iterator(_base + n);
+            return reverse_iterator_t(_base + n);
         }
         /*
         ** @return *this
@@ -171,6 +171,7 @@ namespace rayn {
         }
         
     };
+
     template <class Iter>
     reverse_iterator_t<Iter> operator+ (typename reverse_iterator_t<Iter>::difference_type n,
         const reverse_iterator_t<Iter>& rev_it) {
