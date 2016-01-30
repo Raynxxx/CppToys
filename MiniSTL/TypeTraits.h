@@ -33,7 +33,6 @@ namespace rayn {
     template <typename>
     struct remove_cv;
 
-
     template <typename>
     struct __is_void_helper : public false_type {};
 
@@ -42,7 +41,7 @@ namespace rayn {
 
     // is_void
     template <typename T>
-    struct __is_void
+    struct is_void
         : public __is_void_helper<typename remove_cv<T>::type>::type {};
 
     // is_array
@@ -86,7 +85,34 @@ namespace rayn {
 
     template <typename T>
     struct is_floating_point
-        : public false_type {};
+        : public __is_floating_point_helper<typename remove_cv<T>::type>::type {};
+
+    template <typename T>
+    struct remove_const {
+        typedef T   type;
+    };
+
+    template <typename T>
+    struct remove_const<T const> {
+        typedef T   type;
+    };
+
+    template <typename T>
+    struct remove_volatile {
+        typedef T   type;
+    };
+
+    template <typename T>
+    struct remove_volatile<T volatile> {
+        typedef T   type;
+    };
+
+    /// remove_cv
+    template <typename T>
+    struct remove_cv {
+        typedef typename
+        remove_const<typename remove_volatile<T>::type>::type   type;
+    };
 
     /*
     ** primary template
