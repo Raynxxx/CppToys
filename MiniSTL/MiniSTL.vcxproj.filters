@@ -81,6 +81,9 @@
     <ClInclude Include="UnitTest\catch.hpp">
       <Filter>测试</Filter>
     </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp">

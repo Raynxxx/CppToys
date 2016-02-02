@@ -149,3 +149,96 @@ TEST_CASE("is_fundamental", "[type_traits]") {
     REQUIRE(rayn::is_fundamental<decltype(nullptr)>::value);
     REQUIRE_FALSE(rayn::is_fundamental<int*>::value);
 }
+
+TEST_CASE("is_reference", "[type_traits]") {
+    REQUIRE_FALSE(rayn::is_reference<int>::value);
+    REQUIRE(rayn::is_reference<int&>::value);
+    REQUIRE(rayn::is_reference<int&&>::value);
+}
+
+TEST_CASE("is_object", "[type_traits]") {
+    class A {};
+    REQUIRE(rayn::is_object<int>::value);
+    REQUIRE(rayn::is_object<A>::value);
+    REQUIRE(rayn::is_object<A*>::value);
+    REQUIRE(rayn::is_object<int(*)(int)>::value);
+    REQUIRE_FALSE(rayn::is_object<A&>::value);
+    REQUIRE_FALSE(rayn::is_object<int(int)>::value);
+}
+
+TEST_CASE("is_member_pointer", "[type_traits]") {
+    struct A {
+        int x;
+    };
+    int A::* pt = &A::x;
+    REQUIRE_FALSE(rayn::is_member_pointer<A*>::value);
+    REQUIRE(rayn::is_member_pointer<int A::*>::value);
+    REQUIRE(rayn::is_member_pointer<void(A::*)()>::value);
+    REQUIRE(rayn::is_member_pointer<decltype(pt)>::value);
+}
+
+TEST_CASE("is_scalar", "[type_traits]") {
+    class A {
+        int x;
+    };
+    enum B { x, y, z };
+    REQUIRE_FALSE(rayn::is_scalar<A>::value);
+    REQUIRE_FALSE(rayn::is_scalar<A&>::value);
+    REQUIRE(rayn::is_scalar<int>::value);
+    REQUIRE(rayn::is_scalar<A*>::value);
+    REQUIRE(rayn::is_scalar<B>::value);
+}
+
+/// Type properties UnitTest
+
+TEST_CASE("is_const", "[type_traits]") {
+    REQUIRE(rayn::is_const<const int>::value);
+    REQUIRE_FALSE(rayn::is_const<const int*>::value);
+    REQUIRE(rayn::is_const<int* const>::value);
+}
+
+TEST_CASE("is_volatile", "[type_traits]") {
+    REQUIRE(rayn::is_volatile<volatile int>::value);
+    REQUIRE_FALSE(rayn::is_volatile<volatile int*>::value);
+    REQUIRE(rayn::is_volatile<int* volatile>::value);
+}
+
+TEST_CASE("is_signed", "[type_traits]") {
+    struct A {
+        int x;
+    };
+    REQUIRE(rayn::is_signed<int>::value);
+    REQUIRE(rayn::is_signed<double>::value);
+    REQUIRE_FALSE(rayn::is_signed<unsigned long>::value);
+    REQUIRE_FALSE(rayn::is_signed<A>::value);
+}
+
+TEST_CASE("is_unsigned", "[type_traits]") {
+    struct A {};
+    REQUIRE(rayn::is_unsigned<unsigned int>::value);
+    REQUIRE_FALSE(rayn::is_unsigned<long>::value);
+    REQUIRE_FALSE(rayn::is_unsigned<A>::value);
+}
+
+/// Type Property queries
+
+TEST_CASE("alignment_of", "[type_traits]") {
+    REQUIRE(rayn::alignment_of<char>::value == 1);
+    REQUIRE(rayn::alignment_of<int>::value == 4);
+    REQUIRE(rayn::alignment_of<int[10]>::value == 4);
+    REQUIRE(rayn::alignment_of<long long>::value == 8);
+}
+
+TEST_CASE("rank", "[type_traits]") {
+    REQUIRE(rayn::rank<int>::value == 0);
+    REQUIRE(rayn::rank<int[4]>::value == 1);
+    REQUIRE(rayn::rank<int[4][10]>::value == 2);
+    REQUIRE(rayn::rank<int[10][10]>::value == 2);
+}
+
+TEST_CASE("extent", "[type_traits]") {
+    REQUIRE(rayn::extent<int>::value == 0);
+    REQUIRE(rayn::extent<int[3][4]>::value == 3);
+    auto v2 = rayn::extent<int[3][10], 1>::value;
+    REQUIRE(v2 == 10);
+}

@@ -10,7 +10,7 @@
 
 |基本组件|进度|链接|单元测试|
 |---|---|---|---|
-|空间配置器|100%|[Allocator.h](MiniSTL/Allocator.h), [Alloc.h](MiniSTL/Alloc.h), [Alloc.cpp](MiniSTL/Alloc.cpp), [Construct.h](MiniSTL/Construct.h)|[TestTypeTraits](MiniSTL/UnitTest/TestTypeTraits.cpp)|
+|空间配置器|100%|[Allocator.h](MiniSTL/Allocator.h), [Alloc.h](MiniSTL/Alloc.h), [Alloc.cpp](MiniSTL/Alloc.cpp), [Construct.h](MiniSTL/Construct.h)|--|
 |iterator|100%|[Iterator.h](MiniSTL/Iterator.h)|--|
 |reverse_iterator|100%|[ReverseIterator.h](MiniSTL/ReverseIterator.h)|--|
 |Algorithm|20%|[Algo.h](MiniSTL/Algo.h), [AlgoBase.h](MiniSTL/AlgoBase.h), [Algorithm.h](MiniSTL/Algorithm.h)|--|
@@ -18,7 +18,7 @@
 |工具|进度|链接|单元测试|
 |---|---|---|---|
 |uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|--|
-|type_traits|20%|[TypeTraits.h](MiniSTL/TypeTraits.h)|--|
+|type_traits|20%|[TypeTraits.h](MiniSTL/TypeTraits.h)|[TestTypeTraits](MiniSTL/UnitTest/TestTypeTraits.cpp)|
 |pair|100%|[Pair.h](MiniSTL/Pair.h)|--|
 |heap|100%|[Heap.h](MiniSTL/Heap.h)|--|
 |rb_tree|20%|[Tree.h](MiniSTL/Tree.h)|--|

@@ -37,11 +37,11 @@ namespace rayn {
         CharT *_finish;
         CharT *_endOfStorage;
 
-        typedef allocator<CharT> data_allocator;
+        typedef allocator<CharT>    data_allocator;
 
     public:
         // The Default Constructor
-        basic_string() : _start(0), _finish(0), _endOfStorage(0) {}
+        explicit basic_string() : _start(0), _finish(0), _endOfStorage(0) {}
         // The Copy Constructor
         basic_string(const basic_string& str) {
             allocate_and_copy(str._start, str._finish);
