@@ -9,7 +9,7 @@
 
 #include "Allocator.h"
 #include "Iterator.h"
-#include "TypeTraits.h"
+#include "Utility.h"
 
 namespace rayn {
     //-----------------------------------------------------------------
@@ -146,19 +146,7 @@ namespace rayn {
         return true;
     }
 
-    //-----------------------------------------------------------------
-    // swap
-    /*
-    ** void swap(a, b);
-    ** @brief       Swap two object
-    ** @complexity  O(1)
-    */
-    template <class T>
-    inline void swap(T& a, T& b) {
-        T temp = a;
-        a = b;
-        b = temp;
-    }
+    
 
     //-----------------------------------------------------------------
     // lexicographical_compare

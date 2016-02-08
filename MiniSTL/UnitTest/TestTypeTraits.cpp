@@ -6,6 +6,7 @@
 #include "../TypeTraits.h"
 #include "../String.h"
 
+
 TEST_CASE("integral_constant", "[type_traits]") {
     typedef rayn::integral_constant<int, 1> one_t;
     REQUIRE(one_t::value == 1);
@@ -220,6 +221,18 @@ TEST_CASE("is_unsigned", "[type_traits]") {
     REQUIRE_FALSE(rayn::is_unsigned<A>::value);
 }
 
+TEST_CASE("Type relationships", "[type_traits]") {
+    bool val = rayn::is_same<int, int>::value;
+    REQUIRE(val);
+    val = rayn::is_convertible<int, float>::value;
+    REQUIRE(val);
+
+    struct A {};
+    struct B : A {};
+    val = rayn::is_base_of<A, B>::value;
+    REQUIRE(val);
+}
+
 /// Type Property queries
 
 TEST_CASE("alignment_of", "[type_traits]") {
@@ -241,4 +254,95 @@ TEST_CASE("extent", "[type_traits]") {
     REQUIRE(rayn::extent<int[3][4]>::value == 3);
     auto v2 = rayn::extent<int[3][10], 1>::value;
     REQUIRE(v2 == 10);
+}
+
+
+// Compound type alterations
+
+TEST_CASE("add_pointer, remove_pointer", "[type_traits]") {
+    bool val = rayn::is_same<int*, rayn::add_pointer<int>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<const int*, rayn::add_pointer<const int>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int*, rayn::add_pointer<int&>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int**, rayn::add_pointer<int*>::type>::value;
+    REQUIRE(val);
+
+    val = rayn::is_same<int, rayn::remove_pointer<int>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int*, rayn::remove_pointer<int**>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<const int, rayn::remove_pointer<const int*>::type>::value;
+    REQUIRE(val);
+}
+
+TEST_CASE("add_reference, remove_reference", "[type_traits]") {
+    bool val = rayn::is_same<int&, rayn::add_lvalue_reference<int>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int&, rayn::add_lvalue_reference<int&>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int&, rayn::add_lvalue_reference<int&&>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int*&, rayn::add_lvalue_reference<int*>::type>::value;
+    REQUIRE(val);
+
+    val = rayn::is_same<int&&, rayn::add_rvalue_reference<int>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int&, rayn::add_rvalue_reference<int&>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int&&, rayn::add_rvalue_reference<int&&>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int*&&, rayn::add_rvalue_reference<int*>::type>::value;
+    REQUIRE(val);
+
+    val = rayn::is_same<int, rayn::remove_reference<int>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int, rayn::remove_reference<int&>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int, rayn::remove_reference<int&&>::type>::value;
+    REQUIRE(val);
+}
+
+TEST_CASE("remove_extent, remove_all_extents", "[type_traits]") {
+    bool val = rayn::is_same<int, rayn::remove_extent<int>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int, rayn::remove_extent<int[24]>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int[60], rayn::remove_extent<int[24][60]>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int[60], rayn::remove_extent<int[][60]>::type>::value;
+    REQUIRE(val);
+
+    val = rayn::is_same<int, rayn::remove_all_extents<int>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int, rayn::remove_all_extents<int[24]>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int, rayn::remove_all_extents<int[24][60]>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int, rayn::remove_all_extents<int[][60]>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<const int, rayn::remove_all_extents<const int[60]>::type>::value;
+    REQUIRE(val);
+}
+
+TEST_CASE("decay", "[type_traits]") {
+    bool val = rayn::is_same<int, rayn::decay<int>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int, rayn::decay<int&>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int, rayn::decay<int&&>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int, rayn::decay<const int&>::type>::value;
+    REQUIRE(val);
+    val = rayn::is_same<int*, rayn::decay<int[10]>::type>::value;
+    REQUIRE(val);
+}
+
+TEST_CASE("declval", "[type_traits]") {
+    struct A {
+        virtual int value() = 0;
+    };
+    bool val = rayn::is_same<int, decltype(rayn::declval<A>().value())>::value;
+    REQUIRE(val);
 }

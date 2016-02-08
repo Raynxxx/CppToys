@@ -1,5 +1,5 @@
 # MiniSTL
-  造轮子计划1，一个STL的子集，后期会加入一些有趣的组件功能。
+一个C++ STL的自我实现，后期会加入一些额外的组件功能。
 * 开发语言 :  C++11
 * 编译环境 :  Visual Studio Community 2013
 * 参考资料1:  STL源码剖析 侯捷著
@@ -18,8 +18,9 @@
 |工具|进度|链接|单元测试|
 |---|---|---|---|
 |uninitialized|100%|[Uninitialized.h](MiniSTL/Uninitialized.h)|--|
-|type_traits|20%|[TypeTraits.h](MiniSTL/TypeTraits.h)|[TestTypeTraits](MiniSTL/UnitTest/TestTypeTraits.cpp)|
-|pair|100%|[Pair.h](MiniSTL/Pair.h)|--|
+|type_traits|80%|[TypeTraits.h](MiniSTL/TypeTraits.h)|[TestTypeTraits](MiniSTL/UnitTest/TestTypeTraits.cpp)|
+|utility|80%|[Utility.h](MiniSTL/Utility.h)|[TestUtility](MiniSTL/UnitTest/TestUtility.cpp)|
+|pair|100%|[Pair.h](MiniSTL/Pair.h)|[TestUtility](MiniSTL/UnitTest/TestUtility.cpp)|
 |heap|100%|[Heap.h](MiniSTL/Heap.h)|--|
 |rb_tree|20%|[Tree.h](MiniSTL/Tree.h)|--|
 |bitset|--|--|--|
@@ -30,6 +31,7 @@
 |vector|100%|[Vector.h](MiniSTL/Vector.h)|[TestVector](MiniSTL/UnitTest/TestVector.cpp)|
 |list|100%|[List.h](MiniSTL/List.h)|--|
 |deque|100%|[Deque.h](MiniSTL/Deque.h)|--|
+|array|60%|[Array.h](MiniSTL/Array.h)|--|
 
 > 计划加入一些QT的string接口
 

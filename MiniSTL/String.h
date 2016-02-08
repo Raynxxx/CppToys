@@ -30,7 +30,7 @@ namespace rayn {
         typedef ptrdiff_t                           difference_type;
 
         // Value returned by various member functions when they Fail.
-        static const size_type npos = -1;
+        static const size_type npos = static_cast<size_type>(-1);
 
     private:
         CharT *_start;
@@ -42,10 +42,12 @@ namespace rayn {
     public:
         // The Default Constructor
         explicit basic_string() : _start(0), _finish(0), _endOfStorage(0) {}
+
         // The Copy Constructor
         basic_string(const basic_string& str) {
             allocate_and_copy(str._start, str._finish);
         }
+
         // The Move Constructor
         basic_string(basic_string&& str) {
             moveData(str);

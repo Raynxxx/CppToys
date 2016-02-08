@@ -81,7 +81,13 @@
     <ClInclude Include="UnitTest\catch.hpp">
       <Filter>测试</Filter>
     </ClInclude>
+    <ClInclude Include="Move.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="Utility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Array.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -98,8 +104,11 @@
     <ClCompile Include="UnitTest\TestString.cpp">
       <Filter>测试</Filter>
     </ClCompile>
+    <ClCompile Include="UnitTest\TestUtility.cpp">
+      <Filter>测试</Filter>
+    </ClCompile>
     <ClCompile Include="UnitTest\TestTypeTraits.cpp">
-      <Filter>源文件</Filter>
+      <Filter>测试</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

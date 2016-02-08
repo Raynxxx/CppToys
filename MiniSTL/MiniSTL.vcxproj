@@ -16,6 +16,7 @@
     <ClInclude Include="Algorithm.h" />
     <ClInclude Include="Alloc.h" />
     <ClInclude Include="Allocator.h" />
+    <ClInclude Include="Array.h" />
     <ClInclude Include="Construct.h" />
     <ClInclude Include="Deque.h" />
     <ClInclude Include="Functional.h" />
@@ -31,6 +32,7 @@
     <ClInclude Include="String.h" />
     <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="Uninitialized.h" />
+    <ClInclude Include="Move.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
@@ -39,6 +41,7 @@
     <ClCompile Include="UnitTest\TestSTL.cpp" />
     <ClCompile Include="UnitTest\TestString.cpp" />
     <ClCompile Include="UnitTest\TestTypeTraits.cpp" />
+    <ClCompile Include="UnitTest\TestUtility.cpp" />
     <ClCompile Include="UnitTest\TestVector.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

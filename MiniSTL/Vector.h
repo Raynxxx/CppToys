@@ -6,12 +6,11 @@
 #ifndef _VECTOR_H_
 #define _VECTOR_H_
 
-#include <type_traits>
-
 #include "Allocator.h"
 #include "Iterator.h"
 #include "ReverseIterator.h"
 #include "Uninitialized.h"
+#include "TypeTraits.h"
 #include "Algorithm.h"
 
 namespace rayn {
