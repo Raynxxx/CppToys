@@ -110,5 +110,8 @@
     <ClCompile Include="UnitTest\TestTypeTraits.cpp">
       <Filter>测试</Filter>
     </ClCompile>
+    <ClCompile Include="UnitTest\TestArray.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

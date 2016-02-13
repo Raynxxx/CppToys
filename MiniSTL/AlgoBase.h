@@ -13,6 +13,18 @@
 
 namespace rayn {
     //-----------------------------------------------------------------
+    // swap_ranges
+    template <typename ForwardIterator1, typename ForwardIterator2>
+    ForwardIterator2 swap_ranges(ForwardIterator1 first1, ForwardIterator1 last1,
+                                 ForwardIterator2 first2)
+    {
+        for (; first1 != last1; ++first1, ++first2) {
+            rayn::swap(*first1, *first2);
+        }
+        return first2;
+    }
+
+    //-----------------------------------------------------------------
     // fill
     /*
     ** void fill(first, last, value);

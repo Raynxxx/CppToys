@@ -31,7 +31,7 @@
 |vector|100%|[Vector.h](MiniSTL/Vector.h)|[TestVector](MiniSTL/UnitTest/TestVector.cpp)|
 |list|100%|[List.h](MiniSTL/List.h)|--|
 |deque|100%|[Deque.h](MiniSTL/Deque.h)|--|
-|array|60%|[Array.h](MiniSTL/Array.h)|--|
+|array|100%|[Array.h](MiniSTL/Array.h)|[TestArray](MiniSTL/UnitTest/TestArray.cpp)|
 
 > 计划加入一些QT的string接口
 

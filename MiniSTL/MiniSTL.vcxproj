@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alloc.cpp" />
+    <ClCompile Include="UnitTest\TestArray.cpp" />
     <ClCompile Include="UnitTest\TestSTL.cpp" />
     <ClCompile Include="UnitTest\TestString.cpp" />
     <ClCompile Include="UnitTest\TestTypeTraits.cpp" />

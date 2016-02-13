@@ -7,6 +7,7 @@
 
 #include "TypeTraits.h"
 #include "ReverseIterator.h"
+#include "AlgoBase.h"
 
 namespace rayn {
 
@@ -14,12 +15,12 @@ namespace rayn {
     struct __array_traits {
         typedef T   Type[Size];
 
-        static const T&
+        static T&
         _s_ref(const Type& arr, size_t n) {
             return const_cast<T&>(arr[n]);
         }
 
-        static const T*
+        static T*
         _s_ptr(const Type& arr) {
             return const_cast<T*>(arr);
         }
@@ -27,14 +28,14 @@ namespace rayn {
 
     template <typename T>
     struct __array_traits<T, 0> {
-        typedef T   {};
+        struct Type   {};
 
-        static const T& 
+        static T& 
         _s_ref(const Type& arr, size_t n) {
-            return *const_cast<T*>(nullptr);
+            return *static_cast<T*>(nullptr);
         }
 
-        static const T*
+        static T*
         _s_ptr(const Type& arr) {
             return nullptr;
         }
@@ -56,7 +57,7 @@ namespace rayn {
 
         // Support for zero-sized arrays mandatory.
         typedef __array_traits<T, Size>     _AT_type;
-        typedef _AT_type::Type              _elems;
+        typename _AT_type::Type             _elems;
 
         // Iterators
         iterator                begin()         { return iterator(data()); }
@@ -78,8 +79,97 @@ namespace rayn {
         bool        empty()     { return Size() == 0; }
 
         // Element access
-        pointer         data()          { return _AT_type::_s_ptr(_elems); }
-        const_pointer   data() const    { return _AT_type::_s_ptr(_elems); }
+        reference operator[] (size_type n) {
+            return _AT_type::_s_ref(_elems, n);
+        }
+        const_reference operator[] (size_type n) const {
+            return _AT_type::_s_ref(_elems, n);
+        }
+
+        reference at(size_type n) {
+            return _AT_type::_s_ref(_elems, n);
+        }
+        const_reference at(size_type n) const {
+            return _AT_type::_s_ref(_elems, n);
+        }
+
+        reference front() {
+            return *begin();
+        }
+        const_reference front() const {
+            return _AT_type::_s_ref(_elems, 0);
+        }
+
+        reference back() {
+            return Size ? *(end() - 1) : *end();
+        }
+        const_reference back() const {
+            return Size ? _AT_type::_s_ref(_elems, Size - 1)
+                        : _AT_type::_s_ref(_elems, 0);
+        }
+
+        pointer data() {
+            return _AT_type::_s_ptr(_elems);
+        }
+        const_pointer data() const {
+            return _AT_type::_s_ptr(_elems);
+        }
+
+        // Modifiers
+        void fill(const value_type& u) {
+            rayn::fill_n(begin(), size(), u);
+        }
+        void swap(array& other) {
+            rayn::swap_ranges(begin(), end(), other.begin());
+        }
+    };
+
+    // Array comparisons.
+    template <typename T, size_t Size>
+    inline bool operator==(const array<T, Size>& one, const array<T, Size>& two) {
+        return rayn::equal(one.begin(), one.end(), two.begin());
+    }
+    template <typename T, size_t Size>
+    inline bool operator!=(const array<T, Size>& one, const array<T, Size>& two) {
+        return !(one == two);
+    }
+    template <typename T, size_t Size>
+    inline bool operator<(const array<T, Size>& one, const array<T, Size>& two) {
+        return rayn::lexicographical_compare(one.begin(), one.end(),
+                                             two.begin(), two.end());
+    }
+    template <typename T, size_t Size>
+    inline bool operator>(const array<T, Size>& one, const array<T, Size>& two) {
+        return two < one;
+    }
+    template <typename T, size_t Size>
+    inline bool operator<=(const array<T, Size>& one, const array<T, Size>& two) {
+        return !(one > two);
+    }
+    template <typename T, size_t Size>
+    inline bool operator>=(const array<T, Size>& one, const array<T, Size>& two) {
+        return !(one < two);
+    }
+
+
+    // Specialized algorithms.
+    template <typename T, size_t Size>
+    inline void swap(array<T, Size>& one, array<T, Size>& two) {
+        one.swap(two);
+    }
+
+    template <size_t Index, typename T, size_t Size>
+    T& get(array<T, Size>& arr) {
+        return __array_traits<T, Size>::_s_ref(arr._elems, Index);
+    }
+
+    template <size_t Index, typename T, size_t Size>
+    T&& get(array<T, Size>&& arr) {
+        return rayn::move(get<Index>(arr));
+    }
+    template <size_t Index, typename T, size_t Size>
+    const T& get(const array<T, Size>& arr) {
+        return __array_traits<T, Size>::_s_ref(arr._elems, Index);
     }
 }
 
