@@ -14,17 +14,17 @@
 #include "Uninitialized.h"
 
 namespace rayn {
+
     template <class T> class list;
 
-    // 列表节点
+    // List Node
     template <class T>
     struct __list_node {
-        typedef __list_node* pointer;
-        pointer prev;
-        pointer next;
+        __list_node* prev;
+        __list_node* next;
         T data;
 
-        __list_node(const T& d, pointer p, pointer n):
+        __list_node(const T& d, __list_node* p, __list_node* n) :
             data(d), prev(p), next(n) {}
 
         bool operator== (const __list_node& other) {
@@ -33,51 +33,150 @@ namespace rayn {
         }
     };
 
-    // 列表迭代器
+    // List Iterator
     template <class T>
-    struct __list_iterator : public bidirectional_iterator<T, ptrdiff_t> {
-        typedef __list_iterator<T>  iterator;
-        typedef __list_iterator<T>  self;
+    struct __list_iterator {
 
-        typedef __list_node<T>*     link_type;
-        typedef size_t              size_type;
-        typedef ptrdiff_t           difference_type;
+        typedef __list_iterator<T>                  _self;
+        typedef __list_node<T>                      _node;
 
-        // 指向list的节点
-        link_type node;
+        typedef rayn::bidirectional_iterator_tag    iterator_category;
+        typedef ptrdiff_t                           difference_type;
+        typedef size_t                              size_type;
+        typedef T                                   value_type;
+        typedef T*                                  pointer;
+        typedef T&                                  reference;
 
-        // Constructor
-        __list_iterator(): node(nullptr) {}
-        __list_iterator(link_type x) : node(x) {}
-        __list_iterator(const iterator& x) : node(x.node) {}
+        // point to the list element
+        __list_node<T>* node;
 
-        inline bool operator== (const self& x) const { return node == x.node; }
-        inline bool operator!= (const self& x) const { return node != x.node; }
-        reference operator* () const { return node->data; }
-        pointer operator-> () const { return &(operator*()); }
+        __list_iterator()
+            : node() {}
 
-        self& operator++ () {
+        explicit
+        __list_iterator(__list_node<T>* x)
+            : node(x) {}
+
+        _self _const_cast() const {
+            return *this;
+        }
+
+        reference operator* () const {
+            return static_cast<_node*>(node)->data;
+        }
+        pointer operator-> () const {
+            return &(static_cast<_node*>(node)->data);
+        }
+
+        _self& operator++ () {
             node = node->next;
             return *this;
         }
-        self operator++ (int) {
+        _self operator++ (int) {
+            _self tmp = *this;
+            node = node->next;
+            return tmp;
+        }
+        _self& operator-- () {
+            node = node->prev;
+            return *this;
+        }
+        _self operator-- (int) {
+            self tmp = *this;
+            node = node->prev;
+            return tmp;
+        }
+
+
+        bool operator== (const _self& other) const {
+            return node == other.node;
+        }
+
+        bool operator!= (const _self& other) const {
+            return node != other.node;
+        }
+
+    };
+
+    template <class T>
+    struct __list_const_iterator {
+
+        typedef __list_iterator<T>                  iterator;
+        typedef __list_const_iterator<T>            _self;
+        typedef const __list_node<T>                _node;
+
+        typedef rayn::bidirectional_iterator_tag    iterator_category;
+        typedef ptrdiff_t                           difference_type;
+        typedef size_t                              size_type;
+        typedef T                                   value_type;
+        typedef const T*                            pointer;
+        typedef const T&                            reference;
+        
+
+        // 指向list的节点
+        const __list_node<T>* node;
+
+        // Constructor
+        __list_const_iterator()
+            : node(nullptr) {}
+
+        explicit __list_const_iterator(const __list_node<T>* x)
+            : node(x) {}
+
+        __list_const_iterator(const iterator& x)
+            : node(x.node) {}
+
+        iterator _const_cast() const {
+            return iterator(const_cast<__list_node<T>*>(node));
+        }
+
+        reference operator* () const {
+            return static_cast<_node*>(node)->data;
+        }
+        pointer operator-> () const {
+            return &(static_cast<_node*>(node)->data);
+        }
+
+        _self& operator++ () {
+            node = node->next;
+            return *this;
+        }
+        _self operator++ (int) {
             self tmp = *this;
             ++*this;
             return tmp;
         }
-        self& operator-- () {
+        _self& operator-- () {
             node = node->prev;
             return *this;
         }
-        self operator-- (int) {
+        _self operator-- (int) {
             self tmp = *this;
             --*this;
             return tmp;
         }
-        self _const_cast() const {
-            return *this;
+        
+        bool operator== (const _self& x) const {
+            return node == x.node;
+        }
+
+        bool operator!= (const _self& x) const {
+            return node != x.node;
         }
     };
+
+    template <class T>
+    inline bool operator== (const __list_iterator<T>& x,
+                            const __list_const_iterator<T>& y) {
+        return x.node == y.node;
+    }
+
+    template <class T>
+    inline bool operator!= (const __list_iterator<T>& x,
+                            const __list_const_iterator<T>& y) {
+        return x.node != y.node;
+    }
+
 
     template <class T>
     class list {
@@ -90,7 +189,7 @@ namespace rayn {
         typedef T&                                  reference;
         typedef const T&                            const_reference;
         typedef __list_iterator<T>                  iterator;
-        typedef __list_iterator<const T>            const_iterator;
+        typedef __list_const_iterator<T>            const_iterator;
         typedef reverse_iterator_t<iterator>        reverse_iterator;
         typedef reverse_iterator_t<const_iterator>  const_reverse_iterator;
         typedef size_t                              size_type;
@@ -109,9 +208,9 @@ namespace rayn {
             this->empty_initialize();
             this->insert(end(), count, value_type());
         }
-        list(size_type count, const T& value) {
+        list(size_type count, const value_type& value) {
             this->empty_initialize();
-            this->insert(begin(), count, value);
+            this->fill_initialize(count, value);
         }
         // Contructor with Range [first, last).
         template <class InputIterator>
@@ -171,18 +270,18 @@ namespace rayn {
             }
         }
 
-        reference front() { return *begin(); }
-        const_reference front() const { return *begin(); }
-        reference back() { return *(--end()); }
-        const_reference back() const { return *(--end()); }
+        reference       front()         { return *begin(); }
+        const_reference front() const   { return *begin(); }
+        reference       back()          { return *(--end()); }
+        const_reference back() const    { return *(--end()); }
 
-        iterator begin() { return node->next; }
-        const_iterator begin() const { return node->next; }
-        const_iterator cbegin() const { return node->next; }
+        iterator        begin()         { return iterator(node->next); }
+        const_iterator  begin() const   { return const_iterator(node->next); }
+        const_iterator  cbegin() const  { return const_iterator(node->next); }
 
-        iterator end() { return node; }
-        const_iterator end() const { return node; }
-        const_iterator cend() const { return node; }
+        iterator        end()           { return iterator(node); }
+        const_iterator  end() const     { return const_iterator(node); }
+        const_iterator  cend() const    { return const_iterator(node); }
 
         reverse_iterator rbegin() { return reverse_iterator(end()); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
@@ -222,10 +321,10 @@ namespace rayn {
         template <class Compare>
         void merge(list& other, Compare comp);
 
-        void splice(iterator position, list& other);
-        void splice(iterator position, list& other, iterator it);
-        void splice(iterator position, list& other, const_iterator first,
-            const_iterator last);
+        void splice(const_iterator position, list& other);
+        void splice(const_iterator position, list& other, const_iterator it);
+        void splice(const_iterator position, list& other, const_iterator first,
+                    const_iterator last);
 
         void remove(const T& value);
         template <class UnaryPredicate>
@@ -262,6 +361,11 @@ namespace rayn {
             node->next = node;
             node->prev = node;
         }
+        void fill_initialize(size_type n, const value_type& x) {
+            for (; n; --n)  {
+                push_back(x);
+            }
+        }
         iterator _const_cast(const_iterator cit) {
             return iterator(const_cast<link_type>(cit.node));
         }
@@ -270,10 +374,10 @@ namespace rayn {
         */
         void transfer(iterator position, iterator first, iterator last) {
             if (last != position) {
-                last.node->prev->next = position;
+                last.node->prev->next = position.node;
                 first.node->prev->next = last.node;
                 position.node->prev->next = first.node;
-                link_type tmp = position.node->prev;
+                __list_node_base* tmp = position.node->prev;
                 position.node->prev = last.node->prev;
                 last.node->prev = first.node->prev;
                 first.node->prev = tmp;
@@ -296,13 +400,15 @@ namespace rayn {
     template <class T>
     typename list<T>::iterator
         list<T>::insert(const_iterator position, const T& value) {
-        link_type tmp = create_node(value);
-        tmp->next = position.node;
-        tmp->prev = position.node->prev;
-        position.node->prev->next = tmp;
-        position.node->prev = tmp;
-        return tmp;
+        list_node* tmp = create_node(value);
+        iterator pos = position._const_cast();
+        tmp->next = pos.node;
+        tmp->prev = pos.node->prev;
+        pos.node->prev->next = tmp;
+        pos.node->prev = tmp;
+        return iterator(tmp);
     }
+
     template <class T>
     typename list<T>::iterator
         list<T>::insert(const_iterator position, size_type count, const T& value) {
@@ -314,6 +420,7 @@ namespace rayn {
         }
         return iterator(position);
     }
+
     template <class T>
     template <class InputIterator>
     typename list<T>::iterator
@@ -324,7 +431,7 @@ namespace rayn {
             splice(position, tmp);
             return it;
         }
-        return iterator(position);
+        return position._const_cast();
     }
 
     template <class T>
@@ -411,23 +518,23 @@ namespace rayn {
     }
 
     template <class T>
-    void list<T>::splice(iterator position, list& other) {
+    void list<T>::splice(const_iterator position, list& other) {
         if (!other.empty()) {
-            transfer(position, other.begin(), other.end());
+            transfer(position._const_cast(), other.begin(), other.end());
         }
     }
     template <class T>
-    void list<T>::splice(iterator position, list& other, iterator it) {
+    void list<T>::splice(const_iterator position, list& other, const_iterator it) {
         iterator next = it;
         ++next;
         if (position == it || position == next) return;
-        transfer(position, it, next);
+        transfer(position._const_cast(), it, next);
     }
     template <class T>
-    void list<T>::splice(iterator position, list& other, const_iterator first,
-        const_iterator last) {
+    void list<T>::splice(const_iterator position, list& other, const_iterator first,
+                         const_iterator last) {
         if (first != last) {
-            transfer(position, first, last);
+            transfer(position._const_cast(), first, last);
         }
     }
 

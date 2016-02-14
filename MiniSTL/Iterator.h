@@ -202,7 +202,7 @@ namespace rayn {
     inline typename iterator_traits<InputIterator>::difference_type
     distance(InputIterator first, InputIterator last) {
         typedef typename iterator_traits<InputIterator>::iterator_category category;
-        _distance(first, last, category());
+        return _distance(first, last, category());
     }
 }
 
