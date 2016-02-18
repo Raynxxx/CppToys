@@ -10,52 +10,16 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Src\Algo.h" />
-    <ClInclude Include="Src\AlgoBase.h" />
-    <ClInclude Include="Src\Algorithm.h" />
-    <ClInclude Include="Src\Alloc.h" />
-    <ClInclude Include="Src\Allocator.h" />
-    <ClInclude Include="Src\Array.h" />
-    <ClInclude Include="Src\Construct.h" />
-    <ClInclude Include="Src\Deque.h" />
-    <ClInclude Include="Src\Functional.h" />
-    <ClInclude Include="Src\Heap.h" />
-    <ClInclude Include="Src\Tree.h" />
-    <ClInclude Include="UnitTest\catch.hpp" />
-    <ClInclude Include="Src\Iterator.h" />
-    <ClInclude Include="Src\List.h" />
-    <ClInclude Include="Src\Pair.h" />
-    <ClInclude Include="Src\Queue.h" />
-    <ClInclude Include="Src\ReverseIterator.h" />
-    <ClInclude Include="Src\Stack.h" />
-    <ClInclude Include="Src\String.h" />
-    <ClInclude Include="Src\TypeTraits.h" />
-    <ClInclude Include="Src\Uninitialized.h" />
-    <ClInclude Include="Src\Move.h" />
-    <ClInclude Include="Src\Utility.h" />
-    <ClInclude Include="Src\Vector.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Src\Alloc.cpp" />
-    <ClCompile Include="UnitTest\TestArray.cpp" />
-    <ClCompile Include="UnitTest\TestList.cpp" />
-    <ClCompile Include="UnitTest\TestSTL.cpp" />
-    <ClCompile Include="UnitTest\TestString.cpp" />
-    <ClCompile Include="UnitTest\TestTypeTraits.cpp" />
-    <ClCompile Include="UnitTest\TestUtility.cpp" />
-    <ClCompile Include="UnitTest\TestVector.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{68A28B10-9685-480F-B1F3-A527A7AD12DF}</ProjectGuid>
+    <ProjectGuid>{4355CAB1-8958-49EC-8A5B-7DF8EF472813}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>MiniSTL</RootNamespace>
+    <RootNamespace>Reflection</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>CTP_Nov2013</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -87,7 +51,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_VARIADIC_MAX=10;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -113,6 +77,13 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Args.h" />
+    <ClInclude Include="include\Type.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Src\Args.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

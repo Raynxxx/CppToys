@@ -3,8 +3,8 @@
 ** Created by Rayn on 2016/02/04
 */
 #include "catch.hpp"
-#include "../Utility.h"
-#include "../String.h"
+#include "../Src/Utility.h"
+#include "../Src/String.h"
 
 TEST_CASE("pair", "[pair]") {
     rayn::pair<rayn::string, int> p1("hello", 5);

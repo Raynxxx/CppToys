@@ -3,7 +3,7 @@
 ** Created by Rayn on 2015/12/23
 */
 #include "catch.hpp"
-#include "../Vector.h"
+#include "../Src/Vector.h"
 
 TEST_CASE("vector construct", "[vector]") {
     rayn::vector<double> v1(5, 2.33);

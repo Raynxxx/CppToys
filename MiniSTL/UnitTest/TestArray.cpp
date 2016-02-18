@@ -3,7 +3,7 @@
 ** Created by Rayn on 2016/02/13
 */
 #include "catch.hpp"
-#include "../Array.h"
+#include "../Src/Array.h"
 
 
 TEST_CASE("array template", "[array]") {

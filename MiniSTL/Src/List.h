@@ -20,9 +20,11 @@ namespace rayn {
     // List Node
     template <class T>
     struct __list_node {
-        __list_node* prev;
-        __list_node* next;
-        T data;
+        typedef __list_node*    __node_ptr;
+
+        __node_ptr  prev;
+        __node_ptr  next;
+        T           data;
 
         __list_node(const T& d, __list_node* p, __list_node* n) :
             data(d), prev(p), next(n) {}
@@ -31,6 +33,7 @@ namespace rayn {
             return data == other.data && prev == other.prev
                 && next == other.next;
         }
+
     };
 
     // List Iterator
@@ -183,7 +186,7 @@ namespace rayn {
     protected:
         typedef __list_node<T>                      list_node;
         typedef allocator<list_node>                node_allocator;
-        typedef list_node*                          link_type;
+
     public:
         typedef T                                   value_type;
         typedef T&                                  reference;
@@ -196,78 +199,56 @@ namespace rayn {
         typedef ptrdiff_t                           difference_type;
 
     protected:
-        link_type node;
+        list_node* node;
 
     public:
         // Default Constructor
         list() {
-            this->empty_initialize();
+            empty_initialize();
         }
         // Constructor with count elements.
         explicit list(size_type count) {
-            this->empty_initialize();
-            this->insert(end(), count, value_type());
+            empty_initialize();
+            insert(end(), count, value_type());
         }
         list(size_type count, const value_type& value) {
-            this->empty_initialize();
-            this->fill_initialize(count, value);
+            empty_initialize();
+            fill_initialize(count, value);
         }
         // Contructor with Range [first, last).
         template <class InputIterator>
         list(InputIterator first, InputIterator last) {
-            this->empty_initialize();
-            this->insert(end(), first, last);
+            typedef typename rayn::is_integral<InputIterator>::type Integer;
+            empty_initialize();
+            initialize_dispatch(first, last, Integer());
         }
         // Copy Contructor
         list(const list& other) {
-            this->empty_initialize();
-            iterator first = other.begin();
-            iterator last = other.end();
-            for (auto it = first; it != last; ++it) {
-                this->push_back(*it);
-            }
+            empty_initialize();
+            initialize_dispatch(other.begin(), other.end(), false_type());
         }
         // Move Contructor
         list(list&& other) {
-            this->empty_initialize();
-            this->swap(other);
+            empty_initialize();
+            swap(other);
         }
         // Default Destroy Function
         ~list() {
-            this->clear();
+            clear();
         }
 
         list& operator= (const list& other) {
-            this->assign(other.begin(), other.end());
-        }
-        list& operator= (list&& other) {
-            this->clear();
-            this->swap(other);
+            assign(other.begin(), other.end());
             return *this;
         }
 
         void assign(size_type count, const T& value) {
-            iterator it = begin();
-            for (; it != end() && count > 0; ++it, --count) {
-                *it = value;
-            }
-            if (count > 0) {
-                this->insert(end(), count, value);
-            } else {
-                this->erase(it, end());
-            }
+            fill_assign(count, value);
         }
         template <class InputIterator>
         void assign(InputIterator first, InputIterator last) {
-            iterator first1 = begin(), last1 = end();
-            for (; first1 != last1, first != last;  ++first1, ++first) {
-                *first1 = *first;
-            }
-            if (first == last) {
-                this->erase(first1, last1);
-            } else {
-                this->insert(last1, first, last);
-            }
+            typedef typename rayn::is_integral<InputIterator>::type Integer;
+            assign_dispatch(first, last, Integer());
         }
 
         reference       front()         { return *begin(); }
@@ -341,34 +322,73 @@ namespace rayn {
         void sort(Compare comp);
 
     protected:
-        link_type get_node() {
+        list_node* get_node() {
             return node_allocator::allocate();
         }
-        void put_node(link_type p) {
+        void put_node(list_node* p) {
             node_allocator::deallocate(p);
         }
-        link_type create_node(const value_type& value) {
-            link_type p = get_node();
+        list_node* create_node(const value_type& value) {
+            list_node* p = get_node();
             rayn::construct(&(p->data), value);
             return p;
         }
-        void destory_node(link_type p) {
+        void destory_node(list_node* p) {
             rayn::destroy(&(p->data));
             put_node(p);
         }
+
+        // initialize helper
         void empty_initialize() {
             node = get_node();
             node->next = node;
             node->prev = node;
         }
-        void fill_initialize(size_type n, const value_type& x) {
-            for (; n; --n)  {
-                push_back(x);
+        template <class Integer>
+        void initialize_dispatch(Integer count, Integer value, rayn::true_type) {
+            fill_initialize(static_cast<size_type>(count), value);
+        }
+        template <class InputIterator>
+        void initialize_dispatch(InputIterator first, InputIterator last, rayn::false_type) {
+            for (; first != last; ++first) {
+                push_back(*first);
             }
         }
-        iterator _const_cast(const_iterator cit) {
-            return iterator(const_cast<link_type>(cit.node));
+        void fill_initialize(size_type count, const value_type& value) {
+            for (; count; --count)  {
+                push_back(value);
+            }
         }
+
+        // assign helper
+        template <class Integer>
+        void assign_dispatch(Integer count, Integer value, rayn::true_type) {
+            fill_assign(static_cast<size_type>(count), value);
+        }
+        template <class InputIterator>
+        void assign_dispatch(InputIterator first2, InputIterator last2, rayn::false_type) {
+            iterator first1 = begin(), last1 = end();
+            for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
+                *first1 = *first2;
+            }
+            if (first2 == last2) {
+                erase(first1, last1);
+            } else {
+                insert(last1, first2, last2);
+            }
+        }
+        void fill_assign(size_type count, const value_type& value) {
+            iterator it = begin();
+            for (; it != end() && count > 0; ++it, --count) {
+                *it = value;
+            }
+            if (count > 0) {
+                insert(end(), count, value);
+            } else {
+                erase(it, end());
+            }
+        }
+
         /*
         ** @brief   Move [first, last) to the front of position.
         */
@@ -377,7 +397,7 @@ namespace rayn {
                 last.node->prev->next = position.node;
                 first.node->prev->next = last.node;
                 position.node->prev->next = first.node;
-                __list_node_base* tmp = position.node->prev;
+                list_node* tmp = position.node->prev;
                 position.node->prev = last.node->prev;
                 last.node->prev = first.node->prev;
                 first.node->prev = tmp;
@@ -387,9 +407,9 @@ namespace rayn {
 
     template <class T>
     void list<T>::clear() {
-        link_type cur = node->next;
+        list_node* cur = node->next;
         while (cur != node) {
-            link_type tmp = cur;
+            list_node* tmp = cur;
             cur = cur->next;
             destory_node(tmp);
         }
@@ -412,13 +432,13 @@ namespace rayn {
     template <class T>
     typename list<T>::iterator
         list<T>::insert(const_iterator position, size_type count, const T& value) {
-        if (n) {
-            list tmp(n, value);
+        if (count) {
+            list tmp(count, value);
             iterator it = tmp.begin();
             splice(position, tmp);
             return it;
         }
-        return iterator(position);
+        return iterator(position._const_cast());
     }
 
     template <class T>
@@ -437,20 +457,21 @@ namespace rayn {
     template <class T>
     typename list<T>::iterator
         list<T>::erase(const_iterator position) {
-        link_type next_node = position.node->next;
-        link_type prev_node = position.node->prev;
+        list_node* next_node = position.node->next;
+        list_node* prev_node = position.node->prev;
         prev_node->next = next_node;
         next_node->prev = prev_node;
-        destory_node(position.node);
-        return next_node;
+        destory_node(position._const_cast().node);
+        return iterator(next_node);
     }
+
     template <class T>
     typename list<T>::iterator
         list<T>::erase(const_iterator first, const_iterator last) {
         while (first != last) {
             first = erase(first);
         }
-        return last;
+        return last._const_cast();
     }
 
     template <class T>
@@ -464,6 +485,7 @@ namespace rayn {
             insert(end(), count - len, T());
         }
     }
+
     template <class T>
     void list<T>::resize(size_type count, const T& value) {
         iterator it = begin();
@@ -498,6 +520,7 @@ namespace rayn {
             transfer(last1, first2, last2);
         }
     }
+
     template <class T>
     template <class Compare>
     void list<T>::merge(list& other, Compare comp) {
@@ -523,6 +546,7 @@ namespace rayn {
             transfer(position._const_cast(), other.begin(), other.end());
         }
     }
+
     template <class T>
     void list<T>::splice(const_iterator position, list& other, const_iterator it) {
         iterator next = it;
@@ -530,6 +554,7 @@ namespace rayn {
         if (position == it || position == next) return;
         transfer(position._const_cast(), it, next);
     }
+
     template <class T>
     void list<T>::splice(const_iterator position, list& other, const_iterator first,
                          const_iterator last) {
@@ -550,6 +575,7 @@ namespace rayn {
             first = ++next;
         }
     }
+
     template <class T>
     template <class UnaryPredicate>
     void list<T>::remove_if(UnaryPredicate p) {
@@ -594,6 +620,7 @@ namespace rayn {
         }
 
     }
+
     template <class T>
     template <class BinaryPredicate>
     void list<T>::unique(BinaryPredicate p) {
@@ -635,6 +662,7 @@ namespace rayn {
         }
         this->swap(counter[fill - 1]);
     }
+
     template <class T>
     template <class Compare>
     void list<T>::sort(Compare comp) {
@@ -671,10 +699,12 @@ namespace rayn {
         }
         return first1 == end1 && first2 == end2;
     }
+
     template <class T>
     inline bool operator!= (list<T>& lhs, list<T>& rhs) {
         return !(lhs == rhs);
     }
+
     template <class T>
     inline bool operator< (list<T>& lhs, list<T>& rhs) {
         typedef typename list<T>::const_iterator const_iterator;
@@ -690,18 +720,22 @@ namespace rayn {
         }
         return first2 != end2;
     }
+
     template <class T>
     inline bool operator<= (list<T>& lhs, list<T>& rhs) {
         return !(rhs < lhs);
     }
+
     template <class T>
     inline bool operator> (list<T>& lhs, list<T>& rhs) {
         return rhs < lhs;
     }
+
     template <class T>
     inline bool operator>= (list<T>& lhs, list<T>& rhs) {
         return !(lhs < rhs);
     }
+
     template <class T>
     inline void swap(list<T>& lhs, list<T>& rhs) {
         lhs.swap(rhs);

@@ -18,83 +18,80 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Alloc.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Construct.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Iterator.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TypeTraits.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Uninitialized.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Allocator.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ReverseIterator.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="AlgoBase.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Algorithm.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Algo.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="String.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="List.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Deque.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Stack.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Queue.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Heap.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Pair.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Functional.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Tree.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="UnitTest\catch.hpp">
       <Filter>测试</Filter>
     </ClInclude>
-    <ClInclude Include="Move.h">
+    <ClInclude Include="Src\Algo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Utility.h">
+    <ClInclude Include="Src\AlgoBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Array.h">
+    <ClInclude Include="Src\Algorithm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Alloc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Allocator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Construct.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Array.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Heap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Iterator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Deque.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Functional.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\List.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Pair.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Move.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Queue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ReverseIterator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\String.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Stack.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Tree.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\TypeTraits.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Uninitialized.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Utility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Vector.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Alloc.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="UnitTest\TestSTL.cpp">
       <Filter>测试</Filter>
     </ClCompile>
@@ -114,6 +111,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UnitTest\TestList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Alloc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

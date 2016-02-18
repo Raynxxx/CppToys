@@ -3,7 +3,7 @@
 ** Created by Rayn on 2015/12/23
 */
 #include "catch.hpp"
-#include "../String.h"
+#include "../Src/String.h"
 
 TEST_CASE("string constructor", "[string]") {
     rayn::string s1("Hello World!");

@@ -3,8 +3,8 @@
 ** Created by Rayn on 2016/01/29
 */
 #include "catch.hpp"
-#include "../TypeTraits.h"
-#include "../String.h"
+#include "../Src/TypeTraits.h"
+#include "../Src/String.h"
 
 
 TEST_CASE("integral_constant", "[type_traits]") {
