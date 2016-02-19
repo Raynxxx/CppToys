@@ -75,7 +75,6 @@ TEST_CASE("list element access", "[list]") {
     REQUIRE(lst.back() == 56);
 }
 
-
 TEST_CASE("list assign", "[list]") {
     rayn::list<int> first;
     rayn::list<int> second;

@@ -21,9 +21,12 @@ C++ STL的自我实现，后期会加入一些额外的组件功能。
 |uninitialized|100%|[Uninitialized.h](Src/Uninitialized.h)|--|
 |type_traits|80%|[TypeTraits.h](Src/TypeTraits.h)|[TestTypeTraits](UnitTest/TestTypeTraits.cpp)|
 |utility|80%|[Utility.h](Src/Utility.h)|[TestUtility](UnitTest/TestUtility.cpp)|
+|functional|40%|[Functional.h](Src/Functional.h)|--|
 |heap|100%|[Heap.h](Src/Heap.h)|--|
-|rb_tree|20%|[Tree.h](Src/Tree.h)|--|
+|rb_tree|50%|[Tree.h](Src/Tree.h)|[TestTree](UnitTest/TestTree.cpp)|
+|hashtable|--|--|--|
 |pair|100%|[Pair.h](Src/Pair.h)|[TestUtility](UnitTest/TestUtility.cpp)|
+|tuple|--|--|--|
 
 |顺序容器|进度|链接|单元测试|
 |---|---|---|---|
@@ -44,7 +47,7 @@ C++ STL的自我实现，后期会加入一些额外的组件功能。
 
 |关联容器|进度|链接|单元测试|
 |---|---|---|---|
-|set|---|---|---|
+|set|20%|[Set.h](Src/Set.h)|[TestSet](UnitTest/TestSet.cpp)|
 |map|---|---|---|
 |multiset|---|---|---|
 |multimap|---|---|---|

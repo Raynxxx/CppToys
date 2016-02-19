@@ -21,6 +21,7 @@
     <ClInclude Include="Src\Deque.h" />
     <ClInclude Include="Src\Functional.h" />
     <ClInclude Include="Src\Heap.h" />
+    <ClInclude Include="Src\Set.h" />
     <ClInclude Include="Src\Tree.h" />
     <ClInclude Include="UnitTest\catch.hpp" />
     <ClInclude Include="Src\Iterator.h" />
@@ -40,8 +41,10 @@
     <ClCompile Include="Src\Alloc.cpp" />
     <ClCompile Include="UnitTest\TestArray.cpp" />
     <ClCompile Include="UnitTest\TestList.cpp" />
+    <ClCompile Include="UnitTest\TestSet.cpp" />
     <ClCompile Include="UnitTest\TestSTL.cpp" />
     <ClCompile Include="UnitTest\TestString.cpp" />
+    <ClCompile Include="UnitTest\TestTree.cpp" />
     <ClCompile Include="UnitTest\TestTypeTraits.cpp" />
     <ClCompile Include="UnitTest\TestUtility.cpp" />
     <ClCompile Include="UnitTest\TestVector.cpp" />
