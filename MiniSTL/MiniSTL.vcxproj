@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Alloc.cpp" />
+    <ClCompile Include="Src\Tree.cpp" />
     <ClCompile Include="UnitTest\TestArray.cpp" />
     <ClCompile Include="UnitTest\TestList.cpp" />
     <ClCompile Include="UnitTest\TestSet.cpp" />

@@ -6,7 +6,7 @@
 #include "../Src/Tree.h"
 #include "../Src/Functional.h"
 
-
+/*
 TEST_CASE("rb-tree insert_unique", "[rb-tree]") {
     rayn::rb_tree<int, int, rayn::identity<int>, rayn::less<int>> tree;
 
@@ -65,3 +65,4 @@ TEST_CASE("rb-tree find", "[rb-tree]") {
     it = tree.find(78);
     REQUIRE(it == tree.end());
 }
+*/
