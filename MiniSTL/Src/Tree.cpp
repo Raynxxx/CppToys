@@ -120,9 +120,9 @@ namespace rayn {
     _rb_tree_insert_and_rebalance(const bool insert_left,
                                   __rb_tree_node_base* x,
                                   __rb_tree_node_base* pa,
-                                  __rb_tree_node_base*& header)
+                                  __rb_tree_node_base& header)
     {
-        __rb_tree_node_base*& root = header->parent;
+        __rb_tree_node_base*& root = header.parent;
 
         // initialize fields in new node to insert
         x->parent = pa;
@@ -135,20 +135,20 @@ namespace rayn {
         // maintain root, leftmost and rightmost nodes.
         // First node is always inserted left.
         if (insert_left) {
-            // also makes leftmost = x when pa == header
+            // also makes leftmost = x when pa == &header
             pa->left = x;
-            if (pa == header) {
-                header->parent = x;
-                header->right = x;
-            } else if (pa == header->left) {
+            if (pa == &header) {
+                header.parent = x;
+                header.right = x;
+            } else if (pa == header.left) {
                 // maintain leftmost pointing to min node
-                header->left = x;
+                header.left = x;
             }
         } else {
             pa->right = x;
-            if (pa == header->right) {
+            if (pa == header.right) {
                 // maintain rightmost pointing to max node
-                header->right = x;
+                header.right = x;
             }
         }
 
@@ -194,9 +194,92 @@ namespace rayn {
 
 
     __rb_tree_node_base*
-    _rb_tree_rebalance_for_erase(__rb_tree_node_base* const x,
-                                 __rb_tree_node_base*& header)
+    _rb_tree_rebalance_for_erase(__rb_tree_node_base* const z,
+                                 __rb_tree_node_base& header)
     {
-        return nullptr;
+        __rb_tree_node_base*& root = header.parent;
+        __rb_tree_node_base*& leftmost = header.left;
+        __rb_tree_node_base*& rightmost = header.right;
+        __rb_tree_node_base* y = z;
+        __rb_tree_node_base* x = 0;
+        __rb_tree_node_base* x_parent = 0;
+
+        
+        if (y->left == 0) { // z has at most one non-null child.
+            x = y->right;   // x might be null.
+        } else {
+            if (y->right == 0) {    // z has exactly one non-null child.
+                x = y->left;        // x is not null.
+            } else {
+                // z has two non-null children.
+                // Set y to z's successor.  __x might be null.
+                y = z->right;
+                while (y->left != 0) {
+                    y = y->left;
+                }
+                x = y->right;
+            }
+        }
+        if (y != z) {
+            // relink y in place of z.  y is z's successor
+            z->left->parent = y;
+            y->left = z->left;
+            if (y != z->right) {
+                x_parent = y->parent;
+                if (x) {
+                    x->parent = y->parent;
+                }
+                // y must be a left child
+                y->parent->left = x;
+                y->right = z->right;
+                z->right->parent = y;
+            } else {
+                x_parent = y;
+            }
+            if (root == z) {
+                root = y;
+            } else if (z->parent->left == z) {
+                z->parent->left = y;
+            } else {
+                z->parent->right = y;
+            }
+            y->parent = z->parent;
+            rayn::swap(y->color, z->color);
+            y = z;
+            // y now points to node to be actually deleted
+        } else {
+            // y == z
+            x_parent = y->parent;
+            if (x) {
+                x->parent = y->parent;
+            }
+            if (z == root) {
+                root = x;
+            } else if (z->parent->left == z) {
+                z->parent->left = x;
+            } else {
+                z->parent->right = x;
+            }
+            if (leftmost == z) {
+                // z->left must be null also
+                if (z->right == 0) {
+                    leftmost = z->parent;
+                    // makes leftmost == header if z == root
+                } else {
+                    leftmost = __rb_tree_node_base::minimum(x);
+                }
+            }
+            if (rightmost == z) {
+                // z->right must be null also
+                if (z->left == 0) {
+                    rightmost = z->parent;
+                    // makes rightmost == header if z == root
+                } else {
+                    rightmost = __rb_tree_node_base::maximum(x);
+                }
+            }
+        }
+
+        return z;
     }
 }

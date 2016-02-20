@@ -6,7 +6,6 @@
 #include "../Src/Tree.h"
 #include "../Src/Functional.h"
 
-/*
 TEST_CASE("rb-tree insert_unique", "[rb-tree]") {
     rayn::rb_tree<int, int, rayn::identity<int>, rayn::less<int>> tree;
 
@@ -47,6 +46,30 @@ TEST_CASE("rb-tree insert_equal", "[rb-tree]") {
     REQUIRE(*(--tree.end()) == 15);
 }
 
+TEST_CASE("rb-tree erase", "[rb-tree]") {
+    rayn::rb_tree<int, int, rayn::identity<int>, rayn::less<int>> tree;
+
+    REQUIRE(tree.size() == 0);
+
+    tree.insert_equal(10);
+    tree.insert_equal(7);
+    tree.insert_equal(8);
+    tree.insert_equal(15);
+    tree.insert_equal(5);
+    tree.insert_equal(6);
+    tree.insert_equal(6);
+    tree.insert_equal(6);
+
+    REQUIRE(tree.size() == 8);
+
+    tree.erase(5);
+    tree.erase(6);
+
+    REQUIRE(tree.size() == 4);
+    REQUIRE(*tree.begin() == 7);
+    REQUIRE(*(--tree.end()) == 15);
+}
+
 TEST_CASE("rb-tree find", "[rb-tree]") {
     rayn::rb_tree<int, int, rayn::identity<int>, rayn::less<int>> tree;
 
@@ -65,4 +88,3 @@ TEST_CASE("rb-tree find", "[rb-tree]") {
     it = tree.find(78);
     REQUIRE(it == tree.end());
 }
-*/
