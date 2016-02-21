@@ -21,6 +21,9 @@
     <ClInclude Include="Src\Deque.h" />
     <ClInclude Include="Src\Functional.h" />
     <ClInclude Include="Src\Heap.h" />
+    <ClInclude Include="Src\Map.h" />
+    <ClInclude Include="Src\MultiMap.h" />
+    <ClInclude Include="Src\MultiSet.h" />
     <ClInclude Include="Src\Set.h" />
     <ClInclude Include="Src\Tree.h" />
     <ClInclude Include="UnitTest\catch.hpp" />
@@ -42,6 +45,7 @@
     <ClCompile Include="Src\Tree.cpp" />
     <ClCompile Include="UnitTest\TestArray.cpp" />
     <ClCompile Include="UnitTest\TestList.cpp" />
+    <ClCompile Include="UnitTest\TestMap.cpp" />
     <ClCompile Include="UnitTest\TestSet.cpp" />
     <ClCompile Include="UnitTest\TestSTL.cpp" />
     <ClCompile Include="UnitTest\TestString.cpp" />

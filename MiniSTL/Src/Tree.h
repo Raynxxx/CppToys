@@ -250,11 +250,11 @@ namespace rayn {
         Compare     key_compare;
 
         base_ptr&       _m_root()               { return header.parent; }
-        const_base_ptr& _m_root() const         { return header.parent; }
+        const_base_ptr  _m_root() const         { return header.parent; }
         base_ptr&       _m_leftmost()           { return header.left; }
-        const_base_ptr& _m_leftmost() const     { return header.left; }
+        const_base_ptr  _m_leftmost() const     { return header.left; }
         base_ptr&       _m_rightmost()          { return header.right; }
-        const_base_ptr& _m_rightmost() const    { return header.right; }
+        const_base_ptr  _m_rightmost() const    { return header.right; }
 
         link_type 
         _m_begin()
@@ -479,17 +479,19 @@ namespace rayn {
         void        swap(rb_tree&);
 
         // modifiers
+        template <typename InputIterator>
+        void
+        assign_unique(InputIterator first, InputIterator last);
+
+        template <typename InputIterator>
+        void
+        assign_equal(InputIterator first, InputIterator last);
+
         pair<iterator, bool>
         insert_unique(const value_type& v);
 
         iterator
         insert_equal(const value_type& v);
-
-        iterator
-        insert_unique(const_iterator pos, const value_type& v);
-
-        iterator
-        insert_equal(const_iterator pos, const value_type& v);
 
         template <typename InputIterator>
         void
@@ -498,8 +500,7 @@ namespace rayn {
         template <typename InputIterator>
         void
         insert_equal(InputIterator first, InputIterator last);
-        
-    public:
+
         iterator
         erase(const_iterator pos) {
             const_iterator ret = pos;
@@ -534,7 +535,7 @@ namespace rayn {
             _m_reset();
         }
 
-        // Set operations.
+        // find operations.
         iterator
         find(const key_type& k);
 
@@ -690,6 +691,7 @@ namespace rayn {
         }
         return Result(x, y);
     }
+
 
     // _m_insert
     template <class Key, class Value, class KeyOfValue, class Compare>
@@ -892,61 +894,6 @@ namespace rayn {
         return *this;
     }
 
-    // equal_range
-    template <class Key, class Value, class KeyOfValue, class Compare>
-    pair<typename rb_tree<Key, Value, KeyOfValue, Compare>::iterator,
-         typename rb_tree<Key, Value, KeyOfValue, Compare>::iterator>
-    rb_tree<Key, Value, KeyOfValue, Compare>::
-    equal_range(const key_type& k)
-    {
-        link_type cur = _m_begin();
-        base_ptr pos = _m_end();
-
-        while (cur != 0) {
-            if (key_compare(_s_key(cur), k)) {
-                cur = _s_right(cur);
-            } else if (key_compare(k, _s_key(cur))) {
-                pos = cur, cur = _s_left(cur);
-            } else {
-                link_type xu(cur);
-                base_ptr yu(pos);
-                pos = cur, cur = _s_left(cur);
-                xu = _s_right(xu);
-                return pair<iterator, iterator>(_m_lower_bound(cur, pos, k),
-                                                _m_upper_bound(xu, yu, k));
-            }
-        }
-        return pair<iterator, iterator>(iterator(pos), iterator(pos));
-    }
-
-    template <class Key, class Value, class KeyOfValue, class Compare>
-    pair<typename rb_tree<Key, Value, KeyOfValue, Compare>::const_iterator,
-         typename rb_tree<Key, Value, KeyOfValue, Compare>::const_iterator>
-    rb_tree<Key, Value, KeyOfValue, Compare>::
-    equal_range(const key_type& k) const
-    {
-        const_link_type cur = _m_begin();
-        const_base_ptr pos = _m_end();
-
-        while (cur != 0) {
-            if (key_compare(_s_key(cur), k)) {
-                cur = _s_right(cur);
-            } else if (key_compare(k, _s_key(cur))) {
-                pos = cur, cur = _s_left(cur);
-            } else {
-                const_link_type xu(cur);
-                const_base_ptr yu(pos);
-                pos = cur, cur = _s_left(cur);
-                xu = _s_right(xu);
-                return pair<const_iterator,
-                            const_iterator>(_m_lower_bound(cur, pos, k),
-                                            _m_upper_bound(xu, yu, k));
-            }
-        }
-        return pair<const_iterator, const_iterator>(iterator(pos),
-                                                    iterator(pos));
-    }
-
     // swap
     template <class Key, class Value, class KeyOfValue, class Compare>
     void
@@ -980,6 +927,32 @@ namespace rayn {
         rayn::swap(key_compare, t.key_compare);
     }
 
+    // assign_unique
+    template <class Key, class Value, class KeyOfValue, class Compare>
+    template <typename InputIterator>
+    void
+    rb_tree<Key, Value, KeyOfValue, Compare>::
+    assign_unique(InputIterator first, InputIterator last)
+    {
+        clear();
+        for (; first != last; ++first) {
+            insert_unique(*first);
+        }
+    }
+
+    // assign_equal
+    template <class Key, class Value, class KeyOfValue, class Compare>
+    template <typename InputIterator>
+    void
+    rb_tree<Key, Value, KeyOfValue, Compare>::
+    assign_equal(InputIterator first, InputIterator last)
+    {
+        clear();
+        for (; first != last; ++first) {
+            insert_equal(*first);
+        }
+    }
+
     // insert_unique
     template <class Key, class Value, class KeyOfValue, class Compare>
     pair<typename rb_tree<Key, Value, KeyOfValue, Compare>::iterator, bool>
@@ -1008,24 +981,6 @@ namespace rayn {
         return _m_insert(insert_pos.first, insert_pos.second, v);
     }
 
-    // insert_unique with hint
-    template <class Key, class Value, class KeyOfValue, class Compare>
-    typename rb_tree<Key, Value, KeyOfValue, Compare>::iterator
-    rb_tree<Key, Value, KeyOfValue, Compare>::
-    insert_unique(const_iterator pos, const value_type& v)
-    {
-
-    }
-
-    // insert_equal with hint
-    template <class Key, class Value, class KeyOfValue, class Compare>
-    typename rb_tree<Key, Value, KeyOfValue, Compare>::iterator
-    rb_tree<Key, Value, KeyOfValue, Compare>::
-    insert_equal(const_iterator pos, const value_type& v)
-    {
-
-    }
-
     // insert_unique with range
     template <class Key, class Value, class KeyOfValue, class Compare>
     template <typename InputIterator>
@@ -1033,7 +988,9 @@ namespace rayn {
     rb_tree<Key, Value, KeyOfValue, Compare>::
     insert_unique(InputIterator first, InputIterator last)
     {
-
+        for (; first != last; ++first) {
+            insert_unique(*first);
+        }
     }
 
     // insert_equal with range
@@ -1043,7 +1000,9 @@ namespace rayn {
     rb_tree<Key, Value, KeyOfValue, Compare>::
     insert_equal(InputIterator first, InputIterator last)
     {
-
+        for (; first != last; ++first) {
+            insert_equal(*first);
+        }
     }
 
     // erase
@@ -1095,6 +1054,62 @@ namespace rayn {
         pair<const_iterator, const_iterator> p = equal_range(k);
         const size_type n = rayn::distance(p.first, p.second);
         return n;
+    }
+
+    // equal_range
+    template <class Key, class Value, class KeyOfValue, class Compare>
+    pair<typename rb_tree<Key, Value, KeyOfValue, Compare>::iterator,
+         typename rb_tree<Key, Value, KeyOfValue, Compare>::iterator>
+    rb_tree<Key, Value, KeyOfValue, Compare>::
+    equal_range(const key_type& k)
+    {
+        link_type cur = _m_begin();
+        base_ptr pos = _m_end();
+
+        while (cur != 0) {
+            if (key_compare(_s_key(cur), k)) {
+                cur = _s_right(cur);
+            } else if (key_compare(k, _s_key(cur))) {
+                pos = cur, cur = _s_left(cur);
+            } else {
+                link_type xu(cur);
+                base_ptr yu(pos);
+                pos = cur, cur = _s_left(cur);
+                xu = _s_right(xu);
+                return pair<iterator, iterator>(_m_lower_bound(cur, pos, k),
+                                                _m_upper_bound(xu, yu, k));
+            }
+        }
+        return pair<iterator, iterator>(iterator(pos), iterator(pos));
+    }
+
+    template <class Key, class Value, class KeyOfValue, class Compare>
+    pair<typename rb_tree<Key, Value, KeyOfValue, Compare>::const_iterator,
+         typename rb_tree<Key, Value, KeyOfValue, Compare>::const_iterator>
+    rb_tree<Key, Value, KeyOfValue, Compare>::
+    equal_range(const key_type& k) const
+    {
+        const_link_type cur = _m_begin();
+        const_base_ptr pos = _m_end();
+
+        while (cur != 0) {
+            if (key_compare(_s_key(cur), k)) {
+                cur = _s_right(cur);
+            } else if (key_compare(k, _s_key(cur))) {
+                pos = cur, cur = _s_left(cur);
+            } else {
+                const_link_type xu(cur);
+                const_base_ptr yu(pos);
+                pos = cur, cur = _s_left(cur);
+                xu = _s_right(xu);
+                return pair<const_iterator,
+                            const_iterator>(_m_lower_bound(cur, pos, k),
+                                            _m_upper_bound(xu, yu, k));
+            }
+        }
+        return pair<const_iterator,
+                    const_iterator>(const_iterator(pos),
+                                    const_iterator(pos));
     }
 }
 

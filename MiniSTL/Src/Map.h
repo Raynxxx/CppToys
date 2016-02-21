@@ -1,68 +1,84 @@
 /*
-** Set.h
-** Created by Rayn on 2016/02/19
+** Map.h
+** Created by Rayn on 2016/02/21
 */
-#ifndef _SET_H_
-#define _SET_H_
+#ifndef _MAP_H_
+#define _MAP_H_
 
 #include "Tree.h"
 #include "Functional.h"
 
 namespace rayn {
 
-    template <class T, class Compare = rayn::less<T>>
-    class set {
+    template <class Key, class T, class Compare = rayn::less<Key>>
+    class map {
     public:
         // public typedefs
-        typedef T           key_type;
-        typedef T           value_type;
-        typedef Compare     key_compare;
-        typedef Compare     value_compare;
+        typedef Key                 key_type;
+        typedef T                   mapped_type;
+        typedef pair<const Key, T>  value_type;
+        typedef Compare             key_compare;
+
+        class value_compare
+        : public binary_function < value_type, value_type, bool >
+        {
+            friend class map<Key, T, Compare>;
+
+        protected:
+            Compare comp;
+
+            value_compare(Compare c) : comp(c) {}
+
+        public:
+            bool operator()(const value_type& x, const value_type& y) const {
+                return comp(x.first, y.first);
+            }
+        };
 
     private:
-        typedef rb_tree<key_type, value_type, identity<value_type>,
+        typedef rb_tree<key_type, value_type, select1st<value_type>,
                         key_compare>    _rep_type;
 
         _rep_type   _m_tree;
 
     public:
         // public typedefs of iterator.
-        typedef typename _rep_type::const_pointer           pointer;
+        typedef typename _rep_type::pointer                 pointer;
         typedef typename _rep_type::const_pointer           const_pointer;
-        typedef typename _rep_type::const_reference         reference;
+        typedef typename _rep_type::reference               reference;
         typedef typename _rep_type::const_reference         const_reference;
-        typedef typename _rep_type::const_iterator          iterator;
+        typedef typename _rep_type::iterator                iterator;
         typedef typename _rep_type::const_iterator          const_iterator;
-        typedef typename _rep_type::const_reverse_iterator  reverse_iterator;
+        typedef typename _rep_type::reverse_iterator        reverse_iterator;
         typedef typename _rep_type::const_reverse_iterator  const_reverse_iterator;
         typedef typename _rep_type::size_type               size_type;
         typedef typename _rep_type::difference_type         difference_type;
 
         // constructor/destructor
-        set() : _m_tree() {}
-        
+        map() : _m_tree() {}
+
         explicit
-        set(const Compare& comp) : _m_tree(comp) {}
+        map(const Compare& comp) : _m_tree(comp) {}
 
         template <typename InputIterator>
-        set(InputIterator first, InputIterator last) : _m_tree()
+        map(InputIterator first, InputIterator last) : _m_tree()
         {
             _m_tree.insert_unique(first, last);
         }
 
         template <typename InputIterator>
-        set(InputIterator first, InputIterator last, const Compare& comp)
-        : _m_tree(comp)
+        map(InputIterator first, InputIterator last, const Compare& comp)
+            : _m_tree(comp)
         {
             _m_tree.insert_unique(first, last);
         }
 
-        set(const set& s) : _m_tree(s._m_tree) {}
+        map(const map& m) : _m_tree(m._m_tree) {}
 
-        set(set&& s) : _m_tree(rayn::move(s._m_tree)) {}
+        map(map&& m) : _m_tree(rayn::move(m._m_tree)) {}
 
-        set& operator=(const set& s) {
-            _m_tree = s._m_tree;
+        map& operator=(const map& m) {
+            _m_tree = m._m_tree;
             return *this;
         }
 
@@ -120,8 +136,18 @@ namespace rayn {
         size_type   size() const        { return _m_tree.size(); }
         size_type   max_size() const    { return _m_tree.max_size(); }
 
+        // Element access
+        mapped_type&
+        operator[] (const key_type& k)
+        {
+            iterator it = lower_bound(k);
+            if (it == end() || key_comp()(k, it->first))
+                it = insert(value_type(k, mapped_type()));
+            return it->second;
+        }
+
         // Modifiers
-        pair<iterator, bool> 
+        pair<iterator, bool>
         insert(const value_type& val)
         {
             pair<typename _rep_type::iterator, bool> ret =
@@ -155,14 +181,14 @@ namespace rayn {
         }
 
         void
-        swap(set& x) { _m_tree.swap(x._m_tree); }
+        swap(map& x) { _m_tree.swap(x._m_tree); }
 
         void
         clear() { _m_tree.clear(); }
 
         // Observers
         key_compare     key_comp() const    { return _m_tree.key_comp(); }
-        value_compare   value_comp() const  { return _m_tree.key_comp(); }
+        value_compare   value_comp() const  { return value_compare(_m_tree.key_comp()); }
 
         // Operations
         iterator
@@ -173,90 +199,55 @@ namespace rayn {
 
         size_type
         count(const key_type& k) const
-        { return _m_tree.find(k) == _m_tree.end() ? 0 : 1; }
+        {
+            return _m_tree.find(k) == _m_tree.end() ? 0 : 1;
+        }
 
         iterator
         lower_bound(const key_type& k)
-        { return _m_tree.lower_bound(k); }
+        {
+            return _m_tree.lower_bound(k);
+        }
 
         const_iterator
         lower_bound(const key_type& k) const
-        { return _m_tree.lower_bound(k); }
+        {
+            return _m_tree.lower_bound(k);
+        }
 
         iterator
         upper_bound(const key_type& k)
-        { return _m_tree.upper_bound(k); }
+        {
+            return _m_tree.upper_bound(k);
+        }
 
         const_iterator
         upper_bound(const key_type& k) const
-        { return _m_tree.upper_bound(k); }
+        {
+            return _m_tree.upper_bound(k);
+        }
 
         pair<iterator, iterator>
         equal_range(const key_type& k)
-        { return _m_tree.equal_range(k); }
+        {
+            return _m_tree.equal_range(k);
+        }
 
         pair<const_iterator, const_iterator>
         equal_range(const key_type& k) const
-        { return _m_tree.equal_range(k); }
+        {
+            return _m_tree.equal_range(k);
+        }
 
         // friend functions
-        template <class T2, class Compare2>
+        template <class Key2, class T2, class Compare2>
         friend bool
-        operator==(const set<T2, Compare2>&, const set<T2, Compare2>&);
+        operator==(const map<Key2, T2, Compare2>&, const map<Key2, T2, Compare2>&);
 
-        template <class T2, class Compare2>
+        template <class Key2, class T2, class Compare2>
         friend bool
-        operator<(const set<T2, Compare2>&, const set<T2, Compare2>&);
+        operator<(const map<Key2, T2, Compare2>&, const map<Key2, T2, Compare2>&);
     };
-
-    template <class T, class Compare>
-    inline bool
-    operator==(const set<T, Compare>& x, const set<T, Compare>& y)
-    {
-        return x._m_tree == y._m_tree;
-    }
-
-    template <class T, class Compare>
-    inline bool
-    operator!=(const set<T, Compare>& x, const set<T, Compare>& y)
-    {
-        return !(x == y);
-    }
-
-    template <class T, class Compare>
-    inline bool
-    operator<(const set<T, Compare>& x, const set<T, Compare>& y)
-    {
-        return x._m_tree < y._m_tree;
-    }
-
-    template <class T, class Compare>
-    inline bool
-    operator>(const set<T, Compare>& x, const set<T, Compare>& y)
-    {
-        return y < x;
-    }
-
-    template <class T, class Compare>
-    inline bool
-    operator<=(const set<T, Compare>& x, const set<T, Compare>& y)
-    {
-        return !(y < x);
-    }
-
-    template <class T, class Compare>
-    inline bool
-    operator>=(const set<T, Compare>& x, const set<T, Compare>& y)
-    {
-        return !(x < y);
-    }
-
-    template <class T, class Compare>
-    inline void
-    swap(const set<T, Compare>& x, const set<T, Compare>& y)
-    {
-        x.swap(y);
-    }
 }
 
 #endif

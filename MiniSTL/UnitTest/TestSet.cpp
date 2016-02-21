@@ -4,3 +4,14 @@
 */
 #include "catch.hpp"
 #include "../Src/Set.h"
+#include "../Src/MultiSet.h"
+
+// *************************************
+// set
+
+TEST_CASE("set constructor", "[set]") {
+
+}
+
+// *************************************
+// multiset

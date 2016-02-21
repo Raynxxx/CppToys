@@ -205,11 +205,11 @@ namespace rayn {
         __rb_tree_node_base* x_parent = 0;
 
         
-        if (y->left == 0) { // z has at most one non-null child.
-            x = y->right;   // x might be null.
+        if (z->left == 0) { // z has at most one non-null child.
+            x = z->right;   // x might be null.
         } else {
-            if (y->right == 0) {    // z has exactly one non-null child.
-                x = y->left;        // x is not null.
+            if (z->right == 0) {    // z has exactly one non-null child.
+                x = z->left;        // x is not null.
             } else {
                 // z has two non-null children.
                 // Set y to z's successor.  __x might be null.
@@ -279,7 +279,70 @@ namespace rayn {
                 }
             }
         }
-
-        return z;
+        if (y->color != _s_red) {
+            while (x != root && (x == 0 || x->color == _s_black)) {
+                if (x == x_parent->left) {
+                    __rb_tree_node_base* w = x_parent->right;
+                    if (w->color == _s_red) {
+                        w->color = _s_black;
+                        x_parent->color = _s_red;
+                        local_rb_tree_rotate_left(x_parent, root);
+                        w = x_parent->right;
+                    }
+                    if ((w->left == 0 || w->left->color == _s_black)
+                        && (w->right == 0 || w->right->color == _s_black)) {
+                        w->color = _s_red;
+                        x = x_parent;
+                        x_parent = x_parent->parent;
+                    } else {
+                        if (w->right == 0 || w->right->color == _s_black) {
+                            w->left->color = _s_black;
+                            w->color = _s_red;
+                            local_rb_tree_rotate_right(w, root);
+                            w = x_parent->right;
+                        }
+                        w->color = x_parent->color;
+                        x_parent->color = _s_black;
+                        if (w->right) {
+                            w->right->color = _s_black;
+                        }
+                        local_rb_tree_rotate_left(x_parent, root);
+                        break;
+                    }
+                } else {
+                    __rb_tree_node_base* w = x_parent->left;
+                    if (w->color == _s_red) {
+                        w->color = _s_black;
+                        x_parent->color = _s_red;
+                        local_rb_tree_rotate_right(x_parent, root);
+                        w = x_parent->left;
+                    }
+                    if ((w->right == 0 || w->right->color == _s_black)
+                        && (w->left == 0 || w->left->color == _s_black)) {
+                        w->color = _s_red;
+                        x = x_parent;
+                        x_parent = x_parent->parent;
+                    } else {
+                        if (w->left == 0 || w->left->color == _s_black) {
+                            w->right->color = _s_black;
+                            w->color = _s_red;
+                            local_rb_tree_rotate_left(w, root);
+                            w = x_parent->left;
+                        }
+                        w->color = x_parent->color;
+                        x_parent->color = _s_black;
+                        if (w->left) {
+                            w->left->color = _s_black;
+                        }
+                        local_rb_tree_rotate_right(x_parent, root);
+                        break;
+                    }
+                }
+            }
+            if (x) {
+                x->color = _s_black;
+            }
+        }
+        return y;
     }
 }
