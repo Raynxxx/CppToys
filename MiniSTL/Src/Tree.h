@@ -6,9 +6,9 @@
 #ifndef _TREE_H_
 #define _TREE_H_
 
+#include "Allocator.h"
 #include "Iterator.h"
 #include "ReverseIterator.h"
-#include "Allocator.h"
 #include "Pair.h"
 #include "AlgoBase.h"
 
@@ -73,7 +73,7 @@ namespace rayn {
     __rb_tree_node_base*
     _rb_tree_decrement(__rb_tree_node_base* node) throw ();
 
-    inline const __rb_tree_node_base*
+    const __rb_tree_node_base*
     _rb_tree_decrement(const __rb_tree_node_base* node) throw ();
 
 
@@ -174,11 +174,11 @@ namespace rayn {
             _m_node = _rb_tree_increment(_m_node);
             return temp;
         }
-        self& operator-- () {
+        self& operator--() {
             _m_node = _rb_tree_decrement(_m_node);
             return *this;
         }
-        self operator-- (int) {
+        self operator--(int) {
             self temp = *this;
             _m_node = _rb_tree_decrement(_m_node);
             return temp;
@@ -406,11 +406,11 @@ namespace rayn {
     public:
         // constructor/destructor
         rb_tree(const Compare& comp = Compare())
-            : header(), node_count(0), key_compare(comp) 
+        : header(), node_count(0), key_compare(comp) 
         { _m_initialize(); }
 
         rb_tree(const rb_tree& other)
-            : header(), node_count(0), key_compare(other.key_compare)
+        : header(), node_count(0), key_compare(other.key_compare)
         {
             if (other._m_root() != 0) {
                 _m_root() = _m_copy(other._m_begin(), _m_end());
@@ -421,7 +421,7 @@ namespace rayn {
         }
 
         rb_tree(rb_tree&& other)
-            : header(), node_count(0), key_compare(other.key_compare)
+        : header(), node_count(0), key_compare(other.key_compare)
         {
             if (other._m_root() != 0) {
                 _m_move_data(other);
@@ -473,7 +473,7 @@ namespace rayn {
         { return const_reverse_iterator(begin()); }
 
         // capacity
-        bool        empty()             { return node_count == 0; }
+        bool        empty() const       { return node_count == 0; }
         size_type   size() const        { return node_count; }
         size_type   max_size() const    { return size_type(-1); }
         void        swap(rb_tree&);

@@ -4,8 +4,9 @@ C++ STL的自我实现，后期会加入一些额外的组件功能。
 * 开发语言 :  C++11
 * 编译环境 :  Visual Studio Community 2013
 * 参考资料1:  STL源码剖析 侯捷著
-* 参考资料2:  gcc 4.9 源码 [点我](https://github.com/gcc-mirror/gcc/tree/master/libstdc%2B%2B-v3/include)
-* 参考资料3:  QTBase 源码 [点我](https://github.com/qtproject/qtbase)
+* 参考资料2:  GCC libstdc++ V3 源码 [点我](https://github.com/gcc-mirror/gcc/tree/master/libstdc%2B%2B-v3/include)
+* 参考资料3:  LLVM libcxx 源码 [点我](https://github.com/llvm-mirror/libcxx)
+* 参考资料4:  QTBase 源码 [点我](https://github.com/qtproject/qtbase)
 
 ## 项目计划
 
@@ -23,7 +24,7 @@ C++ STL的自我实现，后期会加入一些额外的组件功能。
 |utility|80%|[Utility.h](Src/Utility.h)|[TestUtility](UnitTest/TestUtility.cpp)|
 |functional|40%|[Functional.h](Src/Functional.h)|--|
 |heap|100%|[Heap.h](Src/Heap.h)|--|
-|rb_tree|50%|[Tree.h](Src/Tree.h), [Tree.cpp](Src/Tree.cpp)|[TestTree](UnitTest/TestTree.cpp)|
+|rb_tree|90%|[Tree.h](Src/Tree.h), [Tree.cpp](Src/Tree.cpp)|[TestTree](UnitTest/TestTree.cpp)|
 |hashtable|--|--|--|
 |pair|100%|[Pair.h](Src/Pair.h)|[TestUtility](UnitTest/TestUtility.cpp)|
 |tuple|--|--|--|
@@ -45,10 +46,10 @@ C++ STL的自我实现，后期会加入一些额外的组件功能。
 
 |关联容器|进度|链接|单元测试|
 |---|---|---|---|
-|set|100%|[Set.h](Src/Set.h)|[TestSet](UnitTest/TestSet.cpp)|
-|multiset|0%|[MultiSet.h](Src/MultiSet.h)|[TestSet](UnitTest/TestSet.cpp)|
-|map|20%|[Map.h](Src/Map.h)|[TestMap](UnitTest/TestMap.cpp)|
-|multimap|0%|[MultiMap.h](Src/MultiMap.h)|[TestMap](UnitTest/TestMap.cpp)|
+|set|90%|[Set.h](Src/Set.h)|[TestSet](UnitTest/TestSet.cpp)|
+|multiset|90%|[MultiSet.h](Src/MultiSet.h)|[TestSet](UnitTest/TestSet.cpp)|
+|map|90%|[Map.h](Src/Map.h)|[TestMap](UnitTest/TestMap.cpp)|
+|multimap|90%|[MultiMap.h](Src/MultiMap.h)|[TestMap](UnitTest/TestMap.cpp)|
 |unordered_set|---|---|---|
 |unordered_multiset|---|---|---|
 |unordered_map|---|---|---|

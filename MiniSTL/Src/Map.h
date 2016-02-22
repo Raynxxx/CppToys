@@ -141,8 +141,29 @@ namespace rayn {
         operator[] (const key_type& k)
         {
             iterator it = lower_bound(k);
-            if (it == end() || key_comp()(k, it->first))
+            if (it == end() || key_comp()(k, it->first)) {
                 it = insert(value_type(k, mapped_type()));
+            }
+            return it->second;
+        }
+
+        mapped_type&
+        at(const key_type& k)
+        {
+            iterator it = lower_bound(k);
+            if (it == end() || key_comp()(k, it->first)) {
+                throw std::out_of_range("map::at");
+            }
+            return it->second;
+        }
+
+        const mapped_type&
+        at(const key_type& k) const
+        {
+            iterator it = lower_bound(k);
+            if (it == end() || key_comp()(k, it->first)) {
+                throw std::out_of_range("map::at");
+            }
             return it->second;
         }
 
@@ -187,8 +208,13 @@ namespace rayn {
         clear() { _m_tree.clear(); }
 
         // Observers
-        key_compare     key_comp() const    { return _m_tree.key_comp(); }
-        value_compare   value_comp() const  { return value_compare(_m_tree.key_comp()); }
+        key_compare
+        key_comp() const
+        { return _m_tree.key_comp(); }
+
+        value_compare
+        value_comp() const
+        { return value_compare(_m_tree.key_comp()); }
 
         // Operations
         iterator
@@ -248,6 +274,55 @@ namespace rayn {
         friend bool
         operator<(const map<Key2, T2, Compare2>&, const map<Key2, T2, Compare2>&);
     };
+
+    template <class Key, class T, class Compare>
+    inline bool
+    operator==(const map<Key, T, Compare>& x, const map<Key, T, Compare>& y)
+    {
+        return x._m_tree == y._m_tree;
+    }
+
+    template <class Key, class T, class Compare>
+    inline bool
+    operator!=(const map<Key, T, Compare>& x, const map<Key, T, Compare>& y)
+    {
+        return !(x == y);
+    }
+
+    template <class Key, class T, class Compare>
+    inline bool
+    operator<(const map<Key, T, Compare>& x, const map<Key, T, Compare>& y)
+    {
+        return x._m_tree < y._m_tree;
+    }
+
+    template <class Key, class T, class Compare>
+    inline bool
+    operator>(const map<Key, T, Compare>& x, const map<Key, T, Compare>& y)
+    {
+        return y < x;
+    }
+
+    template <class Key, class T, class Compare>
+    inline bool
+    operator<=(const map<Key, T, Compare>& x, const map<Key, T, Compare>& y)
+    {
+        return !(y < x);
+    }
+
+    template <class Key, class T, class Compare>
+    inline bool
+    operator>=(const map<Key, T, Compare>& x, const map<Key, T, Compare>& y)
+    {
+        return !(x < y);
+    }
+
+    template <class Key, class T, class Compare>
+    inline void
+    swap(const map<Key, T, Compare>& x, const map<Key, T, Compare>& y)
+    {
+        x.swap(y);
+    }
 }
 
 #endif
